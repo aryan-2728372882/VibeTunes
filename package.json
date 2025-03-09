@@ -4,6 +4,7 @@
   "description": "FutureStream is a self-hosted music streaming website that allows users to listen to their favorite songs with a modern UI and various functionalities.",
   "main": "index.js",
   "scripts": {
+    "start": "http-server ./", 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
