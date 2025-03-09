@@ -19,6 +19,22 @@
 
     <main>
         <input type="text" id="search-bar" placeholder="Search for songs..." oninput="searchSongs(this.value)">
+
+         <!-- This container will hold the search results, initially hidden -->
+    <div id="search-results-container" class="search-results-container" style="display: none;"></div>
+
+        <!-- ✅ Bhojpuri Songs Section (Horizontal Scrolling) -->
+        <section class="song-section">
+            <h2>Bhojpuri Hits</h2>
+            <div class="scroll-container" id="bhojpuri-list"></div>
+        </section>
+
+        <!-- ✅ Phonk Songs Section (Horizontal Scrolling) -->
+        <section class="song-section">
+            <h2>Phonk Beats</h2>
+            <div class="scroll-container" id="phonk-list"></div>
+        </section>
+
         <div id="song-list"></div>
     </main>
 
@@ -33,11 +49,11 @@
             </div>
         </div>
         <div class="player-controls">
-            <button onclick="toggleShuffle()">🔀</button>
+            <button id="shuffle-btn" onclick="toggleShuffle()">🔀</button>
             <button onclick="previousSong()">⏮</button>
             <button id="play-pause-btn" onclick="togglePlay()">▶</button>
             <button onclick="nextSong()">⏭</button>
-            <button onclick="toggleRepeat()">🔁</button>
+            <button id="repeat-btn" onclick="toggleRepeat()">🔁</button> <!-- ✅ Fixed! -->
             <input type="range" id="volume-bar" value="100" max="100" step="1" oninput="changeVolume(this.value)">
         </div>
     </div>
@@ -47,6 +63,5 @@
     </footer>
 
     <script src="scripts/player.js"></script>
-    <script src="scripts/auth.js"></script>
 </body>
 </html>
