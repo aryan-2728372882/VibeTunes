@@ -198,12 +198,31 @@ function searchSongs(query) {
     }
 }
 
-// Modified initialization
-document.addEventListener("DOMContentLoaded", () => {
-    displayFixedSections();
-    loadSearchSongs();
-    changeVolume(300); // Set initial volume to max 300
-});
+// Smart title splitting with fallback
+function balanceSongTitles() {
+    document.querySelectorAll('.song-title').forEach(title => {
+        const text = title.textContent.trim();
+        if (text.length > 25) {
+            const third = Math.floor(text.length / 3);
+            const firstBreak = text.indexOf(' ', third);
+            const secondBreak = text.indexOf(' ', third * 2);
+            
+            let formatted = text;
+            if (firstBreak > -1 && secondBreak > -1) {
+                formatted = [
+                    text.slice(0, firstBreak),
+                    text.slice(firstBreak+1, secondBreak),
+                    text.slice(secondBreak+1)
+                ].join('\n');
+            }
+            title.innerHTML = formatted.replace(/\n/g, '<br>');
+        }
+    });
+}
+
+// Run on load and resize
+window.addEventListener('load', balanceSongTitles);
+window.addEventListener('resize', balanceSongTitles);
 
 // Playback Control
 function playSong(title, context) {
@@ -239,6 +258,13 @@ function playSong(title, context) {
             showPopup("Error playing song!");
         });
 }
+
+// Remove the duplicate at the bottom and keep this one
+document.addEventListener("DOMContentLoaded", () => {
+    displayFixedSections();
+    loadSearchSongs();
+    changeVolume(100); // This sets volume to 100% (300/300)
+});
 
 async function handleSongEnd() {
     console.log("Current Song Index Before:", currentSongIndex);
@@ -341,35 +367,6 @@ function toggleRepeat() {
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
 }
 
-function toggleShuffle() {
-    shuffleMode = !shuffleMode;
-    const shuffleBtn = document.querySelector("#shuffle-btn");
-    shuffleBtn.textContent = shuffleMode ? '🔀' : '🔄';
-    showPopup(shuffleMode ? 'Shuffle On' : 'Shuffle Off');
-    if (shuffleMode) {
-        currentPlaylist = shuffleArray(currentPlaylist);
-    } else {
-        // Reset to default playlist order if shuffle is turned off
-        if (currentContext === 'bhojpuri') {
-            currentPlaylist = fixedBhojpuri;
-        } else if (currentContext === 'phonk') {
-            currentPlaylist = fixedPhonk;
-        }
-    }
-    playSong(currentPlaylist[currentSongIndex].title, currentContext);
-}
-
-// Shuffle the playlist
-function shuffleArray(array) {
-    let shuffledArray = [...array];
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-    }
-    return shuffledArray;
-}
-
-
 // UI Updates
 function updatePlayerUI(song) {
     document.getElementById("player-thumbnail").src = song.thumbnail;
@@ -415,9 +412,10 @@ function seekSong(value) {
 
 // Modified changeVolume function
 function changeVolume(value) {
-    const volumeValue = Math.min(value / 300, 1); // Cap at 100% actual volume
+    // Change these two lines:
+    const volumeValue = value / 100;  // Now 100% = full volume
     audioPlayer.volume = volumeValue;
-    document.getElementById("volume-percentage").textContent = `${Math.round((volumeValue * 100))}%`;
+    document.getElementById("volume-percentage").textContent = `${value}%`;
 }
 
 // Initialization

@@ -689,3 +689,33 @@ footer {
     }
 }
 
+/* Hide all volume controls permanently */
+.volume-controls, 
+#volume-controls, 
+.volume-slider, 
+#volume-bar, 
+#volume-label, 
+.volume-icon {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+}
+
+/* Adjust player layout for removed controls */
+#music-player {
+    padding-right: 1rem !important; /* Compensate removed volume space */
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .player-controls {
+        margin-right: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    #music-player {
+        grid-template-columns: [thumbnail] 40px [info] 1fr [controls] auto;
+    }
+}
