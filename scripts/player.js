@@ -3,32 +3,32 @@ const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Kehu%20Ke%20Na%20Daal%20Gali%20Koiri%20Ke%20Raaj%20Chali(Khesari2.IN).mp3",
-        "thumbnail": "https://i.ytimg.com/vi/EW_WZlX191Q/hqdefault.jpg"
+        "thumbnail": "https://i.ytimg.com/vi/emeEWLXozqg/maxresdefault.jpg"
     },
     {
         "title": "Namariya Kamar Mei Khos Deb",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23VIDEO%20%23SAMAR%20SINGH%20%20Namariya%20Kamariya%20Me%20Khos%20Deb%20%20%23Shilpi%20Raj%2C%20%23Akanksha%20Dubey%20%23BhojpuriSong.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/sDF_O4OIuwI/maxresdefault.jpg"
+        "thumbnail": "https://i.ytimg.com/vi/iie1dxZtNNA/maxresdefault.jpg"
     },
     {
         "title": "UdanBaj Rajau",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23Viral%20Song%20%20Shilpi%20Raj%20%20%E0%A4%89%E0%A5%9C%E0%A4%A8%E0%A4%AC%E0%A4%9C%20%E0%A4%B0%E0%A4%9C%E0%A4%8A%20%20Feat%20_%20Anisha%20Pandey%20%20Udanbaj%20Rajau%20%20Bhojpuri%20Song%202025.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/8Ho2qllF-A4/maxresdefault.jpg"
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/Rz4W8evbxD/4W87jx2L3x/size_m.jpg"
     },
     {
         "title": "Chuwe Mor Jawani",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23video%20%20%E0%A4%9A%E0%A4%B5%20%E0%A4%AE%E0%A4%B0%20%E0%A4%9C%E0%A4%B5%E0%A4%A8%20%20%23samarsingh%20%20Chuwe%20Mor%20Jawani%20%20%23bhojpuri%20Song%202024.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/hdgoRaPKyOI/maxresdefault.jpg"
+        "thumbnail": "https://c.saavncdn.com/405/Chuwe-Mor-Jawani-Bhojpuri-2024-20240417122251-500x500.jpg"
     },
     {
-        "title": "Bali rei Umariya kei",
+        "title": "Balma Kadar na Jane",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%B0%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/BVrJfw2FvBc/maxresdefault.jpg"
+        "thumbnail": "https://c.saavncdn.com/659/Balma-Kadar-Na-Jane-Bhojpuri-2024-20241022172505-500x500.jpg"
     },
     {
         "title": "Babuan",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Babuaan%20Sooryavansham%20320%20Kbps.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/0HiTKE2-NV0/maxresdefault.jpg"
+        "thumbnail": "https://i.ytimg.com/vi/WpEHdFDDX00/maxresdefault.jpg"
     },
     {
         "title": "Makaiya Mei Raja ji",
@@ -38,17 +38,17 @@ const fixedBhojpuri = [
     {
         "title": "pahin ke chali bikini",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Pahin%20Ke%20Chali%20Bikini%20Purav%20Jha%20320%20Kbps.mp3",
-        "thumbnail": "https://www.lyricsphone.com/wp-content/uploads/2024/11/Pahin-Ke-Chale-Bikini-Lyrics.jpeg"
+        "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/e7/7b/45e77b91-40ee-526c-6df5-6ab7fc13fb3b/cover.jpg/1200x1200bf-60.jpg"
     },
     {
         "title": "Balamua ke balam",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Balamuwa%20Ke%20Ballam(KoshalWorld.Com).mp3",
-        "thumbnail": "https://i.ytimg.com/vi/oYO3P0CY_V0/maxresdefault.jpg"
+        "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4f/10/9d/4f109d9e-8280-d699-4c74-dcd7467a22c3/8905713725498_cover.jpg/800x800cc.jpg"
     },
     {
         "title": "samastipur jila ha",
         "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A1%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/jNDgdhA6-Vg/maxresdefault.jpg"
+        "thumbnail": "https://i.ytimg.com/vi/-EBdpD_aGls/maxresdefault.jpg"
     }
 ];
 
