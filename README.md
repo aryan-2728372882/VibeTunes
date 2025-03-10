@@ -1,18 +1,35 @@
-# FutureStream
+# FutureStream 
 
-FutureStream is a self-hosted music streaming website that allows users to listen to their favorite songs with a modern UI and various functionalities.
+FutureStream is a modern, self-hosted music streaming platform with a focus on regional content and phonk music, featuring a responsive UI and robust player controls.
 
-## Features
-- Music player controls (play, pause, next, previous, volume control, etc.)
-- User authentication (login, signup, Google login)
-- Dynamic song fetching from songs.json
-- Dark & light mode toggle
-- Search and filter options
-- Contact form for inquiries
+![Demo](https://via.placeholder.com/800x400.png?text=FutureStream+Demo) *Replace with actual demo image*
 
-## Installation
-1. Clone the repository.
-2. Open `index.html` in your browser to start using FutureStream.
+## ✨ Features
 
-## License
-This project is licensed under the MIT License.
+**Core Functionality**
+- 🎶 Multi-source music playback (Bhojpuri, Phonk & Search results)
+- 🔊 Volume boost support (up to 300%)
+- 🔄 Playback modes: Shuffle, Repeat (All/One)
+- ⏩ Smart song skipping with retry logic
+- 🔍 Real-time search with horizontal scroll
+
+**Content Management**
+- 📁 Local JSON integration for song management
+- 🖼️ Dynamic thumbnail loading
+- 📲 Responsive mobile-first design
+- 📩 Functional contact form
+
+**Advanced Player Features**
+- 🎛️ Interactive seek bar with progress tracking
+- 🔄 Automatic playlist continuation
+- ⚡ Performance-optimized loading
+- 📊 Volume percentage display
+- 💾 Persistent player state
+
+## 🚀 Installation & Setup
+
+**Basic Usage**
+```bash
+git clone https://github.com/yourusername/FutureStream.git
+cd FutureStream
+# Open index.html in any modern browser

@@ -13,12 +13,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 0.5rem 1rem; /* Reduced padding */
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 1000;
+    min-height: 50px; /* Fixed minimum height */
 }
 
 .site-name {
@@ -576,31 +577,58 @@ footer {
     100% { opacity: 0; transform: translate(-50%, -45%); }
 }
 
-/* Logo Styling - Optimized for All Devices */
+/* Logo Styles */
 .logo {
-    width: 100px;         /* Default size for PC */
-    height: auto;         /* Maintain aspect ratio */
-    max-width: 100%;      /* Prevents oversizing */
-    object-fit: contain;  /* Ensures proper scaling */
-    display: block;
+    width: 60px; /* Reduced base size */
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0; /* Prevent shrinking */
+    margin-right: auto; /* Push nav links to right */
 }
 
-/* Responsive Adjustments */
-@media (max-width: 1024px) { 
-    .logo {
-        width: 90px; /* Slightly smaller for smaller screens */
-    }
+/* Nav Links */
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-left: auto; /* Maintain right alignment */
+    padding: 0 1rem;
 }
 
+/* Mobile Optimization */
 @media (max-width: 768px) {
+    .navbar {
+        padding: 0.5rem; /* Tighter padding */
+        min-height: 45px; /* Reduced height */
+    }
+    
     .logo {
-        width: 80px; /* Tablet size */
+        width: 50px; /* Smaller logo */
+    }
+    
+    .nav-links {
+        gap: 1rem; /* Reduced spacing */
+        font-size: 0.9rem; /* Smaller text */
+    }
+    
+    .site-name {
+        display: none; /* Hide if empty */
     }
 }
 
+/* Small Mobile Screens */
 @media (max-width: 480px) {
+    .navbar {
+        padding: 0.25rem; /* Minimal padding */
+        min-height: 40px;
+    }
+    
     .logo {
-        width: 70px; /* Mobile size */
+        width: 45px; /* Compact logo */
+    }
+    
+    .nav-links {
+        gap: 0.75rem;
+        font-size: 0.85rem; /* Smaller text */
     }
 }
 
