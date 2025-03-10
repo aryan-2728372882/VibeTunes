@@ -9,7 +9,10 @@
 <body>
     <header>
         <div class="navbar">
-            <h1 class="site-name">VibeTunes</h1>
+            <a href="index.html">
+                <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
+            </a>
+            <h1 class="site-name"></h1>
             <nav class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="contact.html">Contact Us</a>
@@ -20,16 +23,19 @@
     <main>
         <input type="text" id="search-bar" placeholder="Search for songs..." oninput="searchSongs(this.value)">
 
-         <!-- This container will hold the search results, initially hidden -->
-    <div id="search-results-container" class="search-results-container" style="display: none;"></div>
+        <!-- Updated Search Results Section -->
+        <div id="search-results-container" class="song-section" style="display: none;">
+            <h2>Search Results</h2>
+            <div class="scroll-container"></div>
+        </div>
 
-        <!-- ✅ Bhojpuri Songs Section (Horizontal Scrolling) -->
+        <!-- Bhojpuri Songs Section -->
         <section class="song-section">
             <h2>Bhojpuri Hits</h2>
             <div class="scroll-container" id="bhojpuri-list"></div>
         </section>
 
-        <!-- ✅ Phonk Songs Section (Horizontal Scrolling) -->
+        <!-- Phonk Songs Section -->
         <section class="song-section">
             <h2>Phonk Beats</h2>
             <div class="scroll-container" id="phonk-list"></div>
@@ -38,7 +44,7 @@
         <div id="song-list"></div>
     </main>
 
-    <!-- Floating Music Player -->
+    <!-- Music Player -->
     <div id="music-player">
         <div class="player-info">
             <img id="player-thumbnail" src="" alt="Thumbnail">
@@ -53,7 +59,7 @@
             <button onclick="previousSong()">⏮</button>
             <button id="play-pause-btn" onclick="togglePlay()">▶</button>
             <button onclick="nextSong()">⏭</button>
-            <button id="repeat-btn" onclick="toggleRepeat()">🔁</button> <!-- ✅ Fixed! -->
+            <button id="repeat-btn" onclick="toggleRepeat()">🔁</button>
             <input type="range" id="volume-bar" value="100" max="100" step="1" oninput="changeVolume(this.value)">
         </div>
     </div>

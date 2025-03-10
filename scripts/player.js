@@ -54,14 +54,54 @@ const fixedBhojpuri = [
 
 const fixedPhonk = [
     {
-        "title": "Phonk Beat 1",
-        "link": "PHONK_SONG_LINK_1",
-        "thumbnail": "PHONK_THUMBNAIL_1"
+        "title": "NEXT!",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/NEXT!.mp3",
+        "thumbnail": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84653ce7dc85f2716164d9c664"
     },
     {
-        "title": "Phonk Beat 2",
-        "link": "PHONK_SONG_LINK_2",
-        "thumbnail": "PHONK_THUMBNAIL_2"
+        "title": "Death Is No More X SleepWalker",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/death%20in%20no%20more%20x%20sleepwalker.mp3",
+        "thumbnail": "https://i.ytimg.com/vi/aO_ZcbgdBHs/maxresdefault.jpg"
+    },
+    {
+        "title": "Matushka UltraFunk",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/M%F0%9D%9A%8A%F0%9D%9A%9D%F0%9D%9A%9E%F0%9D%9A%9C%F0%9D%9A%91%F0%9D%9A%94%F0%9D%9A%8A%20%20U%F0%9D%9A%95%F0%9D%9A%9D%F0%9D%9A%9B%F0%9D%9A%8A%F0%9D%9A%8F%F0%9D%9A%9E%F0%9D%9A%97%F0%9D%9A%94.mp3",
+        "thumbnail": "https://i.ytimg.com/vi/Hq6mo6lhDMM/hqdefault.jpg"
+    },
+    {
+        "title": "Next Up!",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/NEXT%20UP!.mp3",
+        "thumbnail": "https://i1.sndcdn.com/artworks-KmDFHGS2abNxivGQ-koMlyw-t500x500.jpg"
+    },
+    {
+        "title": "Empire",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/EMPIRE.mp3",
+        "thumbnail": "https://i.ytimg.com/vi/FaWzBc-RUA0/maxresdefault.jpg"
+    },
+    {
+        "title": "Funk of Galactico",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/Funk%20of%20Gal%C3%A1ctico.mp3",
+        "thumbnail": "https://i.ytimg.com/vi/VH9EF4QpI4A/maxresdefault.jpg"
+    },
+    {
+        "title": "Acordeão Funk",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/Acorde%C3%A3o%20Funk.mp3",
+        "thumbnail": "https://i.ytimg.com/vi/-ELVoLmlSpU/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGBYgcigxMA8=&rs=AOn4CLBoSiMTQsIhkgEGi-_-wKzsTngy0Q"
+    },
+    {
+        "title": "Glory",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/GLORY.mp3",
+        "thumbnail": "https://i.ytimg.com/vi/Q5chHwL1Fhg/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AG2CIACuAiKAgwIABABGH8gEygTMA8=&rs=AOn4CLBgyb9jPITWD_-cfTZ1ayQYKGlGTg"
+    },
+    {
+        "title": "Slay",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/SLAY!.mp3",
+        "thumbnail": "https://i.ytimg.com/vi/cpVgKG-5EK4/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGBMgGSh_MA8=&rs=AOn4CLBas-BI0W9ds6L03EMbJbrTu7meCw"
+    },
+    {
+        "title": "DERNIERE DANCE FUNK",
+        "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/DERNIERE%20DANCE%20FUNK.mp3",
+        "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d7/e9/ed/d7e9ed7d-8223-f1ea-c0b4-95e75073ea15/cover.jpg/800x800cc.jpg"
     },
     // Add remaining 8 Phonk songs in same format
     // ...
@@ -119,19 +159,22 @@ function loadSearchSongs() {
     }).catch(console.error);
 }
 
+// Modified searchSongs function
 function searchSongs(query) {
-    const searchContainer = document.getElementById('search-results-container');
-    searchContainer.innerHTML = '';  // Clear any previous results
-
+    const searchSection = document.getElementById('search-results-container');
+    const searchContainer = searchSection.querySelector('.scroll-container');
+    
     if (!query.trim()) {
-        searchContainer.style.display = 'none';  // Hide results if query is empty
+        searchSection.style.display = 'none';
         return;
     }
 
     const results = searchSongsList.filter(song =>
-        song.title.toLowerCase().includes(query.toLowerCase())  // Filter songs based on the query
+        song.title.toLowerCase().includes(query.toLowerCase())
     );
 
+    searchContainer.innerHTML = '';
+    
     if (results.length) {
         results.forEach(song => {
             const songElement = document.createElement('div');
@@ -148,12 +191,19 @@ function searchSongs(query) {
 
         currentPlaylist = results;
         currentContext = 'search';
-        searchContainer.style.display = 'flex';  // Show the search results container
+        searchSection.style.display = 'block';
     } else {
         searchContainer.innerHTML = '<p>No songs found</p>';
-        searchContainer.style.display = 'flex';  // Show the container even if no results
+        searchSection.style.display = 'block';
     }
 }
+
+// Modified initialization
+document.addEventListener("DOMContentLoaded", () => {
+    displayFixedSections();
+    loadSearchSongs();
+    changeVolume(300); // Set initial volume to max 300
+});
 
 // Playback Control
 function playSong(title, context) {
@@ -272,7 +322,6 @@ async function handleSongEnd() {
     updatePlayPauseButton(); // Sync the play/pause button when a new song starts playing
 }
 
-
 // Navigation Controls
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
@@ -364,9 +413,11 @@ function seekSong(value) {
     audioPlayer.currentTime = (value / 100) * audioPlayer.duration;
 }
 
+// Modified changeVolume function
 function changeVolume(value) {
-    audioPlayer.volume = value / 100;
-    document.getElementById("volume-percentage").textContent = `${value}%`;
+    const volumeValue = Math.min(value / 300, 1); // Cap at 100% actual volume
+    audioPlayer.volume = volumeValue;
+    document.getElementById("volume-percentage").textContent = `${Math.round((volumeValue * 100))}%`;
 }
 
 // Initialization
