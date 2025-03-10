@@ -13,13 +13,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 1rem; /* Reduced padding */
+    padding: 0.5rem 1rem;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 1000;
-    min-height: 50px; /* Fixed minimum height */
+    min-height: 50px;
 }
 
 .site-name {
@@ -577,58 +577,54 @@ footer {
     100% { opacity: 0; transform: translate(-50%, -45%); }
 }
 
-/* Logo Styles */
+/* Logo Styles (Force Left Alignment) */
 .logo {
-    width: 60px; /* Reduced base size */
+    width: 60px;
     height: auto;
     object-fit: contain;
-    flex-shrink: 0; /* Prevent shrinking */
-    margin-right: auto; /* Push nav links to right */
+    order: 1; /* Always first element */
+    margin-right: auto; /* Push everything else to right */
 }
 
-/* Nav Links */
+/* Nav Links Container (Force Right Alignment) */
 .nav-links {
     display: flex;
     gap: 1.5rem;
-    margin-left: auto; /* Maintain right alignment */
-    padding: 0 1rem;
+    order: 2; /* Always second element */
+    margin-left: auto; /* Push to far right */
 }
 
 /* Mobile Optimization */
 @media (max-width: 768px) {
     .navbar {
-        padding: 0.5rem; /* Tighter padding */
-        min-height: 45px; /* Reduced height */
+        padding: 0.5rem;
+        min-height: 45px;
     }
-    
+
     .logo {
-        width: 50px; /* Smaller logo */
+        width: 50px;
+        margin-right: 0.5rem; /* Small right margin */
     }
-    
+
     .nav-links {
-        gap: 1rem; /* Reduced spacing */
-        font-size: 0.9rem; /* Smaller text */
+        gap: 1rem;
+        font-size: 0.9rem;
+        margin-left: 0; /* Reset margin */
     }
-    
+
     .site-name {
-        display: none; /* Hide if empty */
+        display: none; /* Remove empty space */
     }
 }
 
-/* Small Mobile Screens */
 @media (max-width: 480px) {
-    .navbar {
-        padding: 0.25rem; /* Minimal padding */
-        min-height: 40px;
-    }
-    
     .logo {
-        width: 45px; /* Compact logo */
+        width: 45px;
     }
     
     .nav-links {
         gap: 0.75rem;
-        font-size: 0.85rem; /* Smaller text */
+        font-size: 0.85rem;
     }
 }
 
