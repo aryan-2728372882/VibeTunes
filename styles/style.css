@@ -8,18 +8,17 @@ body {
     min-height: 100vh;
 }
 
-/* Navbar Styles */
+/* Navbar Styles - Fixed */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 1rem;
+    padding: 1rem 2rem;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 1000;
-    min-height: 50px;
 }
 
 .site-name {
@@ -31,6 +30,7 @@ body {
 .nav-links {
     display: flex;
     gap: 2rem;
+    margin-left: auto;
 }
 
 .nav-links a {
@@ -43,6 +43,24 @@ body {
     opacity: 0.8;
 }
 
+/* Mobile Navbar Fix */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: row !important;
+        padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .nav-links {
+        margin-left: auto;
+        font-size: 0.9rem;
+    }
+    
+    .site-name {
+        display: none;
+    }
+}
+
 /* Main Content Styles */
 main {
     padding: 2rem;
@@ -50,7 +68,7 @@ main {
     margin: 0 auto;
 }
 
-/* Horizontal Scroll Sections - UPDATED */
+/* Horizontal Scroll Sections */
 .song-section {
     margin: 3rem 0;
 }
@@ -75,10 +93,9 @@ main {
     gap: 1.5rem;
     padding: 1rem;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain; /* Added scroll containment */
+    overscroll-behavior-x: contain;
 }
 
-/* Hide scrollbar */
 .scroll-container::-webkit-scrollbar {
     display: none;
 }
@@ -91,7 +108,7 @@ main {
     position: relative;
     cursor: pointer;
     transition: transform 0.3s ease;
-    margin-right: 15px; /* Added spacing */
+    margin-right: 15px;
 }
 
 .song-item:hover {
@@ -118,7 +135,6 @@ main {
     transform: scale(1.1);
 }
 
-/* Song Title Overlay */
 .song-title {
     position: absolute;
     bottom: 0;
@@ -135,7 +151,6 @@ main {
     text-overflow: ellipsis;
 }
 
-/* Hover Play Button */
 .hover-play {
     position: absolute;
     top: 50%;
@@ -157,7 +172,7 @@ main {
     opacity: 1;
 }
 
-/* Search Bar Styles */
+/* Search Components */
 #search-bar {
     width: 100%;
     padding: 1rem;
@@ -170,14 +185,13 @@ main {
     backdrop-filter: blur(5px);
 }
 
-/* Search Results Container - UPDATED */
 #search-results-container {
     margin: 2rem 0;
 }
 
 #search-results-container .scroll-container {
-    overscroll-behavior-x: contain; /* Added scroll containment */
-    padding-bottom: 10px; /* Scrollbar spacing */
+    overscroll-behavior-x: contain;
+    padding-bottom: 10px;
 }
 
 /* Music Player Styles */
@@ -231,7 +245,6 @@ main {
     opacity: 0.8;
 }
 
-/* Progress Bar */
 #seek-bar {
     flex-grow: 1;
     height: 4px;
@@ -239,7 +252,6 @@ main {
     accent-color: #ffffff;
 }
 
-/* Volume Controls */
 .volume-controls {
     display: flex;
     align-items: center;
@@ -252,7 +264,7 @@ main {
     accent-color: #ffffff;
 }
 
-/* Contact Page Styles */
+/* Contact Page Styles - Original Unmodified */
 .contact-container {
     max-width: 800px;
     margin: 4rem auto;
@@ -433,26 +445,6 @@ main {
     transform: translateY(-3px);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .contact-content {
-        grid-template-columns: 1fr;
-    }
-    
-    .contact-container {
-        margin: 2rem 1rem;
-        padding: 2rem;
-    }
-    
-    .info-item {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .info-item:hover {
-        transform: translateY(-5px);
-    }
-}
 /* Footer Styles */
 footer {
     text-align: center;
@@ -463,34 +455,8 @@ footer {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .contact-content {
-        grid-template-columns: 1fr;
-    }
-
-    .contact-container {
-        margin: 2rem 1rem;
-        padding: 2rem;
-    }
-
-    .info-item {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .info-item:hover {
-        transform: translateY(-5px);
-    }
-
-    /* Hide Volume Controls on Mobile */
-    .volume-controls {
-        display: none !important;
-      }      
-
-    /* Other responsive adjustments */
     .navbar {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .song-item {
@@ -502,23 +468,62 @@ footer {
         height: 150px;
     }
 
+    /* Mobile Music Player Fix */
     #music-player {
-        flex-wrap: wrap;
-        padding: 1rem;
+        flex-wrap: nowrap;
+        padding: 0.75rem 1rem;
         gap: 1rem;
+        height: 80px;
     }
 
     .player-info {
+        flex-direction: row;
         min-width: auto;
+        gap: 0.75rem;
+        flex-shrink: 0;
+        max-width: 60%;
+    }
+
+    #player-thumbnail {
+        width: 45px;
+        height: 45px;
+    }
+
+    .player-controls {
+        flex-grow: 0;
+        gap: 1rem;
+        justify-content: flex-start;
+    }
+
+    .player-controls button {
+        font-size: 1.3rem;
+        padding: 0.3rem;
+    }
+
+    #seek-bar {
+        position: absolute;
+        top: -5px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        margin: 0;
+        height: 3px;
     }
 
     .volume-controls {
-        display: none;  /* Volume control hidden on mobile */
+        display: none !important;
     }
 
-    .contact-container {
-        margin: 2rem 1rem;
-        padding: 1.5rem;
+    .player-info .song-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+        font-size: 0.85rem;
+        position: static;
+        background: none;
+        padding: 0;
+        color: inherit;
     }
 }
 
@@ -532,7 +537,6 @@ footer {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Popup Notification */
 .popup-notification {
     position: fixed;
     top: 50%;
@@ -549,25 +553,8 @@ footer {
     transition: opacity 0.5s ease-in-out;
 }
 
-/* Fade-out effect */
 .popup-notification.fade-out {
     opacity: 0;
-}
-
-.popup-notification {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    z-index: 1000;
-    animation: fadeInOut 3s ease-in-out;
 }
 
 @keyframes fadeInOut {
@@ -577,68 +564,128 @@ footer {
     100% { opacity: 0; transform: translate(-50%, -45%); }
 }
 
-/* Logo Styles (Force Left Alignment) */
+/* Logo Styling */
 .logo {
-    width: 60px;
+    width: 100px;
     height: auto;
+    max-width: 100%;
     object-fit: contain;
-    order: 1; /* Always first element */
-    margin-right: auto; /* Push everything else to right */
+    display: block;
 }
 
-/* Nav Links Container (Force Right Alignment) */
-.nav-links {
-    display: flex;
-    gap: 1.5rem;
-    order: 2; /* Always second element */
-    margin-left: auto; /* Push to far right */
-}
-
-/* Mobile Optimization */
-@media (max-width: 768px) {
-    .navbar {
-        padding: 0.5rem;
-        min-height: 45px;
-    }
-
+@media (max-width: 1024px) { 
     .logo {
-        width: 50px;
-        margin-right: 0.5rem; /* Small right margin */
+        width: 90px;
     }
+}
 
-    .nav-links {
-        gap: 1rem;
-        font-size: 0.9rem;
-        margin-left: 0; /* Reset margin */
-    }
-
-    .site-name {
-        display: none; /* Remove empty space */
+@media (max-width: 768px) {
+    .logo {
+        width: 80px;
     }
 }
 
 @media (max-width: 480px) {
     .logo {
-        width: 45px;
+        width: 70px;
+    }
+}
+
+.site-name {
+    display: none !important;
+}
+
+/* Mobile First Approach */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+    margin-left: auto;
+    align-items: center;
+}
+
+/* Contact Button Fix */
+.nav-links a[href="/contact"] {
+    color: #ffffff;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.75rem 1rem;
+        flex-wrap: nowrap;
     }
     
     .nav-links {
         gap: 0.75rem;
+        font-size: 0.9rem;
+        padding-left: 0.5rem;
+    }
+    
+    .nav-links a {
         font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .nav-links a[href="/contact"] {
+        padding: 0.4rem 0.8rem;
+        margin-left: auto;
+    }
+    
+    /* Contact Page Specific Fixes */
+    .contact-container {
+        margin: 1rem;
+        padding: 1.25rem;
+    }
+    
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .social-links {
+        margin-top: 1.5rem;
+        justify-content: center;
     }
 }
 
-/* Search Results Scroll Container - UPDATED */
-#search-results-container .scroll-container {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    gap: 1.5rem;
-    padding: 1rem;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain; /* Added scroll containment */
+/* Desktop Optimization */
+@media (min-width: 769px) {
+    .navbar {
+        padding: 1rem 2rem;
+    }
+    
+    .nav-links {
+        gap: 2rem;
+    }
+    
+    .nav-links a[href="/contact"] {
+        padding: 0.5rem 1.25rem;
+    }
 }
 
-#search-results-container .scroll-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar */
-}
