@@ -348,6 +348,21 @@ async function handleSongEnd() {
     updatePlayPauseButton(); // Sync the play/pause button when a new song starts playing
 }
 
+document.addEventListener("visibilitychange", () => {
+    let audio = document.querySelector("audio");
+    if (document.visibilityState === "visible" && audio.paused) {
+        audio.play().catch(err => console.log("Autoplay prevented:", err));
+    }
+});
+
+document.addEventListener("click", () => {
+    let audio = document.querySelector("audio");
+    if (audio.paused) {
+        audio.play().catch(err => console.log("Playback error:", err));
+    }
+}, { once: true });
+
+
 // Navigation Controls
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
