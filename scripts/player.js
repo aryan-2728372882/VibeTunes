@@ -109,7 +109,6 @@ const fixedPhonk = [
 
 // Player State Management
 let currentPlaylist = [];
-let shuffleMode = false; // ✅ Add this at the top
 let currentSongIndex = 0;
 let repeatMode = 0; // 0: No repeat, 1: Repeat all, 2: Repeat one
 let currentContext = 'bhojpuri'; // 'bhojpuri', 'phonk', or 'search'
@@ -123,16 +122,37 @@ playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
 audioPlayer.addEventListener('timeupdate', updateSeekBar);
 
-// Display Fixed Sections
-function displayFixedSections() {
+
+// ✅ Display Fixed Sections
+async function displayFixedSections() {
+    // ✅ Load Fixed Bhojpuri & Phonk Sections (No Changes)
     populateSection('bhojpuri-list', fixedBhojpuri, 'bhojpuri');
     populateSection('phonk-list', fixedPhonk, 'phonk');
+
+    // ✅ Load Dynamic Bhojpuri & Phonk Collection from JSON
+    await loadFullJSONSongs();
+}
+
+async function loadFullJSONSongs() {
+    try {
+        const [bhojpuriSongs, phonkSongs] = await Promise.all([
+            fetch("songs.json").then(response => response.json()),
+            fetch("phonk.json").then(response => response.json())
+        ]);
+
+        // ✅ Ensure Fixed Sections Are NOT Affected
+        populateSection('bhojpuri-collection', bhojpuriSongs, 'json-bhojpuri'); 
+        populateSection('phonk-collection', phonkSongs, 'json-phonk'); 
+
+    } catch (error) {
+        console.error("Error loading songs from JSON:", error);
+    }
 }
 
 function populateSection(containerId, songs, context) {
     const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    
+    container.innerHTML = ''; // Clear old content
+
     songs.forEach(song => {
         const songElement = document.createElement('div');
         songElement.classList.add('song-item');
@@ -147,45 +167,40 @@ function populateSection(containerId, songs, context) {
     });
 }
 
+
 // Search Implementation
 let searchSongsList = [];
-
-function loadSearchSongs() {
-    Promise.all([
-        fetch("songs.json").then(r => r.json()),
-        fetch("phonk.json").then(r => r.json())
-    ]).then(([songs, phonk]) => {
+async function loadSearchSongs() {
+    try {
+        const [songs, phonk] = await Promise.all([
+            fetch("songs.json").then(r => r.json()),
+            fetch("phonk.json").then(r => r.json())
+        ]);
         searchSongsList = [...songs, ...phonk];
-    }).catch(console.error);
+    } catch (error) {
+        console.error("Error loading songs:", error);
+    }
 }
 
 // Modified searchSongs function
 function searchSongs(query) {
     const searchSection = document.getElementById('search-results-container');
     const searchContainer = searchSection.querySelector('.scroll-container');
-    
+
     if (!query.trim()) {
         searchSection.style.display = 'none';
         return;
     }
 
-    const results = searchSongsList.filter(song =>
-        song.title.toLowerCase().includes(query.toLowerCase())
-    );
+    const results = searchSongsList
+        .filter(song => song.title.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 10); // Load only 10 songs
 
     searchContainer.innerHTML = '';
-    
+
     if (results.length) {
         results.forEach(song => {
-            const songElement = document.createElement('div');
-            songElement.classList.add('song-item');
-            songElement.innerHTML = `
-                <div class="thumbnail-container" onclick="playSong('${song.title}', 'search')">
-                    <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
-                    <div class="hover-play">▶</div>
-                </div>
-                <div class="song-title">${song.title}</div>
-            `;
+            const songElement = createSongElement(song, 'search');
             searchContainer.appendChild(songElement);
         });
 
@@ -228,19 +243,26 @@ window.addEventListener('resize', balanceSongTitles);
 function playSong(title, context) {
     let song;
     
-    switch(context) {
-        case 'bhojpuri':
+    switch (context) {
+        case 'bhojpuri': 
             song = fixedBhojpuri.find(s => s.title === title);
             currentPlaylist = fixedBhojpuri;
             currentContext = 'bhojpuri';
             break;
-        case 'phonk':
+        case 'phonk': 
             song = fixedPhonk.find(s => s.title === title);
             currentPlaylist = fixedPhonk;
             currentContext = 'phonk';
             break;
-        case 'search':
-            song = currentPlaylist.find(s => s.title === title);
+        case 'json-bhojpuri': 
+            song = searchSongsList.find(s => s.title === title);
+            currentPlaylist = searchSongsList;
+            currentContext = 'json-bhojpuri';
+            break;
+        case 'json-phonk': 
+            song = searchSongsList.find(s => s.title === title);
+            currentPlaylist = searchSongsList;
+            currentContext = 'json-phonk';
             break;
     }
 
@@ -252,12 +274,24 @@ function playSong(title, context) {
         .then(() => {
             playerContainer.style.display = "flex";
             updatePlayerUI(song);
+            highlightCurrentSong();
         })
         .catch(error => {
             console.error("Playback failed:", error);
             showPopup("Error playing song!");
         });
 }
+
+
+function highlightCurrentSong() {
+    document.querySelectorAll('.song-item').forEach(item => item.classList.remove('playing'));
+    const allSongs = [...document.querySelectorAll('.song-title')];
+    const currentSongElement = allSongs.find(el => el.textContent === currentPlaylist[currentSongIndex]?.title);
+    if (currentSongElement) {
+        currentSongElement.parentElement.classList.add('playing');
+    }
+}
+
 
 // Remove the duplicate at the bottom and keep this one
 document.addEventListener("DOMContentLoaded", () => {
@@ -273,24 +307,24 @@ async function handleSongEnd() {
     // Remove event listener before potentially re-adding it
     audioPlayer.removeEventListener('ended', handleSongEnd);
 
-    if (repeatMode === 2) { // Repeat single
+    if (repeatMode === 2) { // Repeat single song
         audioPlayer.currentTime = 0;
         await audioPlayer.play().catch(error => console.error("Playback failed:", error));
         console.log("Repeating the same song...");
         
-        // Add the event listener back for the repeated song
+        // Add event listener back
         audioPlayer.addEventListener('ended', handleSongEnd);
-        updatePlayPauseButton(); // Sync play/pause button after repeating
+        updatePlayPauseButton();
         return;
     }
 
-    if (repeatMode === 1) { // Repeat all mode
+    if (repeatMode === 1) { // Repeat all songs
         currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-    } else if (currentSongIndex < currentPlaylist.length - 1) { // Normal play mode
+    } else if (currentSongIndex < currentPlaylist.length - 1) { // Play next song normally
         currentSongIndex++;
     } else {
         console.log("Reached the end of the playlist. Stopping.");
-        return; // Stop if no repeat and at the end of the playlist
+        return;
     }
 
     console.log("Loading Next Song:", currentPlaylist[currentSongIndex].title);
@@ -302,7 +336,7 @@ async function handleSongEnd() {
     let retries = 0;
     let maxRetries = 5;
 
-    // ✅ Ensure playback before allowing the next transition
+    // ✅ Ensure playback before moving to the next song
     audioPlayer.oncanplay = async () => {
         console.log("Song Fully Loaded:", currentPlaylist[currentSongIndex].title);
 
@@ -314,39 +348,36 @@ async function handleSongEnd() {
                 break;
             } catch (error) {
                 console.error(`Playback Error (Attempt ${retries + 1}):`, error);
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait before retrying
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Retry after delay
                 retries++;
             }
         }
 
         if (!songStarted) {
-            console.error("Max retries reached! Skipping this song...");
+            console.error("Max retries reached! Skipping to next song...");
             // Skip to the next song
             currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-            playSong(currentPlaylist[currentSongIndex].title, currentContext); // Play the next song
+            playSong(currentPlaylist[currentSongIndex].title, currentContext);
         }
 
-        // Add the event listener back after potentially handling error
+        // Add event listener back after playback starts
         audioPlayer.addEventListener('ended', handleSongEnd);
 
-        updatePlayPauseButton(); // Sync the play/pause button after song change
+        updatePlayPauseButton(); // Sync the play/pause button
     };
 
-    // ✅ Confirm that the song is playing before moving forward
+    // ✅ Confirm the song is playing
     audioPlayer.onplaying = () => {
         console.log("Confirmed: Song is playing:", currentPlaylist[currentSongIndex].title);
         songStarted = true;
-
-        // Add the event listener back after the song starts playing
         audioPlayer.addEventListener('ended', handleSongEnd);
     };
 
-    // Add the event listener back after the song ends
-    audioPlayer.addEventListener('ended', handleSongEnd);
-
-    updatePlayerUI(currentPlaylist[currentSongIndex]); // ✅ Ensure UI updates
-    updatePlayPauseButton(); // Sync the play/pause button when a new song starts playing
+    // ✅ Ensure UI updates with new song info
+    updatePlayerUI(currentPlaylist[currentSongIndex]);
+    updatePlayPauseButton();
 }
+
 
 document.addEventListener("visibilitychange", () => {
     let audio = document.querySelector("audio");
@@ -363,6 +394,7 @@ document.addEventListener("click", () => {
 }, { once: true });
 
 
+
 // Navigation Controls
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
@@ -377,10 +409,10 @@ function previousSong() {
 // Repeat System
 function toggleRepeat() {
     repeatMode = (repeatMode + 1) % 3;
-    const repeatBtn = document.querySelector("#repeat-btn");
-    repeatBtn.textContent = ['🔁', '🔂', '🔄'][repeatMode];
+    document.querySelector("#repeat-btn").textContent = ['🔁', '🔂', '🔄'][repeatMode];
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
 }
+
 
 // UI Updates
 function updatePlayerUI(song) {
@@ -435,7 +467,7 @@ function changeVolume(value) {
 
 // Initialization
 document.addEventListener("DOMContentLoaded", () => {
-    displayFixedSections();
+    displayFixedSections(); // ✅ Loads fixed + JSON songs separately
     loadSearchSongs();
     changeVolume(100);
 });
