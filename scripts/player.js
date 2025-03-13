@@ -378,7 +378,6 @@ async function handleSongEnd() {
     updatePlayPauseButton();
 }
 
-
 document.addEventListener("visibilitychange", () => {
     let audio = document.querySelector("audio");
     if (document.visibilityState === "visible" && audio.paused) {

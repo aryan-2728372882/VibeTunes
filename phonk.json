@@ -1,702 +1,749 @@
 [
     {
-        "title": "FUNK DO BOUNCE (Slowed)",
+        "title": "FUNK DO BOUNCE",
         "artist": "Ariis",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["FUNK DO BOUNCE", "Ariis", "slowed", "funk", "phonk", "brazilian funk"]
+        "thumbnail": "https://i.ytimg.com/vi/Rc2RIQH4n88/maxresdefault.jpg",
+        "keywords": [
+            "FUNK DO BOUNCE",
+            "Ariis",
+            "slowed",
+            "funk",
+            "phonk",
+            "brazilian funk"
+        ]
     },
     {
-        "title": "GLORY",
-        "artist": "Ogryzek",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["GLORY", "Ogryzek", "phonk", "instrumental"]
-    },
-    {
-        "title": "BAD PARENTING FUNK",
+        "title": "BAD PARENTING FUNK V2",
         "artist": "DJ CEREJASS, Sayfalse",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["BAD PARENTING FUNK", "DJ CEREJASS", "Sayfalse", "funk", "phonk", "funny", "comedy"]
-    },
-    {
-        "title": "SLAY!",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["SLAY!", "phonk", "aggressive", " энергичный"]
-    },
-    {
-        "title": "SPOOKY",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["SPOOKY", "phonk", "horror", "halloween"]
-    },
-    {
-        "title": "Funk de Beleza",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Funk de Beleza", "funk", "phonk", "brazilian funk"]
+        "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3d/77/18/3d771852-23b1-0e92-5484-9036673e19c3/cover.jpg/1200x1200bf-60.jpg",
+        "keywords": [
+            "BAD PARENTING FUNK",
+            "DJ CEREJASS",
+            "Sayfalse",
+            "funk",
+            "phonk",
+            "funny",
+            "comedy"
+        ]
     },
     {
         "title": "X-SLIDE",
         "artist": "2KE, 808iuli",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["X-SLIDE", "2KE", "808iuli", "phonk", "slide"]
-    },
-    {
-        "title": "Ela Joga na Hora",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Ela Joga na Hora", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "Funk of Galáctico",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Funk of Galáctico", "funk", "phonk", "space"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/07/11/5050600f774044d1896c78b02ad4c7a3_464_464.jpg",
+        "keywords": [
+            "X-SLIDE",
+            "2KE",
+            "808iuli",
+            "phonk",
+            "slide"
+        ]
     },
     {
         "title": "CUTE DEPRESSED",
         "artist": "Dyan Dxddy",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["CUTE DEPRESSED", "Dyan Dxddy", "phonk", "sad", "cute"]
+        "thumbnail": "https://m.media-amazon.com/images/I/813lR7O3FgL.jpg",
+        "keywords": [
+            "CUTE DEPRESSED",
+            "Dyan Dxddy",
+            "phonk",
+            "sad",
+            "cute"
+        ]
     },
     {
         "title": "Slide da Treme Melódica v2",
         "artist": "DJ FNK, Polaris",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Slide da Treme Melódica v2", "DJ FNK", "Polaris", "phonk", "slide", "melodic"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-zwIupF9DshgyDKTD-btInVw-t1080x1080.jpg",
+        "keywords": [
+            "Slide da Treme Melódica v2",
+            "DJ FNK",
+            "Polaris",
+            "phonk",
+            "slide",
+            "melodic"
+        ]
     },
     {
         "title": "Eu Sento Gabu!",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Eu Sento Gabu!", "phonk", "brazilian funk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-yh2PQTXCU7VO-0-t500x500.jpg",
+        "keywords": [
+            "Eu Sento Gabu!",
+            "phonk",
+            "brazilian funk"
+        ]
     },
     {
         "title": "Murder In My Mind",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Murder In My Mind", "phonk", "dark", "creepy"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-24UT7UzWHbeNAya7-4R911Q-t1080x1080.jpg",
+        "keywords": [
+            "Murder In My Mind",
+            "phonk",
+            "dark",
+            "creepy"
+        ]
     },
     {
         "title": "METAMORPHOSIS",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["METAMORPHOSIS", "phonk", " трансформации", "intense"]
-    },
-    {
-        "title": "VAPO NO SETOR",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["VAPO NO SETOR", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "MASHA ULTRAFUNK",
-        "artist": "HISTED, TXVSTERPLAYA",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["MASHA ULTRAFUNK", "HISTED", "TXVSTERPLAYA", "phonk", "mashacore"]
+        "thumbnail": "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/Metamorphosis_-_Interworld.jpg/220px-Metamorphosis_-_Interworld.jpg",
+        "keywords": [
+            "METAMORPHOSIS",
+            "phonk",
+            "intense",
+            "transformative"
+        ]
     },
     {
         "title": "FUNKED UP",
         "artist": "xxanteria, isq",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["FUNKED UP", "xxanteria", "isq", "funk", "phonk"]
-    },
-    {
-        "title": "UH VEI VEI",
-        "artist": "KREZUS",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["UH VEI VEI", "KREZUS", "phonk"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/01/09/4b10de7d4b3c43c3b54677947ba3445c_464_464.jpg",
+        "keywords": [
+            "FUNKED UP",
+            "xxanteria",
+            "isq",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "BRODYAGA FUNK",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["BRODYAGA FUNK", "phonk", "russian"]
+        "thumbnail": "https://resources.tidal.com/images/f5440d08/ce93/40d6/a18b/75421acc204d/640x640.jpg",
+        "keywords": [
+            "BRODYAGA FUNK",
+            "phonk",
+            "russian"
+        ]
     },
     {
-        "title": "Not My Problem Funk",
+        "title": "AURA",
         "artist": "DJZRX",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Not My Problem Funk", "DJZRX", "funk", "phonk"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/10/18/3b86bcc29b474ec89d0dae4136e9250aH3000W3000_464_464.jpg",
+        "keywords": [
+            "Aura",
+            "DJZRX",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "hypnotic",
         "artist": "isq",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["hypnotic", "isq", "phonk", "atmospheric"]
-    },
-    {
-        "title": "MATUSHKA ULTRAFUNK",
-        "artist": "satirin, FUNK DEMON, EVO",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["MATUSHKA ULTRAFUNK", "satirin", "FUNK DEMON", "EVO", "phonk", "russian"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-zhW5uSZnrzVj8uOy-87H8DA-t1080x1080.jpg",
+        "keywords": [
+            "hypnotic",
+            "isq",
+            "phonk",
+            "atmospheric"
+        ]
     },
     {
         "title": "Lya Funk",
         "artist": "VØJ, TRVNSPORTER",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Lya Funk", "VØJ", "TRVNSPORTER", "funk", "phonk"]
+        "thumbnail": "https://i0.wp.com/s.ytimg.com/vi/SJGnBJ2nKL8/mqdefault.jpg?resize=200,200",
+        "keywords": [
+            "Lya Funk",
+            "VØJ",
+            "TRVNSPORTER",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "MONTAGEM BRAVO",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["MONTAGEM BRAVO", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "Automotivo Bibi Fogosa",
-        "artist": "Bibi Babydoll, Dj Brunin XM, KZA Produções",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Automotivo Bibi Fogosa", "Bibi Babydoll", "Dj Brunin XM", "KZA Produções", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "NEXT!",
-        "artist": "NCTS",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["NEXT!", "NCTS", "phonk", "energetic"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-nGmPYn6eE9ntYmPH-PHHYLA-t1080x1080.jpg",
+        "keywords": [
+            "MONTAGEM BRAVO",
+            "phonk",
+            "brazilian funk"
+        ]
     },
     {
         "title": "AUTOMOTIVO MANGOS",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["AUTOMOTIVO MANGOS", "phonk", "brazilian funk"]
+        "thumbnail": "https://resources.tidal.com/images/7bed1dbd/b513/44e0/a914/43528f0e699e/640x640.jpg",
+        "keywords": [
+            "AUTOMOTIVO MANGOS",
+            "phonk",
+            "brazilian funk"
+        ]
     },
     {
         "title": "LOVELY BASTARDS",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["LOVELY BASTARDS", "phonk"]
-    },
-    {
-        "title": "TRALALERO TRALALA FUNK",
-        "artist": "DJ Raulipues, DJ DYLANFK, MRR",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["TRALALERO TRALALA FUNK", "DJ Raulipues", "DJ DYLANFK", "MRR", "funk", "phonk"]
+        "thumbnail": "https://i.scdn.co/image/ab67616d00001e02226383907a53ab4c13cca8e2",
+        "keywords": [
+            "LOVELY BASTARDS",
+            "phonk"
+        ]
     },
     {
         "title": "Montagem Mysterious Game",
         "artist": "LXNGVX",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Montagem Mysterious Game", "LXNGVX", "phonk", "game"]
-    },
-    {
-        "title": "Memphis Cult Vol. 6",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Memphis Cult Vol. 6", "phonk", "memphis"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/12/01/0b805d4bc2da4cfca7e1f693af544eca_464_464.jpg",
+        "keywords": [
+            "Montagem Mysterious Game",
+            "LXNGVX",
+            "phonk",
+            "game"
+        ]
     },
     {
         "title": "EVOLUTION FUNK VOL. II",
         "artist": "MVSTERIOUS, Hxmr, yngastrobeatz., EVO",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["EVOLUTION FUNK VOL. II", "MVSTERIOUS", "Hxmr", "yngastrobeatz.", "EVO", "funk", "phonk"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/10/16/dd060ceee15d41589a94c6b1226a2db1H1400W1400_320_320.jpg",
+        "keywords": [
+            "EVOLUTION FUNK VOL. II",
+            "MVSTERIOUS",
+            "Hxmr",
+            "yngastrobeatz.",
+            "EVO",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "AUTOMOTIVO DA TURBULENCIA",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["AUTOMOTIVO DA TURBULENCIA", "phonk", "brazilian funk", "turbulent"]
-    },
-    {
-        "title": "PASSO BEM SOLTO",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["PASSO BEM SOLTO", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "MTG - RITMO ZELDA",
-        "artist": "JXM, Polaris",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["MTG - RITMO ZELDA", "JXM", "Polaris", "phonk", "zelda", "game"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-RtzLn81fKQZ9pUgi-zzinIQ-t1080x1080.jpg",
+        "keywords": [
+            "AUTOMOTIVO DA TURBULENCIA",
+            "phonk",
+            "brazilian funk",
+            "turbulent"
+        ]
     },
     {
         "title": "FUNK UNIVERSO",
         "artist": "Irokz",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["FUNK UNIVERSO", "Irokz", "funk", "phonk", "space"]
+        "thumbnail": "https://c.saavncdn.com/509/FUNK-UNIVERSO-Unknown-2024-20240626091059-500x500.jpg",
+        "keywords": [
+            "FUNK UNIVERSO",
+            "Irokz",
+            "funk",
+            "phonk",
+            "space"
+        ]
     },
     {
         "title": "BRAZILIAN DANÇA PHONK",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["BRAZILIAN DANÇA PHONK", "phonk", "brazilian"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-AzNmrtiHdBDB85dz-PjYshw-t1080x1080.jpg",
+        "keywords": [
+            "BRAZILIAN DANÇA PHONK",
+            "phonk",
+            "brazilian"
+        ]
     },
     {
         "title": "BAIXO",
         "artist": "xxanteria",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["BAIXO", "xxanteria", "phonk", "bass"]
-    },
-    {
-        "title": "MONTAGEM - PR FUNK",
-        "artist": "S3BZS, Mc Gw, Mc Menor Do Alvorada",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["MONTAGEM - PR FUNK", "S3BZS", "Mc Gw", "Mc Menor Do Alvorada", "funk", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "BOUNCE FUNK",
-        "artist": "SAPFIR",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["BOUNCE FUNK", "SAPFIR", "funk", "phonk"]
-    },
-    {
-        "title": "MAZKO",
-        "artist": "S4nri0, MC LyC4N",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["MAZKO", "S4nri0", "MC LyC4N", "phonk"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/09/25/889572f9f7204447ad0b6482f0bd36c1_464_464.jpg",
+        "keywords": [
+            "BAIXO",
+            "xxanteria",
+            "phonk",
+            "bass"
+        ]
     },
     {
         "title": "NUNCA MUDA?",
         "artist": "Scythermane, NXGHT!",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["NUNCA MUDA?", "Scythermane", "NXGHT!", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-BJyEa5jB8ORufjr6-5W8gEw-t1080x1080.png",
+        "keywords": [
+            "NUNCA MUDA?",
+            "Scythermane",
+            "NXGHT!",
+            "phonk"
+        ]
     },
     {
         "title": "Orquestra Maldita",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Orquestra Maldita", "phonk", "orchestral"]
+        "thumbnail": "https://c.saavncdn.com/233/Orquestra-Maldita-Portuguese-2023-20231025193424-500x500.jpg",
+        "keywords": [
+            "Orquestra Maldita",
+            "phonk",
+            "orchestral"
+        ]
     },
     {
         "title": "NEON BLADE",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["NEON BLADE", "phonk", "cyberpunk"]
+        "thumbnail": "https://resources.tidal.com/images/598935d7/60fa/4aec/9f42/f3aaba7b2f62/640x640.jpg",
+        "keywords": [
+            "NEON BLADE",
+            "phonk",
+            "cyberpunk"
+        ]
     },
     {
         "title": "MONTAGEM DIAMANTE ROSA",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["MONTAGEM DIAMANTE ROSA", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "ACIDO",
-        "artist": "UdieNnx, Mc Gw",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["ACIDO", "UdieNnx", "Mc Gw", "phonk"]
+        "thumbnail": "https://m.media-amazon.com/images/I/611wAeIciyL.jpg",
+        "keywords": [
+            "MONTAGEM DIAMANTE ROSA",
+            "phonk",
+            "brazilian funk"
+        ]
     },
     {
         "title": "TUCA DONKA",
         "artist": "CURSEDEVIL, DJ FKU, Skorde",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["TUCA DONKA", "CURSEDEVIL", "DJ FKU", "Skorde", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-sukyegKY8rMtmP9T-xnEB6A-t1080x1080.jpg",
+        "keywords": [
+            "TUCA DONKA",
+            "CURSEDEVIL",
+            "DJ FKU",
+            "Skorde",
+            "phonk"
+        ]
     },
     {
         "title": "TREINAMENTO DE FORÇA",
         "artist": "TRXVELER",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["TREINAMENTO DE FORÇA", "TRXVELER", "phonk", "motivational"]
+        "thumbnail": "https://lastfm.freetls.fastly.net/i/u/300x300/c8f927adbc78bf11e15d9e448f8f943d.jpg",
+        "keywords": [
+            "TREINAMENTO DE FORÇA",
+            "TRXVELER",
+            "phonk",
+            "motivational"
+        ]
     },
     {
         "title": "RAVE",
         "artist": "Dxrk ダーク",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["RAVE", "Dxrk ダーク", "phonk", "rave"]
+        "thumbnail": "https://www.sound.xyz/_next/image?url=https://d2i9ybouka0ieh.cloudfront.net/artist-uploads/35499510-9208-43cc-8019-13a2cb0b408a/RELEASE_WEB_STATIC_IMAGE/83777-newImage.png&w=3840&q=75",
+        "keywords": [
+            "RAVE",
+            "Dxrk ダーク",
+            "phonk",
+            "rave"
+        ]
     },
     {
         "title": "GHOST!",
         "artist": "phonk.me, KIIXSHI",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["GHOST!", "phonk.me", "KIIXSHI", "phonk", "ghost"]
+        "thumbnail": "https://lastfm.freetls.fastly.net/i/u/300x300/79c922b082ce28326b3ea70cb0132e22.jpg",
+        "keywords": [
+            "GHOST!",
+            "phonk.me",
+            "KIIXSHI",
+            "phonk",
+            "ghost"
+        ]
     },
     {
         "title": "Cuando se te moja la tarea 2",
         "artist": "LDRR",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Cuando se te moja la tarea 2", "LDRR", "phonk", "funny"]
-    },
-    {
-        "title": "JOGO MORTO",
-        "artist": "SCHWVFTY, DYSMANE, ICEDMANE",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["JOGO MORTO", "SCHWVFTY", "DYSMANE", "ICEDMANE", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-6CcG7td7Wd2a-0-t1080x1080.jpg",
+        "keywords": [
+            "Cuando se te moja la tarea 2",
+            "LDRR",
+            "phonk",
+            "funny"
+        ]
     },
     {
         "title": "DNA",
         "artist": "LXNGVX, VISXGE",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["DNA", "LXNGVX", "VISXGE", "phonk"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/02/26/e2d8795f2505423ca3fc93445c96bfaa_464_464.jpg",
+        "keywords": [
+            "DNA",
+            "LXNGVX",
+            "VISXGE",
+            "phonk"
+        ]
     },
     {
-        "title": "AVANGARD (Slowed)",
+        "title": "AVANGARD",
         "artist": "LONOWN",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["AVANGARD", "LONOWN", "slowed", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-KmakHj8JSupO-0-t1080x1080.png",
+        "keywords": [
+            "AVANGARD",
+            "LONOWN",
+            "slowed",
+            "phonk"
+        ]
     },
-     {
+    {
         "title": "Life in Rio",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Life in Rio", "phonk", "brazilian"]
+        "thumbnail": "https://lastfm.freetls.fastly.net/i/u/300x300/a6cd3ee8c27396170feee18f0b3e7f0f.jpg",
+        "keywords": [
+            "Life in Rio",
+            "phonk",
+            "brazilian"
+        ]
     },
     {
-        "title": "GigaChad Theme (Phonk House Version)",
+        "title": "GigaChad Theme",
         "artist": "g3ox_em",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["GigaChad Theme", "g3ox_em", "phonk", "house", "meme"]
+        "thumbnail": "https://s.mxmcdn.net/images-storage/albums2/6/3/7/9/3/1/65139736_500_500.jpg",
+        "keywords": [
+            "GigaChad Theme",
+            "g3ox_em",
+            "phonk",
+            "house",
+            "meme"
+        ]
     },
     {
         "title": "Sequência da Dz7",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Sequência da Dz7", "phonk", "brazilian funk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-GQyLHfl2k7hR-0-t500x500.jpg",
+        "keywords": [
+            "Sequência da Dz7",
+            "phonk",
+            "brazilian funk"
+        ]
     },
     {
-        "title": "Beeper Funk (Slowed)",
+        "title": "Beeper Funk",
         "artist": "DJ Paulinho Mondi Da Baixa Baviera, Mc Vitorioso",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Beeper Funk", "DJ Paulinho Mondi Da Baixa Baviera", "Mc Vitorioso", "funk", "phonk", "slowed"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-6yOLKFz8rPr72lwB-I2bKEg-t500x500.jpg",
+        "keywords": [
+            "Beeper Funk",
+            "DJ Paulinho Mondi Da Baixa Baviera",
+            "Mc Vitorioso",
+            "funk",
+            "phonk",
+            "slowed"
+        ]
     },
     {
         "title": "BRUXO FANTASMA",
         "artist": "LXNGVX, Dj Gabriel do Borel",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["BRUXO FANTASMA", "LXNGVX", "Dj Gabriel do Borel", "phonk"]
+        "thumbnail": "https://m.media-amazon.com/images/I/71WKej1w85L.jpg",
+        "keywords": [
+            "BRUXO FANTASMA",
+            "LXNGVX",
+            "Dj Gabriel do Borel",
+            "phonk"
+        ]
     },
     {
         "title": "Scopin",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Scopin", "phonk"]
-    },
-    {
-        "title": "Faz de Chicote",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Faz de Chicote", "phonk", "brazilian funk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-DsEjj6AyQR8RuQ4p-xr3Oqg-t1080x1080.jpg",
+        "keywords": [
+            "Scopin",
+            "phonk"
+        ]
     },
     {
         "title": "RAPTURE",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["RAPTURE", "phonk"]
+        "thumbnail": "https://c.saavncdn.com/856/Rapture-Phonk-English-2024-20240412153005-500x500.jpg",
+        "keywords": [
+            "RAPTURE",
+            "phonk"
+        ]
     },
     {
         "title": "FRESH",
         "artist": "NXVAMANE",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["FRESH", "NXVAMANE", "phonk"]
+        "thumbnail": "https://fiverr-res.cloudinary.com/t_gig_cards_web,q_auto,f_auto/gigs/308205926/original/ce7847853fb7222759fb548332de789a0d7cce1b.jpg",
+        "keywords": [
+            "FRESH",
+            "NXVAMANE",
+            "phonk"
+        ]
     },
     {
-        "title": "Montagem Lunar Celestia 1.0 (SLOWED)",
+        "title": "Montagem Lunar Celestia 1.0",
         "artist": "TOKYOPHILE",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Montagem Lunar Celestia 1.0", "TOKYOPHILE", "phonk", "slowed"]
+        "thumbnail": "https://source.boomplaymusic.com/group10/M00/05/15/c01db71e10834ab6b1049130607cf99e_464_464.jpg",
+        "keywords": [
+            "Montagem Lunar Celestia 1.0",
+            "TOKYOPHILE",
+            "phonk",
+            "slowed"
+        ]
     },
     {
         "title": "PYTHON FUNK",
         "artist": "RD12, Sayfalse",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["PYTHON FUNK", "RD12", "Sayfalse", "funk", "phonk"]
-    },
-    {
-        "title": "Turu R9",
-        "artist": "DJ Ikeraus, MC FERNANDINHO FN",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Turu R9", "DJ Ikeraus", "MC FERNANDINHO FN", "phonk"]
-    },
-    {
-        "title": "Ketamine Girl",
-        "artist": "akiaura, LONOWN, STM",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Ketamine Girl", "akiaura", "LONOWN", "STM", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-LaLPBhxXjhsyAz76-sKsaCQ-t1080x1080.jpg",
+        "keywords": [
+            "PYTHON FUNK",
+            "RD12",
+            "Sayfalse",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "O Melhor no Que Faz 3.0 [Slowed]",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["O Melhor no Que Faz 3.0", "phonk", "slowed"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-ifVCQZoAmwzN1KWH-SqikCA-t500x500.jpg",
+        "keywords": [
+            "O Melhor no Que Faz 3.0",
+            "phonk",
+            "slowed"
+        ]
     },
     {
         "title": "MONTAGEM VOZES PROFUNDAS (Remixes)",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["MONTAGEM VOZES PROFUNDAS", "phonk", "brazilian funk", "remix"]
+        "thumbnail": "https://geo-media.beatsource.com/image_size/500x500/3/b/2/3b2c0e3a-0228-400d-af68-19b21392592a.jpg",
+        "keywords": [
+            "MONTAGEM VOZES PROFUNDAS",
+            "phonk",
+            "brazilian funk",
+            "remix"
+        ]
     },
     {
         "title": "EL QUE LA DEBE FUNK",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["EL QUE LA DEBE FUNK", "funk", "phonk"]
+        "thumbnail": "https://resources.tidal.com/images/0864eeb2/8699/4e3e/b266/ec30caf6e689/640x640.jpg",
+        "keywords": [
+            "EL QUE LA DEBE FUNK",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "AUTOMOTIVO EMPURRA",
         "artist": "sma$her",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["AUTOMOTIVO EMPURRA", "sma$her", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "X-TALI",
-        "artist": "MXCCREE, DJ GL3CHEKY",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["X-TALI", "MXCCREE", "DJ GL3CHEKY", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-1zmASxp5DqVThSKu-pfiyzQ-t500x500.jpg",
+        "keywords": [
+            "AUTOMOTIVO EMPURRA",
+            "sma$her",
+            "phonk",
+            "brazilian funk"
+        ]
     },
     {
         "title": "Montagem Melodia Explosiva",
         "artist": "Vermillion, ICEDMANE, DYSMANE, Mc Dido",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Montagem Melodia Explosiva", "Vermillion", "ICEDMANE", "DYSMANE", "Mc Dido", "phonk"]
-    },
-    {
-        "title": "KUATR0",
-        "artist": "S4nri0, Kobe Mane",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["KUATR0", "S4nri0", "Kobe Mane", "phonk"]
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/Dk9KN2KBx1/9KNgAXzB3B/size_m.jpg",
+        "keywords": [
+            "Montagem Melodia Explosiva",
+            "Vermillion",
+            "ICEDMANE",
+            "DYSMANE",
+            "Mc Dido",
+            "phonk"
+        ]
     },
     {
         "title": "RISADA CHUCK 01",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["RISADA CHUCK 01", "phonk", "horror", "chuck"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-KhEndlz38Bvx5bGK-ClVtsg-t500x500.jpg",
+        "keywords": [
+            "RISADA CHUCK 01",
+            "phonk",
+            "horror",
+            "chuck"
+        ]
     },
     {
         "title": "Se Paciente Funk",
         "artist": "RD12",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Se Paciente Funk", "RD12", "funk", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-U0OXvhFl7pcy-0-t500x500.jpg",
+        "keywords": [
+            "Se Paciente Funk",
+            "RD12",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "FUNK INFERNAL",
         "artist": "DYGO, Mxng0",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["FUNK INFERNAL", "DYGO", "Mxng0", "funk", "phonk"]
-    },
-    {
-        "title": "A-What",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["A-What", "phonk"]
-    },
-    {
-        "title": "BLOODY!",
-        "artist": "M4GN, DJ Oliver Mendes",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["BLOODY!", "M4GN", "DJ Oliver Mendes", "phonk"]
-    },
-    {
-        "title": "Montagem sombra estelar 1.0",
-        "artist": "DJ RICK 013, Mc Charles, THZ",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Montagem sombra estelar 1.0", "DJ RICK 013", "Mc Charles", "THZ", "phonk"]
-    },
-    {
-        "title": "Vai Me Bota (Slowed)",
-        "artist": "KREZUS, Mc Lysa",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Vai Me Bota", "KREZUS", "Mc Lysa", "phonk", "slowed"]
-    },
-    {
-        "title": "VAPO DO VAPO",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["VAPO DO VAPO", "phonk", "brazilian funk"]
-    },
-    {
-        "title": "PLANETA DESCONHECIDO",
-        "artist": "DJ NK3, THEUZ ZL",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["PLANETA DESCONHECIDO", "DJ NK3", "THEUZ ZL", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-abYZDW36XYbw7ypv-isY3pQ-t1080x1080.png",
+        "keywords": [
+            "FUNK INFERNAL",
+            "DYGO",
+            "Mxng0",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "EMPTY FUNK",
         "artist": "DJ Anemia, crier, sixnite",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["EMPTY FUNK", "DJ Anemia", "crier", "sixnite", "funk", "phonk"]
-    },
-    {
-        "title": "Montagem Lunar Diamante",
-        "artist": "DJ DYLANFK, WXCHSXN",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Montagem Lunar Diamante", "DJ DYLANFK", "WXCHSXN", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-Krmp3jeOvcDLk1hp-Pv9e2g-t1080x1080.png",
+        "keywords": [
+            "EMPTY FUNK",
+            "DJ Anemia",
+            "crier",
+            "sixnite",
+            "funk",
+            "phonk"
+        ]
     },
     {
         "title": "THOMAS",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["THOMAS", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-e4OMDzVfyvXw7TCp-oIvZbQ-t500x500.jpg",
+        "keywords": [
+            "THOMAS",
+            "phonk"
+        ]
     },
     {
         "title": "Mexican Phonk Eki",
         "artist": "NUEKI, TOLCHONOV",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["Mexican Phonk Eki", "NUEKI", "TOLCHONOV", "phonk", "mexican"]
+        "thumbnail": "https://static.wikia.nocookie.net/robeats/images/6/67/Mexican_Phonk_Eki.jpg/revision/latest/scale-to-width-down/300?cb=20241122210129",
+        "keywords": [
+            "Mexican Phonk Eki",
+            "NUEKI",
+            "TOLCHONOV",
+            "phonk",
+            "mexican"
+        ]
     },
     {
         "title": "DRESS!",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["DRESS!", "phonk"]
+        "thumbnail": "https://static.qobuz.com/images/covers/5a/dp/jwdxflvoqdp5a_600.jpg",
+        "keywords": [
+            "DRESS!",
+            "phonk"
+        ]
     },
     {
         "title": "AUTOMOTIVO PA PA PAPAI",
         "artist": "DJ RIO, 0to8",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["AUTOMOTIVO PA PA PAPAI", "DJ RIO", "0to8", "phonk"]
+        "thumbnail": "https://resources.tidal.com/images/bf207014/1815/487f/bedc/145e83fddcab/640x640.jpg",
+        "keywords": [
+            "AUTOMOTIVO PA PA PAPAI",
+            "DJ RIO",
+            "0to8",
+            "phonk"
+        ]
     },
     {
         "title": "BLOODY BRAZIL (Slowed)",
         "artist": "TENZOO",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["BLOODY BRAZIL", "TENZOO", "phonk", "slowed", "brazilian"]
-    },
-    {
-        "title": "z-alpha 2",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["z-alpha 2", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-Jrjxwgv2srHh-0-t500x500.jpg",
+        "keywords": [
+            "BLOODY BRAZIL",
+            "TENZOO",
+            "phonk",
+            "slowed",
+            "brazilian"
+        ]
     },
     {
         "title": "REI DO BRASIL",
         "artist": "Seek",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["REI DO BRASIL", "Seek", "phonk", "brazilian"]
-    },
-    {
-        "title": "ECOS DO ABISMO",
-        "artist": "Flame Runner, ZIMXN",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["ECOS DO ABISMO", "Flame Runner", "ZIMXN", "phonk"]
-    },
-    {
-        "title": "Montagem Sonic Ritmado 1.0 (Super Slowed)",
-        "artist": "TOKYOPHILE",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["Montagem Sonic Ritmado 1.0", "TOKYOPHILE", "phonk", "sonic", "slowed"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-irznl3EWzy0WvDdX-1sf2DA-t500x500.jpg",
+        "keywords": [
+            "REI DO BRASIL",
+            "Seek",
+            "phonk",
+            "brazilian"
+        ]
     },
     {
         "title": "KRUSHKRUSH!",
         "artist": "Hussain Ali",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["KRUSHKRUSH!", "Hussain Ali", "phonk"]
-    },
-    {
-        "title": "EI DO SENSACIO!",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["EI DO SENSACIO!", "phonk", "brazilian funk"]
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/kGxbn03y4r/xbn1zN9QWy/size_m.jpg",
+        "keywords": [
+            "KRUSHKRUSH!",
+            "Hussain Ali",
+            "phonk"
+        ]
     },
     {
         "title": "NITE",
         "artist": "ELVEN DIOR",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["NITE", "ELVEN DIOR", "phonk"]
-    },
-    {
-        "title": "PASSO BEM SOLTO",
-        "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": ["PASSO BEM SOLTO", "phonk", "brazilian funk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-zFXrbEjGzFKOgB3D-nLQ6CA-t1080x1080.jpg",
+        "keywords": [
+            "NITE",
+            "ELVEN DIOR",
+            "phonk"
+        ]
     },
     {
         "title": "krushed!",
         "artist": "$werve, SXCREDMANE, FXRCE",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["krushed!", "$werve", "SXCREDMANE", "FXRCE", "phonk"]
+        "thumbnail": "https://i1.sndcdn.com/artworks-joCZq2uJ3kpu2yqB-5WuuYA-t500x500.jpg",
+        "keywords": [
+            "krushed!",
+            "$werve",
+            "SXCREDMANE",
+            "FXRCE",
+            "phonk"
+        ]
     },
     {
         "title": "The Automotivo Infernal 1.0",
         "artist": "",
         "link": "",
-        "thumbnail": "",
-        "keywords": ["The Automotivo Infernal 1.0", "phonk", "brazilian funk"]
+        "thumbnail": "https://c.saavncdn.com/218/The-Automotivo-Infernal-1-0-Portuguese-2023-20230716012709-500x500.jpg",
+        "keywords": [
+            "The Automotivo Infernal 1.0",
+            "phonk",
+            "brazilian funk"
+        ]
     }
 ]
