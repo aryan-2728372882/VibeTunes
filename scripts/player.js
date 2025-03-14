@@ -109,6 +109,9 @@ const fixedPhonk = [
 
 // Player State Management
 let currentPlaylist = [];
+// Add global variables for JSON songs
+let jsonBhojpuriSongs = [];
+let jsonPhonkSongs = [];
 let currentSongIndex = 0;
 let repeatMode = 0; // 0: No repeat, 1: Repeat all, 2: Repeat one
 let currentContext = 'bhojpuri'; // 'bhojpuri', 'phonk', or 'search'
@@ -133,6 +136,7 @@ async function displayFixedSections() {
     await loadFullJSONSongs();
 }
 
+// ✅ Keep original loadFullJSONSongs intact with additions
 async function loadFullJSONSongs() {
     try {
         const [bhojpuriSongs, phonkSongs] = await Promise.all([
@@ -140,9 +144,13 @@ async function loadFullJSONSongs() {
             fetch("phonk.json").then(response => response.json())
         ]);
 
-        // ✅ Ensure Fixed Sections Are NOT Affected
-        populateSection('bhojpuri-collection', bhojpuriSongs, 'json-bhojpuri'); 
-        populateSection('phonk-collection', phonkSongs, 'json-phonk'); 
+        // Store JSON songs in global variables
+        jsonBhojpuriSongs = bhojpuriSongs;
+        jsonPhonkSongs = phonkSongs;
+
+        // ✅ Original population remains unchanged
+        populateSection('bhojpuri-collection', jsonBhojpuriSongs, 'json-bhojpuri'); 
+        populateSection('phonk-collection', jsonPhonkSongs, 'json-phonk'); 
 
     } catch (error) {
         console.error("Error loading songs from JSON:", error);
@@ -170,19 +178,17 @@ function populateSection(containerId, songs, context) {
 
 // Search Implementation
 let searchSongsList = [];
+// ✅ Modified loadSearchSongs (keep old code structure)
 async function loadSearchSongs() {
     try {
-        const [songs, phonk] = await Promise.all([
-            fetch("songs.json").then(r => r.json()),
-            fetch("phonk.json").then(r => r.json())
-        ]);
-        searchSongsList = [...songs, ...phonk];
+        // Use only JSON songs for search
+        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs];
     } catch (error) {
         console.error("Error loading songs:", error);
     }
 }
 
-// Modified searchSongs function
+// ✅ Updated searchSongs function (preserve original structure)
 function searchSongs(query) {
     const searchSection = document.getElementById('search-results-container');
     const searchContainer = searchSection.querySelector('.scroll-container');
@@ -194,13 +200,21 @@ function searchSongs(query) {
 
     const results = searchSongsList
         .filter(song => song.title.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 10); // Load only 10 songs
+        .slice(0, 10);
 
     searchContainer.innerHTML = '';
 
     if (results.length) {
         results.forEach(song => {
-            const songElement = createSongElement(song, 'search');
+            const songElement = document.createElement('div');
+            songElement.classList.add('song-item');
+            songElement.innerHTML = `
+                <div class="thumbnail-container" onclick="playSong('${song.title}', 'search')">
+                    <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
+                    <div class="hover-play">▶</div>
+                </div>
+                <div class="song-title">${song.title}</div>
+            `;
             searchContainer.appendChild(songElement);
         });
 
@@ -239,7 +253,7 @@ function balanceSongTitles() {
 window.addEventListener('load', balanceSongTitles);
 window.addEventListener('resize', balanceSongTitles);
 
-// Playback Control
+// ✅ Updated playSong function (keep original cases)
 function playSong(title, context) {
     let song;
     
@@ -255,14 +269,18 @@ function playSong(title, context) {
             currentContext = 'phonk';
             break;
         case 'json-bhojpuri': 
-            song = searchSongsList.find(s => s.title === title);
-            currentPlaylist = searchSongsList;
+            song = jsonBhojpuriSongs.find(s => s.title === title);
+            currentPlaylist = jsonBhojpuriSongs;
             currentContext = 'json-bhojpuri';
             break;
         case 'json-phonk': 
-            song = searchSongsList.find(s => s.title === title);
-            currentPlaylist = searchSongsList;
+            song = jsonPhonkSongs.find(s => s.title === title);
+            currentPlaylist = jsonPhonkSongs;
             currentContext = 'json-phonk';
+            break;
+        case 'search':
+            song = currentPlaylist.find(s => s.title === title);
+            currentContext = 'search';
             break;
     }
 
@@ -281,7 +299,6 @@ function playSong(title, context) {
             showPopup("Error playing song!");
         });
 }
-
 
 function highlightCurrentSong() {
     document.querySelectorAll('.song-item').forEach(item => item.classList.remove('playing'));
@@ -464,9 +481,9 @@ function changeVolume(value) {
     document.getElementById("volume-percentage").textContent = `${value}%`;
 }
 
-// Initialization
-document.addEventListener("DOMContentLoaded", () => {
-    displayFixedSections(); // ✅ Loads fixed + JSON songs separately
-    loadSearchSongs();
+// ✅ Modified initialization sequence
+document.addEventListener("DOMContentLoaded", async () => {
+    await displayFixedSections(); // First load JSON collections
+    await loadSearchSongs(); // Then prepare search list
     changeVolume(100);
 });
