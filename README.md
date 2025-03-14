@@ -2,7 +2,7 @@
 
 FutureStream is a modern, self-hosted music streaming platform with a focus on regional content and phonk music, featuring a responsive UI and robust player controls.
 
-![Demo](assets/VibeTunes%20logo-modified.png) *Replace with actual demo image*
+![Demo](assets/favicon%20-%20Copy.ico) *Replace with actual demo image*
 
 ## ✨ Features
 
