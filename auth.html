@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Overview | VibeTunes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ✅ Enhanced Dark Theme */
+        :root {
+            --primary: #6366f1;         /* Indigo accent */
+            --secondary: #3b82f6;       /* Modern blue */
+            --dark-bg: #0f172a;         /* Deep navy */
+            --dark-secondary: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #22c55e;
+        }
+
+        /* ✅ Improved Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ✅ Premium Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--dark-secondary);
+            padding: 1.2rem 5%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* ✅ Modern Auth Containers */
+        .container {
+            max-width: 440px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: var(--dark-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-3px);
+        }
+
+        /* ✅ Enhanced Form Elements */
+        input {
+            width: 100%;
+            padding: 0.9rem 1.25rem;
+            margin: 0.75rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+
+        /* ✅ Gradient Buttons with Depth */
+        button {
+            width: 100%;
+            padding: 0.9rem;
+            margin: 0.75rem 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .google-btn {
+            background: linear-gradient(135deg, #db4437, #c1351a);
+        }
+
+        /* ✅ Stats Section Styling */
+        .stats-section, .update-section {
+            background: var(--dark-bg);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stats-section p {
+            margin: 0.75rem 0;
+            color: var(--text-secondary);
+        }
+
+        /* ✅ Account Dashboard Styling */
+        #accountDashboard h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        #accountDashboard h3 {
+            margin: 1.5rem 0 1rem;
+            color: var(--primary);
+        }
+
+        /* ✅ Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 5%;
+            }
+
+            .container {
+                margin: 2rem auto;
+                width: 90%;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-links a {
+                padding: 0.75rem;
+            }
+
+            input, button {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+
+    
+</head>
+<body>
+
+    <!-- ✅ Navigation Bar -->
+    <header>
+        <div class="navbar">
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="contact.html">Contact Us</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ✅ Authentication Section -->
+    <div class="container" id="auth-container">
+        <div id="login-form" class="auth-form active-form">
+            <h2>Login</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <button class="google-btn" onclick="loginWithGoogle()">Continue with Google</button>
+            <p><a href="#" onclick="forgotPassword()">Forgot Password?</a></p>
+            <button onclick="showAuthForm('signup')">Create Account</button>
+        </div>
+
+        <div id="signup-form" class="auth-form" style="display: none;">
+            <h2>Sign Up</h2>
+            <input type="email" id="signup-email" placeholder="Email">
+            <input type="password" id="signup-password" placeholder="Password">
+            <input type="text" id="signup-username" placeholder="Username">
+            <button onclick="signup()">Sign Up</button>
+            <button onclick="showAuthForm('login')">Already have an account?</button>
+        </div>
+    </div>
+
+    <!-- ✅ Account Overview -->
+    <div class="container account-container" id="accountDashboard">
+        <h2>Welcome to Your Account</h2>
+        <p>Email: <span id="user-email"></span></p>
+        <p>Username: <span id="username"></span></p>
+        <p>Password: <span id="stored-password">********</span></p>
+        <p>Password Last Updated: <span id="password-updated-time">N/A</span></p>
+        <button onclick="logout()">Logout</button>
+
+        <h3>Listening Statistics</h3>
+        <div class="stats-section">
+            <p>Minutes Listened: <span id="minutes-listened">0</span></p>
+            <p>Songs Played: <span id="songs-played">0</span></p>
+        </div>
+
+        <h3>Update Profile</h3>
+        <div class="update-section">
+            <input type="text" id="new-username" placeholder="New username">
+            <button onclick="updateUsername()">Update Username</button>
+        </div>
+        <h3>Update Password</h3>
+        <div class="update-section">
+        <input type="password" id="current-password" placeholder="Current Password">
+        <input type="password" id="new-password" placeholder="New Password">
+        <button onclick="updatePassword()">Update Password</button>
+        </div>
+
+
+    </div>
+
+    <!-- ✅ Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyClIhXAaTVmlqhEPxU49C9w9fDkUag-1eQ",
+        authDomain: "vibe-tunes.firebaseapp.com",
+        databaseURL: "https://vibe-tunes-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "vibe-tunes",
+        storageBucket: "vibe-tunes.firebasestorage.app",
+        messagingSenderId: "792892627539",
+        appId: "1:792892627539:web:69817da08d2d4741a404a6",
+        measurementId: "G-7RQD85KP8Z"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ✅ Ensure session persistence
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => console.log("Auth persistence set to LOCAL"))
+        .catch(error => console.error("Error setting auth persistence:", error));
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("accountDashboard").style.display = "block";
+            document.getElementById("user-email").textContent = user.email;
+
+            // ✅ Store user data in sessionStorage for cross-page use
+            sessionStorage.setItem("userUID", user.uid);
+            sessionStorage.setItem("userEmail", user.email);
+
+            loadUserData(user.uid);
+        } else {
+            document.getElementById("auth-container").style.display = "block";
+            document.getElementById("accountDashboard").style.display = "none";
+            sessionStorage.clear(); // Clear stored user data on logout
+            setTimeout(() => showAuthForm('login'), 200);
+        }
+    });
+
+
+async function loginWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        const userRef = db.collection("users").doc(user.uid);
+        const doc = await userRef.get();
+
+        if (!doc.exists) {
+            // Generate a username if the user is new
+            const firstName = user.displayName ? user.displayName.split(" ")[0] : "User";
+            const randomNumber = Math.floor(1000 + Math.random() * 9000);
+            const generatedUsername = firstName + randomNumber;
+
+            await userRef.set({
+                email: user.email,
+                username: generatedUsername,
+                minutesListened: 0,
+                songsPlayed: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        // ✅ Ensure UI updates correctly
+        document.getElementById("auth-container").style.display = "none";
+        document.getElementById("accountDashboard").style.display = "block";
+        document.getElementById("user-email").textContent = user.email;
+        loadUserData(user.uid);
+
+    } catch (error) {
+        console.error("Google Login Error:", error);
+        alert(error.message);
+    }
+}
+
+
+function showAuthForm(formType) {
+    document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+    document.getElementById(`${formType}-form`).style.display = 'block';
+}
+
+// Call this when the page loads to default to the login form
+document.addEventListener("DOMContentLoaded", () => {
+    showAuthForm('login');
+});
+
+
+async function login() {
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+        console.error("Login Error:", error);
+        alert(error.message); // Display error message to user
+    }
+}
+
+async function signup() {
+    const email = document.getElementById("signup-email").value;
+    const password = document.getElementById("signup-password").value;
+    const username = document.getElementById("signup-username").value.trim();
+
+    if (!email || !password || !username) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Save user data in Firestore
+        await db.collection("users").doc(user.uid).set({
+            email: user.email,
+            username: username,
+            minutesListened: 0,
+            songsPlayed: 0,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Signup successful! You can now log in.");
+        showAuthForm('login');
+    } catch (error) {
+        console.error("Signup Error:", error);
+        alert(error.message);
+    }
+}
+
+async function updatePassword() {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("You must be logged in to update your password.");
+        return;
+    }
+
+    const currentPassword = document.getElementById("current-password").value;
+    const newPassword = document.getElementById("new-password").value;
+
+    if (newPassword.length < 6) {
+        alert("Password must be at least 6 characters.");
+        return;
+    }
+
+    // ✅ Re-authenticate User Before Changing Password
+    const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+
+    try {
+        await user.reauthenticateWithCredential(credential);
+        await user.updatePassword(newPassword);
+
+        // ❌ Storing Password in Plain Text (DANGEROUS)
+        const userRef = db.collection("users").doc(user.uid);
+        await userRef.update({
+            password: newPassword,  // ⚠️ This is a security risk!
+            passwordLastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Password updated successfully!");
+    } catch (error) {
+        console.error("Error updating password:", error);
+        alert(error.message);
+    }
+}
+
+
+function forgotPassword() {
+    const email = document.getElementById("login-email").value.trim();
+    
+    if (!email) {
+        alert("Please enter your email before resetting the password.");
+        return;
+    }
+
+    auth.sendPasswordResetEmail(email)
+        .then(() => {
+            alert("Password reset email sent! Check your inbox.");
+        })
+        .catch(error => {
+            console.error("Error resetting password:", error);
+            alert(error.message);
+        });
+}
+
+function loadUserData(uid) {
+    db.collection("users").doc(uid).get().then(doc => {
+        if (doc.exists) {
+            const userData = doc.data();
+            document.getElementById("username").textContent = userData.username || "N/A";
+            document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
+            document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
+
+            // ✅ Show Password (Optional: Hide by Default)
+            document.getElementById("stored-password").textContent = userData.password || "N/A";
+
+            // ✅ Show Password Last Updated Time
+            if (userData.passwordLastUpdated) {
+                const timestamp = userData.passwordLastUpdated.toDate();
+                document.getElementById("password-updated-time").textContent = timestamp.toLocaleString();
+            } else {
+                document.getElementById("password-updated-time").textContent = "Never Changed";
+            }
+        }
+    }).catch(error => console.error("Error loading user data:", error));
+}
+
+
+async function updateUsername() {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("You must be logged in to update your username.");
+        return;
+    }
+
+    const newUsername = document.getElementById("new-username").value.trim();
+    if (newUsername === "") {
+        alert("Username cannot be empty.");
+        return;
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+    const doc = await userRef.get();
+
+    if (!doc.exists) {
+        alert("User data not found in Firestore. Try logging out and logging back in.");
+        return;
+    }
+
+    try {
+        await userRef.update({ username: newUsername });
+
+        document.getElementById("username").textContent = newUsername;
+        alert("Username updated successfully!");
+    } catch (error) {
+        console.error("Error updating username:", error);
+        alert("Failed to update username. Please try again.");
+    }
+}
+
+
+function logout() {
+    auth.signOut().then(() => {
+        document.getElementById("auth-container").style.display = "block";
+        document.getElementById("accountDashboard").style.display = "none";
+        document.getElementById("login-email").value = "";
+        document.getElementById("login-password").value = "";
+        document.getElementById("signup-email").value = "";
+        document.getElementById("signup-password").value = "";
+        document.getElementById("signup-username").value = "";
+        showAuthForm('login'); // Ensure login form is shown after logout
+    }).catch(error => {
+        console.error("Logout Error:", error);
+    });
+}
+
+    </script>
+</body>
+</html>

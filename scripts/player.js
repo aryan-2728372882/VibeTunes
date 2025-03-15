@@ -1,4 +1,75 @@
 // Fixed Songs Collections
+
+auth.onAuthStateChanged(user => {
+    if (!user) {
+        console.warn("No user logged in, skipping song tracking.");
+    } else {
+        console.log("User detected:", user.email);
+        setupSongTracking(user.uid);
+    }
+});
+
+function setupSongTracking(uid) {
+    const audioPlayer = document.getElementById("audio-player");
+    
+    if (!audioPlayer) {
+        console.warn("Audio player not found.");
+        return;
+    }
+
+    let totalPlayTime = 0;  // Stores the total playtime (in milliseconds)
+    let lastPlayTime = 0;    // Stores the last play timestamp
+
+    // ✅ When the song starts or resumes
+    audioPlayer.addEventListener("play", () => {
+        lastPlayTime = Date.now(); // Capture the time when song starts playing
+    });
+
+    // ✅ When the song is paused
+    audioPlayer.addEventListener("pause", () => {
+        if (lastPlayTime) {
+            totalPlayTime += (Date.now() - lastPlayTime); // Add elapsed time
+            lastPlayTime = 0; // Reset last play timestamp
+        }
+    });
+
+    // ✅ When the song finishes playing
+    audioPlayer.addEventListener("ended", () => {
+        if (lastPlayTime) {
+            totalPlayTime += (Date.now() - lastPlayTime); // Final playtime update
+            lastPlayTime = 0;
+        }
+
+        let minutesPlayed = Math.floor(totalPlayTime / 60000); // Convert ms to minutes
+        totalPlayTime = 0; // Reset total playtime after updating
+
+        if (minutesPlayed > 0) {
+            updateUserStats(uid, minutesPlayed);
+        }
+    });
+}
+
+// ✅ Only Update Firestore with the Correct Value
+function updateUserStats(uid, minutesPlayed) {
+    if (!uid) {
+        console.warn("Cannot update stats: No user ID provided.");
+        return;
+    }
+
+    if (minutesPlayed < 1) {
+        console.warn("Playtime is less than 1 minute, not updating Firestore.");
+        return; // Ignore updates for playtime less than 1 minute
+    }
+
+    const userRef = db.collection("users").doc(uid);
+    userRef.update({
+        songsPlayed: firebase.firestore.FieldValue.increment(1),
+        minutesListened: firebase.firestore.FieldValue.increment(minutesPlayed)
+    }).then(() => console.log(`Updated: +1 song, +${minutesPlayed} minutes`))
+      .catch(error => console.error("Error updating user stats:", error));
+}
+
+
 const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
@@ -487,3 +558,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadSearchSongs(); // Then prepare search list
     changeVolume(100);
 });
+

@@ -92,6 +92,18 @@
         </div>
     </footer>
 
+
+    <script>
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                console.warn("User not logged in, redirecting to login page.");
+                window.location.href = "auth.html";
+            } else {
+                console.log("User detected:", user.email);
+            }
+        });
+    </script>
+    
     <script src="scripts/mail.js"></script>
     
 </body>
