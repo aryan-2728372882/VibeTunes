@@ -320,7 +320,6 @@ async function loadSearchSongs() {
     }
 }
 
-
 // ✅ Updated searchSongs function (preserve original structure)
 function searchSongs(query) {
     const searchSection = document.getElementById('search-results-container');
