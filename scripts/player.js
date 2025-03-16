@@ -310,16 +310,16 @@ function populateSection(containerId, songs, context) {
 
 // Search Implementation
 let searchSongsList = [];
-// ✅ Modified loadSearchSongs (keep old code structure)
 // Search Implementation
 async function loadSearchSongs() {
     try {
-        // Include Haryanvi songs in search
-        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...fixedBhojpuri, ...fixedPhonk, ...fixedHaryanvi];
+        // We'll load songs directly in the searchSongs function instead
+        console.log("Search functionality ready");
     } catch (error) {
-        console.error("Error loading songs:", error);
+        console.error("Error preparing search:", error);
     }
 }
+
 
 // ✅ Updated searchSongs function (preserve original structure)
 function searchSongs(query) {
@@ -331,18 +331,62 @@ function searchSongs(query) {
         return;
     }
 
-    const results = searchSongsList
-        .filter(song => song.title.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 10);
-
+    // Create a new array for search results that includes source information
+    const results = [];
+    
+    // Check Bhojpuri songs
+    jsonBhojpuriSongs.forEach(song => {
+        if (song.title.toLowerCase().includes(query.toLowerCase())) {
+            results.push({...song, source: 'json-bhojpuri'});
+        }
+    });
+    
+    // Check Phonk songs
+    jsonPhonkSongs.forEach(song => {
+        if (song.title.toLowerCase().includes(query.toLowerCase())) {
+            results.push({...song, source: 'json-phonk'});
+        }
+    });
+    
+    // Check Haryanvi songs
+    jsonHaryanviSongs.forEach(song => {
+        if (song.title.toLowerCase().includes(query.toLowerCase())) {
+            results.push({...song, source: 'json-haryanvi'});
+        }
+    });
+    
+    // Check fixed Bhojpuri songs
+    fixedBhojpuri.forEach(song => {
+        if (song.title.toLowerCase().includes(query.toLowerCase())) {
+            results.push({...song, source: 'bhojpuri'});
+        }
+    });
+    
+    // Check fixed Phonk songs
+    fixedPhonk.forEach(song => {
+        if (song.title.toLowerCase().includes(query.toLowerCase())) {
+            results.push({...song, source: 'phonk'});
+        }
+    });
+    
+    // Check fixed Haryanvi songs
+    fixedHaryanvi.forEach(song => {
+        if (song.title.toLowerCase().includes(query.toLowerCase())) {
+            results.push({...song, source: 'haryanvi'});
+        }
+    });
+    
+    // Limit to top 10 results
+    const topResults = results.slice(0, 10);
+    
     searchContainer.innerHTML = '';
 
-    if (results.length) {
-        results.forEach(song => {
+    if (topResults.length) {
+        topResults.forEach(song => {
             const songElement = document.createElement('div');
             songElement.classList.add('song-item');
             songElement.innerHTML = `
-                <div class="thumbnail-container" onclick="playSong('${song.title}', 'search')">
+                <div class="thumbnail-container" onclick="playSearchSong('${song.title}', '${song.source}')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                     <div class="hover-play">▶</div>
                 </div>
@@ -351,7 +395,7 @@ function searchSongs(query) {
             searchContainer.appendChild(songElement);
         });
 
-        currentPlaylist = results;
+        currentPlaylist = topResults; // Keep track of search results
         currentContext = 'search';
         searchSection.style.display = 'block';
     } else {
@@ -387,56 +431,62 @@ window.addEventListener('load', balanceSongTitles);
 window.addEventListener('resize', balanceSongTitles);
 
 // ✅ Updated playSong function (keep original cases)
-function playSong(title, context) {
+function playSearchSong(title, source) {
     let song;
+    let sourcePlaylist;
     
-    switch (context) {
-        case 'bhojpuri': 
+    // Find the song in its original source
+    switch (source) {
+        case 'bhojpuri':
             song = fixedBhojpuri.find(s => s.title === title);
-            currentPlaylist = fixedBhojpuri;
-            currentContext = 'bhojpuri';
+            sourcePlaylist = fixedBhojpuri;
             break;
-        case 'phonk': 
+        case 'phonk':
             song = fixedPhonk.find(s => s.title === title);
-            currentPlaylist = fixedPhonk;
-            currentContext = 'phonk';
+            sourcePlaylist = fixedPhonk;
             break;
-        case 'haryanvi': 
+        case 'haryanvi':
             song = fixedHaryanvi.find(s => s.title === title);
-            currentPlaylist = fixedHaryanvi;
-            currentContext = 'haryanvi';
+            sourcePlaylist = fixedHaryanvi;
             break;
-        case 'json-bhojpuri': 
+        case 'json-bhojpuri':
             song = jsonBhojpuriSongs.find(s => s.title === title);
-            currentPlaylist = jsonBhojpuriSongs;
-            currentContext = 'json-bhojpuri';
+            sourcePlaylist = jsonBhojpuriSongs;
             break;
-        case 'json-phonk': 
+        case 'json-phonk':
             song = jsonPhonkSongs.find(s => s.title === title);
-            currentPlaylist = jsonPhonkSongs;
-            currentContext = 'json-phonk';
+            sourcePlaylist = jsonPhonkSongs;
             break;
-        case 'json-haryanvi': 
+        case 'json-haryanvi':
             song = jsonHaryanviSongs.find(s => s.title === title);
-            currentPlaylist = jsonHaryanviSongs;
-            currentContext = 'json-haryanvi';
-            break;
-        case 'search':
-            song = currentPlaylist.find(s => s.title === title);
-            currentContext = 'search';
+            sourcePlaylist = jsonHaryanviSongs;
             break;
     }
-
-    // Rest of the function remains the same
-    if (!song) return;
     
+    if (!song) {
+        console.error("Song not found:", title);
+        return;
+    }
+    
+    // Use the original source playlist for continuous playback
+    currentPlaylist = sourcePlaylist;
+    currentContext = source;
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
+    
+    if (currentSongIndex === -1) {
+        console.error("Song index not found in source playlist");
+        return;
+    }
+    
+    console.log(`Playing "${title}" from ${source} (index: ${currentSongIndex}). Next songs will continue from this collection.`);
+    
     audioPlayer.src = song.link;
     audioPlayer.play()
         .then(() => {
             playerContainer.style.display = "flex";
             updatePlayerUI(song);
             highlightCurrentSong();
+            showPopup(`Playing from ${source.replace('json-', '')}`);
         })
         .catch(error => {
             console.error("Playback failed:", error);
