@@ -187,7 +187,7 @@ const fixedHaryanvi = [
     },
     {
         "title": "Goli Chal Javegi",
-        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Goli%20Chal%20Javegi.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Goli-Chal-Javegi.mp3",
         "thumbnail": "https://c.saavncdn.com/995/Goli-Chal-Javegi-Haryanvi-2023-20230626165918-500x500.jpg"
     },
     {
