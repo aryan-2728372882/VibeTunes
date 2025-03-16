@@ -403,6 +403,75 @@ function searchSongs(query) {
     }
 }
 
+// Also update the playSong function to ensure context is properly maintained
+function playSong(title, context) {
+    let song;
+    let sourcePlaylist;
+    
+    // Find the song in its original source
+    switch (context) {
+        case 'bhojpuri':
+            song = fixedBhojpuri.find(s => s.title === title);
+            sourcePlaylist = fixedBhojpuri;
+            break;
+        case 'phonk':
+            song = fixedPhonk.find(s => s.title === title);
+            sourcePlaylist = fixedPhonk;
+            break;
+        case 'haryanvi':
+            song = fixedHaryanvi.find(s => s.title === title);
+            sourcePlaylist = fixedHaryanvi;
+            break;
+        case 'json-bhojpuri':
+            song = jsonBhojpuriSongs.find(s => s.title === title);
+            sourcePlaylist = jsonBhojpuriSongs;
+            break;
+        case 'json-phonk':
+            song = jsonPhonkSongs.find(s => s.title === title);
+            sourcePlaylist = jsonPhonkSongs;
+            break;
+        case 'json-haryanvi':
+            song = jsonHaryanviSongs.find(s => s.title === title);
+            sourcePlaylist = jsonHaryanviSongs;
+            break;
+        case 'search':
+            song = currentPlaylist.find(s => s.title === title);
+            sourcePlaylist = currentPlaylist;
+            break;
+    }
+    
+    if (!song) {
+        console.error("Song not found:", title);
+        return;
+    }
+    
+    // Use the original source playlist for continuous playback
+    currentPlaylist = sourcePlaylist;
+    currentContext = context;
+    currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
+    
+    if (currentSongIndex === -1) {
+        console.error("Song index not found in source playlist");
+        return;
+    }
+    
+    console.log(`Playing "${title}" from ${context} (index: ${currentSongIndex})`);
+    
+    audioPlayer.src = song.link;
+    audioPlayer.play()
+        .then(() => {
+            playerContainer.style.display = "flex";
+            updatePlayerUI(song);
+            highlightCurrentSong();
+            showPopup(`Playing from ${context.replace('json-', '')}`);
+        })
+        .catch(error => {
+            console.error("Playback failed:", error);
+            showPopup("Error playing song!");
+        });
+}
+
+
 // Smart title splitting with fallback
 function balanceSongTitles() {
     document.querySelectorAll('.song-title').forEach(title => {
@@ -510,16 +579,17 @@ document.addEventListener("DOMContentLoaded", () => {
     changeVolume(100); // This sets volume to 100% (300/300)
 });
 
-async function handleSongEnd() {
+function handleSongEnd() {
     console.log("Current Song Index Before:", currentSongIndex);
     console.log("Repeat Mode:", repeatMode);
+    console.log("Current Context:", currentContext);
 
     // Remove event listener before potentially re-adding it
     audioPlayer.removeEventListener('ended', handleSongEnd);
 
     if (repeatMode === 2) { // Repeat single song
         audioPlayer.currentTime = 0;
-        await audioPlayer.play().catch(error => console.error("Playback failed:", error));
+        audioPlayer.play().catch(error => console.error("Playback failed:", error));
         console.log("Repeating the same song...");
         
         // Add event listener back
@@ -528,17 +598,20 @@ async function handleSongEnd() {
         return;
     }
 
+    // Get the next song in the current context/collection
     if (repeatMode === 1) { // Repeat all songs
         currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     } else if (currentSongIndex < currentPlaylist.length - 1) { // Play next song normally
         currentSongIndex++;
     } else {
         console.log("Reached the end of the playlist. Stopping.");
+        audioPlayer.addEventListener('ended', handleSongEnd);
         return;
     }
 
-    console.log("Loading Next Song:", currentPlaylist[currentSongIndex].title);
+    console.log(`Loading Next Song (${currentContext}):`, currentPlaylist[currentSongIndex].title);
 
+    // Load the next song from the SAME context
     audioPlayer.src = currentPlaylist[currentSongIndex].link;
     audioPlayer.load();
 
@@ -546,7 +619,7 @@ async function handleSongEnd() {
     let retries = 0;
     let maxRetries = 5;
 
-    // ✅ Ensure playback before moving to the next song
+    // Ensure playback before moving to the next song
     audioPlayer.oncanplay = async () => {
         console.log("Song Fully Loaded:", currentPlaylist[currentSongIndex].title);
 
@@ -563,28 +636,29 @@ async function handleSongEnd() {
             }
         }
 
-        if (!songStarted) {
+        if (!songStarted && currentPlaylist.length > 1) {
             console.error("Max retries reached! Skipping to next song...");
-            // Skip to the next song
+            // Skip to the next song BUT STAY IN SAME CONTEXT
             currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
             playSong(currentPlaylist[currentSongIndex].title, currentContext);
         }
 
         // Add event listener back after playback starts
         audioPlayer.addEventListener('ended', handleSongEnd);
-
         updatePlayPauseButton(); // Sync the play/pause button
     };
 
-    // ✅ Confirm the song is playing
+    // Confirm the song is playing
     audioPlayer.onplaying = () => {
         console.log("Confirmed: Song is playing:", currentPlaylist[currentSongIndex].title);
         songStarted = true;
         audioPlayer.addEventListener('ended', handleSongEnd);
+        highlightCurrentSong(); // Highlight the currently playing song
     };
 
-    // ✅ Ensure UI updates with new song info
+    // Ensure UI updates with new song info
     updatePlayerUI(currentPlaylist[currentSongIndex]);
+    highlightCurrentSong(); // Also update highlighting when song changes
     updatePlayPauseButton();
 }
 
@@ -602,9 +676,7 @@ document.addEventListener("click", () => {
     }
 }, { once: true });
 
-
-
-// Navigation Controls
+// Make sure the next/previous functions also maintain context
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
@@ -672,6 +744,29 @@ function changeVolume(value) {
     const volumeValue = value / 100;  // Now 100% = full volume
     audioPlayer.volume = volumeValue;
     document.getElementById("volume-percentage").textContent = `${value}%`;
+}
+
+// Improved highlighting function
+function highlightCurrentSong() {
+    // First, remove 'playing' class from all song items
+    document.querySelectorAll('.song-item').forEach(item => item.classList.remove('playing'));
+    
+    // Find the current song element by matching title text
+    const currentSongTitle = currentPlaylist[currentSongIndex]?.title;
+    if (!currentSongTitle) return;
+    
+    // Get all song titles
+    const allSongTitles = document.querySelectorAll('.song-title');
+    
+    // Find the matching element and add 'playing' class to its parent
+    for (const titleElement of allSongTitles) {
+        if (titleElement.textContent.trim() === currentSongTitle) {
+            titleElement.parentElement.classList.add('playing');
+            // You might also want to scroll to the playing song
+            titleElement.parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            break;
+        }
+    }
 }
 
 // ✅ Modified initialization sequence
