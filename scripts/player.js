@@ -73,52 +73,52 @@ function updateUserStats(uid, minutesPlayed) {
 const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Kehu%20Ke%20Na%20Daal%20Gali%20Koiri%20Ke%20Raaj%20Chali(Khesari2.IN).mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/Kehu%20Ke%20Na%20Daal%20Gali%20Koiri%20Ke%20Raaj%20Chali(Khesari2.IN).mp3",
         "thumbnail": "https://i.ytimg.com/vi/emeEWLXozqg/maxresdefault.jpg"
     },
     {
         "title": "Namariya Kamar Mei Khos Deb",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23VIDEO%20%23SAMAR%20SINGH%20%20Namariya%20Kamariya%20Me%20Khos%20Deb%20%20%23Shilpi%20Raj%2C%20%23Akanksha%20Dubey%20%23BhojpuriSong.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23VIDEO%20%23SAMAR%20SINGH%20%20Namariya%20Kamariya%20Me%20Khos%20Deb%20%20%23Shilpi%20Raj%2C%20%23Akanksha%20Dubey%20%23BhojpuriSong.mp3",
         "thumbnail": "https://i.ytimg.com/vi/iie1dxZtNNA/maxresdefault.jpg"
     },
     {
         "title": "UdanBaj Rajau",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23Viral%20Song%20%20Shilpi%20Raj%20%20%E0%A4%89%E0%A5%9C%E0%A4%A8%E0%A4%AC%E0%A4%9C%20%E0%A4%B0%E0%A4%9C%E0%A4%8A%20%20Feat%20_%20Anisha%20Pandey%20%20Udanbaj%20Rajau%20%20Bhojpuri%20Song%202025.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23Viral%20Song%20%20Shilpi%20Raj%20%20%E0%A4%89%E0%A5%9C%E0%A4%A8%E0%A4%AC%E0%A4%9C%20%E0%A4%B0%E0%A4%9C%E0%A4%8A%20%20Feat%20_%20Anisha%20Pandey%20%20Udanbaj%20Rajau%20%20Bhojpuri%20Song%202025.mp3",
         "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/Rz4W8evbxD/4W87jx2L3x/size_m.jpg"
     },
     {
         "title": "Chuwe Mor Jawani",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23video%20%20%E0%A4%9A%E0%A4%B5%20%E0%A4%AE%E0%A4%B0%20%E0%A4%9C%E0%A4%B5%E0%A4%A8%20%20%23samarsingh%20%20Chuwe%20Mor%20Jawani%20%20%23bhojpuri%20Song%202024.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20%20%E0%A4%9A%E0%A4%B5%20%E0%A4%AE%E0%A4%B0%20%E0%A4%9C%E0%A4%B5%E0%A4%A8%20%20%23samarsingh%20%20Chuwe%20Mor%20Jawani%20%20%23bhojpuri%20Song%202024.mp3",
         "thumbnail": "https://c.saavncdn.com/405/Chuwe-Mor-Jawani-Bhojpuri-2024-20240417122251-500x500.jpg"
     },
     {
         "title": "Balma Kadar na Jane",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%B0%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%B0%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
         "thumbnail": "https://c.saavncdn.com/659/Balma-Kadar-Na-Jane-Bhojpuri-2024-20241022172505-500x500.jpg"
     },
     {
         "title": "Babuan",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Babuaan%20Sooryavansham%20320%20Kbps.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/Babuaan%20Sooryavansham%20320%20Kbps.mp3",
         "thumbnail": "https://i.ytimg.com/vi/WpEHdFDDX00/maxresdefault.jpg"
     },
     {
         "title": "Makaiya Mei Raja ji",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Makaiya%20Me%20Raja%20JI(BhojpuriWap.In).mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/Makaiya%20Me%20Raja%20JI(BhojpuriWap.In).mp3",
         "thumbnail": "https://i.ytimg.com/vi/KO9MHwbV4c8/maxresdefault.jpg"
     },
     {
         "title": "pahin ke chali bikini",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Pahin%20Ke%20Chali%20Bikini%20Purav%20Jha%20320%20Kbps.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/Pahin%20Ke%20Chali%20Bikini%20Purav%20Jha%20320%20Kbps.mp3",
         "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/e7/7b/45e77b91-40ee-526c-6df5-6ab7fc13fb3b/cover.jpg/1200x1200bf-60.jpg"
     },
     {
         "title": "Balamua ke balam",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/Balamuwa%20Ke%20Ballam(KoshalWorld.Com).mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/Balamuwa%20Ke%20Ballam(KoshalWorld.Com).mp3",
         "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4f/10/9d/4f109d9e-8280-d699-4c74-dcd7467a22c3/8905713725498_cover.jpg/800x800cc.jpg"
     },
     {
         "title": "samastipur jila ha",
-        "link": "https://github.com/aryan-2728372882/TRENDING/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A1%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A1%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
         "thumbnail": "https://i.ytimg.com/vi/-EBdpD_aGls/maxresdefault.jpg"
     }
 ];
@@ -178,11 +178,66 @@ const fixedPhonk = [
     // ...
 ];
 
+
+const fixedHaryanvi = [
+    {
+        "title": "52 Gaj Ka Daman",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/52%20Gaj%20Ka%20Daman.mp3",
+        "thumbnail": "https://www.musiculture.in/wp-content/uploads/2021/06/52_Gaj_ka_Daman_1000x1000.jpg"
+    },
+    {
+        "title": "Goli Chal Javegi",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Goli%20Chal%20Javegi.mp3",
+        "thumbnail": "https://c.saavncdn.com/995/Goli-Chal-Javegi-Haryanvi-2023-20230626165918-500x500.jpg"
+    },
+    {
+        "title": "Matak Chalugi",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Matak%20Chalungi.mp3",
+        "thumbnail": "https://c.saavncdn.com/570/Matak-Chalungi-Haryanvi-2023-20240703034725-500x500.jpg"
+    },
+    {
+        "title": "Jale2",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Jale2.mp3",
+        "thumbnail": "https://c.saavncdn.com/475/Jale-2-Extended-Haryanvi-2024-20240419001117-500x500.jpg"
+    },
+    {
+        "title": "Kallo",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Kallo.mp3",
+        "thumbnail": "https://c.saavncdn.com/129/Kallo-Feat-Ajay-Hooda-Pardeep-Boora-Haryanvi-2023-20231025091456-500x500.jpg"
+    },
+    {
+        "title": "Bandook Chalegi",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Bandook%20Chalegi.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/qaLKY623pO/LKY66j5w3p/size_m.jpg"
+    },
+    {
+        "title": "Teri Lat Lag Javegi",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Teri%20Lat%20Lag%20Javegi.mp3",
+        "thumbnail": "https://c.saavncdn.com/443/Sonotek-DJ-Remix-Vol-6-Hindi-1991-20230329182027-500x500.jpg"
+    },
+    {
+        "title": "Teri Aakhya Ka Yo Kajal",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Teri%20Aakhya%20Ka%20Yo%20Kajal.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/lJvKa63DV9/JvKaOEv6WD/size_m.jpg"
+    },
+    {
+        "title": "Heavy Ghaghra",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Heavy%20Ghaghra.mp3",
+        "thumbnail": "https://c.saavncdn.com/385/Heavy-Ghaghra-Haryanvi-2021-20240321044309-500x500.jpg"
+    },
+    {
+        "title": "Ghunghat Bain",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Ghunghat%20Bain.mp3",
+        "thumbnail": "https://c.saavncdn.com/041/Ghunghat-Bain-Remix-Haryanvi-2020-20201026142405-500x500.jpg"
+    }
+];
+
 // Player State Management
 let currentPlaylist = [];
 // Add global variables for JSON songs
 let jsonBhojpuriSongs = [];
 let jsonPhonkSongs = [];
+let jsonHaryanviSongs = [];
 let currentSongIndex = 0;
 let repeatMode = 0; // 0: No repeat, 1: Repeat all, 2: Repeat one
 let currentContext = 'bhojpuri'; // 'bhojpuri', 'phonk', or 'search'
@@ -198,10 +253,13 @@ audioPlayer.addEventListener('timeupdate', updateSeekBar);
 
 
 // ✅ Display Fixed Sections
+// ✅ Display Fixed Sections
 async function displayFixedSections() {
     // ✅ Load Fixed Bhojpuri & Phonk Sections (No Changes)
     populateSection('bhojpuri-list', fixedBhojpuri, 'bhojpuri');
     populateSection('phonk-list', fixedPhonk, 'phonk');
+    // Add Haryanvi trending section
+    populateSection('haryanvi-list', fixedHaryanvi, 'haryanvi');
 
     // ✅ Load Dynamic Bhojpuri & Phonk Collection from JSON
     await loadFullJSONSongs();
@@ -210,18 +268,22 @@ async function displayFixedSections() {
 // ✅ Keep original loadFullJSONSongs intact with additions
 async function loadFullJSONSongs() {
     try {
-        const [bhojpuriSongs, phonkSongs] = await Promise.all([
+        const [bhojpuriSongs, phonkSongs, haryanviSongs] = await Promise.all([
             fetch("songs.json").then(response => response.json()),
-            fetch("phonk.json").then(response => response.json())
+            fetch("phonk.json").then(response => response.json()),
+            fetch("haryanvi.json").then(response => response.json())
         ]);
 
         // Store JSON songs in global variables
         jsonBhojpuriSongs = bhojpuriSongs;
         jsonPhonkSongs = phonkSongs;
+        jsonHaryanviSongs = haryanviSongs;
 
-        // ✅ Original population remains unchanged
+        // Original population remains unchanged
         populateSection('bhojpuri-collection', jsonBhojpuriSongs, 'json-bhojpuri'); 
         populateSection('phonk-collection', jsonPhonkSongs, 'json-phonk'); 
+        // Add Haryanvi population
+        populateSection('haryanvi-collection', jsonHaryanviSongs, 'json-haryanvi');
 
     } catch (error) {
         console.error("Error loading songs from JSON:", error);
@@ -250,10 +312,11 @@ function populateSection(containerId, songs, context) {
 // Search Implementation
 let searchSongsList = [];
 // ✅ Modified loadSearchSongs (keep old code structure)
+// Search Implementation
 async function loadSearchSongs() {
     try {
-        // Use only JSON songs for search
-        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs];
+        // Include Haryanvi songs in search
+        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...fixedBhojpuri, ...fixedPhonk, ...fixedHaryanvi];
     } catch (error) {
         console.error("Error loading songs:", error);
     }
@@ -339,6 +402,11 @@ function playSong(title, context) {
             currentPlaylist = fixedPhonk;
             currentContext = 'phonk';
             break;
+        case 'haryanvi': 
+            song = fixedHaryanvi.find(s => s.title === title);
+            currentPlaylist = fixedHaryanvi;
+            currentContext = 'haryanvi';
+            break;
         case 'json-bhojpuri': 
             song = jsonBhojpuriSongs.find(s => s.title === title);
             currentPlaylist = jsonBhojpuriSongs;
@@ -349,14 +417,20 @@ function playSong(title, context) {
             currentPlaylist = jsonPhonkSongs;
             currentContext = 'json-phonk';
             break;
+        case 'json-haryanvi': 
+            song = jsonHaryanviSongs.find(s => s.title === title);
+            currentPlaylist = jsonHaryanviSongs;
+            currentContext = 'json-haryanvi';
+            break;
         case 'search':
             song = currentPlaylist.find(s => s.title === title);
             currentContext = 'search';
             break;
     }
 
+    // Rest of the function remains the same
     if (!song) return;
-
+    
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
     audioPlayer.src = song.link;
     audioPlayer.play()
