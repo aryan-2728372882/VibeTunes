@@ -197,7 +197,7 @@ const fixedHaryanvi = [
     },
     {
         "title": "Jale2",
-        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Jale2.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Jale%202.mp3",
         "thumbnail": "https://c.saavncdn.com/475/Jale-2-Extended-Haryanvi-2024-20240419001117-500x500.jpg"
     },
     {
@@ -234,7 +234,6 @@ const fixedHaryanvi = [
 
 // Player State Management
 let currentPlaylist = [];
-// Add global variables for JSON songs
 let jsonBhojpuriSongs = [];
 let jsonPhonkSongs = [];
 let jsonHaryanviSongs = [];
