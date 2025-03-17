@@ -487,7 +487,7 @@ async function playSong(title, context) {
             break;
         case 'search':
             song = currentPlaylist.find(s => s.title === title);
-            sourcePlaylist = currentPlaylist;
+            sourcePlaylist = [...currentPlaylist]; // Keep search results intact
             break;
     }
 
@@ -496,8 +496,10 @@ async function playSong(title, context) {
         return;
     }
 
-    // Use the original source playlist for continuous playback
-    currentPlaylist = sourcePlaylist;
+    // 🚀 Only update currentPlaylist if it is NOT already set correctly
+    if (currentContext !== context) {
+        currentPlaylist = sourcePlaylist;
+    }
     currentContext = context;
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
 
@@ -800,14 +802,28 @@ document.addEventListener("click", () => {
 
 // Make sure the next/previous functions also maintain context
 function nextSong() {
-    currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
+    if (currentPlaylist.length === 0) return;
+
+    currentSongIndex++;
+    if (currentSongIndex >= currentPlaylist.length) {
+        console.log("Playlist ended. Restarting...");
+        currentSongIndex = 0; // Restart from the first song
+    }
+
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
 function previousSong() {
-    currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+    if (currentPlaylist.length === 0) return;
+
+    currentSongIndex--;
+    if (currentSongIndex < 0) {
+        currentSongIndex = currentPlaylist.length - 1; // Go to the last song
+    }
+
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
+
 
 // Repeat System
 function toggleRepeat() {
