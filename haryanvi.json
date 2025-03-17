@@ -1,2 +1,142 @@
 [
+    {
+        "title": "Solid Body",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/8w83la.mp3",
+        "thumbnail": "https://c.saavncdn.com/676/Solid-Body-Haryanvi-2022-20220503002130-500x500.jpg",
+        "keywords": ["Solid,", "Body,", "Haryanvi,"]
+    },
+    {
+        "title": "Tu Cheez Lajwaab",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/hbwr64.mp3",
+        "thumbnail": "https://c.saavncdn.com/911/Sonotek-DJ-Remix-Vol-10-Hindi-1991-20230329181532-500x500.jpg",
+        "keywords": ["Tu,", "Cheez,", "Lajwaab,", "Haryanvi,"]
+    },
+    {
+        "title": "Laad Piya Ke",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/wa8vpb.mp3",
+        "thumbnail": "https://c.saavncdn.com/393/Laad-Piya-Ke-Haryanvi-2022-20230812003418-500x500.jpg",
+        "keywords": ["Laad,", "Piya,", "Ke,", "Haryanvi,"]
+    },
+    {
+        "title": "Gypsy",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/5cnd2k.mp3",
+        "thumbnail": "https://c.saavncdn.com/268/Gypsy-Haryanvi-2022-20220428195345-500x500.jpg",
+        "keywords": ["Gypsy,", "Haryanvi,"]
+    },
+    {
+        "title": "Hero Handa",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/cbxytm.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/D0PKLrWGl9/PKLvMYE4WG/size_m.jpg",
+        "keywords": ["Hero,", "Handa,", "Haryanvi,"]
+    },
+    {
+        "title": "Khasa Aal Chahar",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/49u148.mp3",
+        "thumbnail": "https://c.saavncdn.com/artists/Khasa_Aala_Chahar_001_20230313111956_500x500.jpg",
+        "keywords": ["Khasa,", "Aal,", "Chahar,", "Haryanvi,"]
+    },
+    {
+        "title": "Bole Teri Tagdi",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/qa5g7e.mp3",
+        "thumbnail": "https://c.saavncdn.com/307/DJ-Haryanvi-Songs-Hindi-2022-20220908124912-500x500.jpg",
+        "keywords": ["Bole,", "Teri,", "Tagdi,", "Haryanvi,"]
+    },
+    {
+        "title": "Chuni Me Perfume",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/l9ejw0.mp3",
+        "thumbnail": "https://c.saavncdn.com/903/Chunni-Me-Chunni-Me-Perfume-Lagave-Chunni-Me-Rajasthani-2023-20230330030607-500x500.jpg",
+        "keywords": ["Chuni,", "Me,", "Perfume,", "Haryanvi,"]
+    },
+    {
+        "title": "Chatak Matak",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/keluw7.mp3",
+        "thumbnail": "https://c.saavncdn.com/001/Chatak-Matak-Haryanvi-2020-20201221105140-500x500.jpg",
+        "keywords": ["Chatak,", "Matak,", "Haryanvi,"]
+    },
+    {
+        "title": "Coco Cola",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/e7mxql.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/4Z9bqZoKyQ/Z9bqPx45Wy/size_m_1599127563.jpg",
+        "keywords": ["Coco,", "Cola,", "Haryanvi,"]
+    },
+    {
+        "title": "Film Chandrawal Dekhungi",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/1jl9vb.mp3",
+        "thumbnail": "https://c.saavncdn.com/667/Film-Chandrawal-Dekhungi-Haryanvi-0033-20220106051013-500x500.jpg",
+        "keywords": ["Film,", "Chandrawal,", "Dekhungi,", "Haryanvi,"]
+    },
+    {
+        "title": "Gajban Pani",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/md3pen.mp3",
+        "thumbnail": "https://c.saavncdn.com/867/Gajban-Pani-Ne-Chali-Rajasthani-2021-20210504013509-500x500.jpg",
+        "keywords": ["Gajban,", "Pani,", "Haryanvi,"]
+    },
+    {
+        "title": "Kamar Teri Left Right Halle",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/12hcr1.mp3",
+        "thumbnail": "https://c.saavncdn.com/592/Kamar-Teri-Left-Right-Hale-Haryanvi-2022-20220414144503-500x500.jpg",
+        "keywords": ["Kamar,", "Teri,", "Left,", "Right,", "Halle,", "Haryanvi,"]
+    },
+    {
+        "title": "Kabootar",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/4qfax5.mp3",
+        "thumbnail": "https://c.saavncdn.com/108/Kabootar-Haryanvi-2021-20211006173906-500x500.jpg",
+        "keywords": ["Kabootar,", "Haryanvi,"]
+    },
+    {
+        "title": "Bahu Kale Ki",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/t165rj.mp3",
+        "thumbnail": "https://c.saavncdn.com/394/Bahu-Kale-Ki-Haryanvi-2022-20220419132022-500x500.jpg",
+        "keywords": ["Bahu,", "Kale,", "Ki,", "Haryanvi,"]
+    },
+    {
+        "title": "Nagin Si Lugai Tera Balam Chhota",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/fmmup5.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/2lV3d1WRgB/V3dlXrXL3R/size_m.jpg",
+        "keywords": ["Nagin,", "Si,", "Lugai,", "Tera,", "Balam,", "Chhota,", "Haryanvi,"]
+    },
+    {
+        "title": "Thada Bhartar",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/f1uwr2.mp3",
+        "thumbnail": "",
+        "keywords": ["Thada,", "Bhartar,", "Haryanvi,"]
+    },
+    {
+        "title": "Naina Ke Teer",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/yj45lj.mp3",
+        "thumbnail": "https://c.saavncdn.com/347/Thada-Bhartar-Lofi-Mix-Haryanvi-2023-20230828094005-500x500.jpg",
+        "keywords": ["Naina,", "Ke,", "Teer,", "Haryanvi,"]
+    },
+    {
+        "title": "Baby Mere Birthday Pe Goli Chalegi",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/rabpci.mp3",
+        "thumbnail": "https://i1.sndcdn.com/artworks-bLp2tyJLKmll6zbL-RFhRqQ-t1080x1080.jpg",
+        "keywords": ["Baby,", "Mere,", "Birthday,", "Pe,", "Goli,", "Chalegi,", "Haryanvi,"]
+    },
+    {
+        "title": "Halka Dupatta",
+        "artist": "Unknown",
+        "link": "https://files.catbox.moe/83ih4t.mp3",
+        "thumbnail": "https://c.saavncdn.com/560/Halka-Dupatta-Tera-Muh-Dikhe-Hindi-2023-20230317081828-500x500.jpg",
+        "keywords": ["Halka,", "Dupatta,", "Haryanvi,"]
+    }
 ]

@@ -715,10 +715,35 @@ function togglePlay() {
 function updatePlayPauseButton() {
     // Ensure we are accessing the button element correctly
     const playPauseBtn = document.getElementById('play-pause-btn');
+    
     if (playPauseBtn) {
-        playPauseBtn.textContent = audioPlayer.paused ? "▶" : "⏸"; // Use ▶ for play, ⏸ for pause
+        // Force a check of the actual player state
+        if (audioPlayer.paused || audioPlayer.ended || audioPlayer.readyState < 3) {
+            playPauseBtn.textContent = "▶"; // Play symbol
+        } else {
+            playPauseBtn.textContent = "⏸"; // Pause symbol
+        }
     }
 }
+
+// Add these event listeners to help with mobile device synchronization
+document.addEventListener("visibilitychange", () => {
+    // When page becomes visible again, update the button state immediately
+    if (document.visibilityState === "visible") {
+        updatePlayPauseButton();
+        
+        // Update again after a short delay in case the audio state is still changing
+        setTimeout(updatePlayPauseButton, 100);
+        setTimeout(updatePlayPauseButton, 500); // Another check after 500ms
+    }
+});
+
+// Add these additional event listeners to the audio player
+audioPlayer.addEventListener("play", updatePlayPauseButton);
+audioPlayer.addEventListener("pause", updatePlayPauseButton);
+audioPlayer.addEventListener("ended", updatePlayPauseButton);
+audioPlayer.addEventListener("waiting", updatePlayPauseButton);
+audioPlayer.addEventListener("canplay", updatePlayPauseButton);
 
 // Utility Functions
 function showPopup(message) {
