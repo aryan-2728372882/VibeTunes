@@ -250,25 +250,6 @@ playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
 audioPlayer.addEventListener('timeupdate', updateSeekBar);
 
-// 🚀 Suppress Console Logs (Keep Only Important Messages)
-const originalConsoleError = console.error;
-const originalConsoleWarn = console.warn;
-
-// Silence Errors & Warnings
-console.error = function (...args) {
-    if (!args[0].includes("Failed to fetch") && !args[0].includes("CORS policy")) {
-        originalConsoleError.apply(console, args);
-    }
-};
-
-console.warn = function (...args) {
-    if (!args[0].includes("Wake Lock request failed")) {
-        originalConsoleWarn.apply(console, args);
-    }
-};
-
-
-
 // ✅ Display Fixed Sections
 async function displayFixedSections() {
     // ✅ Load Fixed Bhojpuri & Phonk Sections (No Changes)
@@ -330,10 +311,32 @@ let searchSongsList = [];
 // Search Implementation
 async function loadSearchSongs() {
     try {
-        // We'll load songs directly in the searchSongs function instead
-        console.log("Search functionality ready");
+        // Make sure this runs after all JSON songs are loaded
+        await new Promise(resolve => {
+            // Check if JSON songs are already loaded
+            if (jsonBhojpuriSongs.length > 0 && jsonPhonkSongs.length > 0) {
+                resolve();
+            } else {
+                // Wait a bit and check again
+                setTimeout(() => {
+                    resolve();
+                }, 1000);
+            }
+        });
+        
+        // Combine all sources for search
+        searchSongsList = [
+            ...fixedBhojpuri,
+            ...fixedPhonk,
+            ...fixedHaryanvi,
+            ...jsonBhojpuriSongs,
+            ...jsonPhonkSongs,
+            ...jsonHaryanviSongs
+        ];
+        
+        console.log(`Search index built with ${searchSongsList.length} songs`);
     } catch (error) {
-        console.error("Error preparing search:", error);
+        console.error("Error building search index:", error);
     }
 }
 
@@ -420,181 +423,96 @@ function searchSongs(query) {
     }
 }
 
-function getSongArray(context) {
-    switch (context.toLowerCase()) {
-        case "haryanvi":
-            return fixedHaryanvi;
-        case "bhojpuri":
-            return fixedBhojpuri;
-        case "phonk":
-            return fixedPhonk;
-        case "json-bhojpuri":
-            return jsonBhojpuriSongs;
-        case "json-phonk":
-            return jsonPhonkSongs;
-        case "json-haryanvi":
-            return jsonHaryanviSongs;
-        case "search":
-            return currentPlaylist;
-        default:
-            console.error(`Unknown context: ${context}`);
-            return [];
-    }
-}
-
-
-// 🚀 Fix CORS for GitHub, Dropbox, Catbox Automatically
-function fixCORSForAll(url) {
-    if (url.includes("github.com")) {
-        return `https://corsproxy.io/?${encodeURIComponent(url.replace("blob/", ""))}`;
-    } else if (url.includes("dropbox.com")) {
-        return url.replace("www.dropbox.com", "dl.dropboxusercontent.com");
-    } else if (url.includes("catbox.moe")) {
-        return url; // Catbox does not block CORS
-    }
-    return url;
-}
-
-async function playSong(title, context) {
+function playSong(title, context) {
     let song;
-    let sourcePlaylist;
-
-    // Find the song in its original source
+    let originalIndex = -1;
+    
+    // First attempt to find the song
     switch (context) {
-        case 'bhojpuri':
+        case 'bhojpuri': 
             song = fixedBhojpuri.find(s => s.title === title);
-            sourcePlaylist = fixedBhojpuri;
+            currentPlaylist = fixedBhojpuri;
+            currentContext = 'bhojpuri';
             break;
-        case 'phonk':
+        case 'phonk': 
             song = fixedPhonk.find(s => s.title === title);
-            sourcePlaylist = fixedPhonk;
+            currentPlaylist = fixedPhonk;
+            currentContext = 'phonk';
             break;
-        case 'haryanvi':
+        case 'haryanvi': 
             song = fixedHaryanvi.find(s => s.title === title);
-            sourcePlaylist = fixedHaryanvi;
+            currentPlaylist = fixedHaryanvi;
+            currentContext = 'haryanvi';
             break;
-        case 'json-bhojpuri':
+        case 'json-bhojpuri': 
             song = jsonBhojpuriSongs.find(s => s.title === title);
-            sourcePlaylist = jsonBhojpuriSongs;
+            currentPlaylist = jsonBhojpuriSongs;
+            currentContext = 'json-bhojpuri';
             break;
-        case 'json-phonk':
+        case 'json-phonk': 
             song = jsonPhonkSongs.find(s => s.title === title);
-            sourcePlaylist = jsonPhonkSongs;
+            currentPlaylist = jsonPhonkSongs;
+            currentContext = 'json-phonk';
             break;
-        case 'json-haryanvi':
+        case 'json-haryanvi': 
             song = jsonHaryanviSongs.find(s => s.title === title);
-            sourcePlaylist = jsonHaryanviSongs;
+            currentPlaylist = jsonHaryanviSongs;
+            currentContext = 'json-haryanvi';
             break;
         case 'search':
-            song = currentPlaylist.find(s => s.title === title);
-            sourcePlaylist = [...currentPlaylist]; // Keep search results intact
+            song = searchSongsList.find(s => s.title === title);
+            // For search results, we need to recreate the currentPlaylist
+            // because it might have been filtered
+            if (song) {
+                // Find all matching songs that contain this title
+                currentPlaylist = searchSongsList.filter(s => 
+                    s.title.toLowerCase().includes(title.toLowerCase())
+                );
+                currentContext = 'search';
+            }
             break;
     }
 
+    // Safety check - if song not found, show error and exit
     if (!song) {
-        console.error("Song not found:", title);
+        console.error(`Song "${title}" not found in ${context} playlist`);
+        showPopup("Song not found!");
         return;
     }
 
-    // 🚀 Only update currentPlaylist if it is NOT already set correctly
-    if (currentContext !== context) {
-        currentPlaylist = sourcePlaylist;
-    }
-    currentContext = context;
+    // Get the index in the current playlist
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
-
+    
+    // Additional safety check - if index not found, use the first song
     if (currentSongIndex === -1) {
-        console.error("Song index not found in source playlist");
-        return;
+        console.warn(`Song "${title}" found but index is -1, using first song in playlist`);
+        currentSongIndex = 0;
+        song = currentPlaylist[0];
+        
+        // If somehow the playlist is empty, show error and exit
+        if (!song) {
+            console.error("Current playlist is empty!");
+            showPopup("Empty playlist!");
+            return;
+        }
     }
 
-    console.log(`Playing "${title}" from ${context} (index: ${currentSongIndex})`);
-
-    // 🚀 Force UI update BEFORE loading the audio
-    updatePlayerUI(song);
-
-    // 🚀 Ensure previous playback is stopped before setting a new source
-    if (!audioPlayer.paused) {
-        audioPlayer.pause();
-    }
+    // Log for debugging
+    console.log(`Playing "${song.title}" from ${context} (index: ${currentSongIndex}/${currentPlaylist.length-1})`);
+    
+    // Now play the song
     audioPlayer.src = song.link;
-
-    // 🚀 Ensure metadata loads before playing
-    audioPlayer.onloadedmetadata = () => {
-        audioPlayer.play()
-            .then(() => {
-                playerContainer.style.display = "flex";
-                highlightCurrentSong();
-                showPopup(`Playing from ${context.replace('json-', '')}`);
-            })
-            .catch(error => {
-                console.warn("Playback interrupted, retrying...");
-                setTimeout(() => audioPlayer.play().catch(() => {}), 500);
-            });
-    };
+    audioPlayer.play()
+        .then(() => {
+            playerContainer.style.display = "flex";
+            updatePlayerUI(song);
+            highlightCurrentSong();
+        })
+        .catch(error => {
+            console.error("Playback failed:", error);
+            showPopup("Error playing song!");
+        });
 }
-
-// 🚀 Keep Music Playing Even If Screen Is Locked or App Is in Background
-document.addEventListener("visibilitychange", async () => {
-    if (document.hidden) {
-        await keepAudioAlive();
-    }
-});
-
-async function keepAudioAlive() {
-    if (audioPlayer.paused) {
-        await audioPlayer.play().catch(() => {});
-    }
-}
-
-// 🚀 Prevent Screen from Turning Off While Playing
-let wakeLock = null;
-
-async function requestWakeLock() {
-    if (document.hidden) return; // 🚀 Don't request Wake Lock if page is hidden
-
-    if ("wakeLock" in navigator) {
-        try {
-            wakeLock = await navigator.wakeLock.request("screen");
-            wakeLock.addEventListener("release", async () => {
-                console.log("Wake Lock released");
-                wakeLock = null;
-
-                // 🚀 Fix: Delay audio resume to prevent static noise
-                setTimeout(async () => {
-                    if (audioPlayer.paused) {
-                        console.log("Restarting Audio Smoothly...");
-                        await audioPlayer.play().catch(() => {});
-                    }
-                }, 500); // Delay resuming audio by 0.5s
-            });
-        } catch (err) {}
-    }
-}
-
-// 🚀 Activate Wake Lock When Music Starts
-audioPlayer.addEventListener("play", () => {
-    if (audioPlayer.volume < 1.0) {
-        let volume = audioPlayer.volume;
-        let interval = setInterval(() => {
-            volume = Math.min(1.0, volume + 0.05); // Gradually increase volume
-            audioPlayer.volume = volume;
-            if (volume >= 1.0) clearInterval(interval);
-        }, 100); // Adjust volume every 100ms
-    }
-});
-
-
-// 🚀 Auto-Resume Music If It Stops Unexpectedly
-setInterval(async () => {
-    if (audioPlayer.paused) {
-        await audioPlayer.play().catch(() => {});
-    }
-}, 5000); // Every 5 seconds
-
-audioPlayer.play().catch(error => {
-    console.warn("⚠️ Playback warning:", error.message); // ⚠️ Only logs if needed
-});
 
 // Smart title splitting with fallback
 function balanceSongTitles() {
@@ -707,6 +625,7 @@ function handleSongEnd() {
     console.log("Current Song Index Before:", currentSongIndex);
     console.log("Repeat Mode:", repeatMode);
     console.log("Current Context:", currentContext);
+
 
     // Remove event listener before potentially re-adding it
     audioPlayer.removeEventListener('ended', handleSongEnd);
@@ -840,15 +759,28 @@ function updatePlayerUI(song) {
     updatePlayPauseButton();
 }
 
+// Modified togglePlay function
 function togglePlay() {
     if (audioPlayer.paused) {
-        audioPlayer.play().catch(error => console.error("Playback failed:", error));
+        audioPlayer.play()
+            .then(() => {
+                pendingPlayInteraction = false;
+                updatePlayPauseButton();
+            })
+            .catch(error => {
+                if (pendingPlayInteraction) {
+                    showPopup("Tap again to start playback");
+                } else {
+                    console.error("Playback error:", error);
+                    showPopup("Error starting playback");
+                }
+            });
     } else {
         audioPlayer.pause();
+        updatePlayPauseButton();
     }
-    // Update the button immediately after play/pause toggle
-    updatePlayPauseButton();
 }
+
 
 function updatePlayPauseButton() {
     // Ensure we are accessing the button element correctly
@@ -931,133 +863,6 @@ function highlightCurrentSong() {
         }
     }
 }
-
-// === Chunked Audio Streaming System (No Function Removed) ===
-class ChunkedAudioLoader {
-    constructor() {
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        this.gainNode = this.audioContext.createGain();
-        this.gainNode.gain.value = 3.0; // 300% volume boost
-        this.gainNode.connect(this.audioContext.destination);
-        this.chunkSize = 256 * 1024; // 256KB chunks
-        this.audioBufferQueue = [];
-        this.isPlaying = false;
-    }
-
-    async playChunkedAudio(url) {
-        const totalSize = await this.getContentLength(url);
-        const totalChunks = Math.ceil(totalSize / this.chunkSize);
-
-        for (let i = 0; i < totalChunks; i++) {
-            const chunk = await this.loadChunk(url, i, totalSize);
-            this.audioBufferQueue.push(chunk);
-        }
-
-        this.startPlayback();
-    }
-
-    async loadChunk(url, index, totalSize) {
-        const chunkSize = Math.min(256 * 1024, totalSize / 10); // 🚀 Adjust chunk size based on file size
-        const start = index * chunkSize;
-        const end = Math.min(start + chunkSize - 1, totalSize - 1);
-        let retries = 3; // 🚀 Retry failed requests up to 3 times
-    
-        while (retries > 0) {
-            try {
-                const response = await fetch(url, { headers: { Range: `bytes=${start}-${end}` } });
-    
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    
-                return response.arrayBuffer();
-    
-            } catch (err) {
-                retries--;
-                if (retries === 0) {
-                    console.warn("⚠️ Chunk fetch failed after retries:", err.message); // 🚀 Log warning instead of error
-                    return null;
-                }
-                await new Promise(res => setTimeout(res, 1000)); // 🚀 Wait 1s before retrying
-            }
-        }
-    }    
-
-    async fetchGitHubFile(url) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return await response.arrayBuffer();
-        } catch (err) {
-            console.error("GitHub fetch failed:", err);
-            return null;
-        }
-    }
-
-    async startPlayback() {
-        if (this.isPlaying || this.audioBufferQueue.length === 0) return;
-
-        this.isPlaying = true;
-        while (this.audioBufferQueue.length > 0) {
-            const chunk = this.audioBufferQueue.shift();
-            await this.decodeAndPlayChunk(chunk);
-        }
-
-        this.isPlaying = false;
-    }
-
-    async decodeAndPlayChunk(chunk) {
-        try {
-            const audioBuffer = await this.audioContext.decodeAudioData(chunk);
-            
-            // 🚀 Reduce File Size by Re-Encoding to OPUS (48kbps)
-            const opusEncoded = await this.encodeToOpus(audioBuffer, 48000, 48);
-            
-            const source = this.audioContext.createBufferSource();
-            source.buffer = opusEncoded;
-            source.connect(this.gainNode);
-            source.start(0);
-            
-        } catch (error) {
-            console.error("Error decoding chunk:", error);
-        }
-    }
-
-    async encodeToOpus(audioBuffer, sampleRate = 48000, bitrate = 48) {
-        // Convert to OPUS (48kbps) to reduce file size ~2.5MB
-        const offlineCtx = new OfflineAudioContext(1, audioBuffer.length, sampleRate);
-        const source = offlineCtx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(offlineCtx.destination);
-        source.start();
-        
-        return offlineCtx.startRendering();
-    }    
-
-    async getContentLength(url) {
-        const response = await fetch(url, { method: "HEAD" });
-        return parseInt(response.headers.get("Content-Length"));
-    }
-}
-
-// === Initialize Chunked Audio Loader ===
-const chunkedAudioLoader = new ChunkedAudioLoader();
-
-// === Modify playSong to Use Chunked Streaming ===
-const originalPlaySong = playSong; // Preserve the original function
-
-playSong = async function (title, context) {
-    originalPlaySong(title, context);
-
-    // 🚀 Fix: Refresh Audio Source After Wake Lock Release
-    setTimeout(() => {
-        if (wakeLock === null) {
-            console.log("Refreshing Audio to Prevent Static Noise...");
-            const currentTime = audioPlayer.currentTime;
-            audioPlayer.src = audioPlayer.src; // Refresh source
-            audioPlayer.currentTime = currentTime;
-            audioPlayer.play().catch(() => {});
-        }
-    }, 800); // Slightly increase delay to prevent distortion
-};
 
 // ✅ Modified initialization sequence
 document.addEventListener("DOMContentLoaded", async () => {
