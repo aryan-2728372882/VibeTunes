@@ -575,50 +575,92 @@ function handleSongEnd() {
     console.log("Repeat Mode:", repeatMode);
     console.log("Current Context:", currentContext);
 
-
-    // Remove event listener before potentially re-adding it
     audioPlayer.removeEventListener('ended', handleSongEnd);
 
     if (repeatMode === 2) { // Repeat single song
         audioPlayer.currentTime = 0;
         audioPlayer.play().catch(error => console.error("Playback failed:", error));
         console.log("Repeating the same song...");
-        
-        // Add event listener back
         audioPlayer.addEventListener('ended', handleSongEnd);
         updatePlayPauseButton();
         return;
     }
 
-    // Get the next song in the current context/collection
-    if (repeatMode === 1) { // Repeat all songs
-        currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-    } else if (currentSongIndex < currentPlaylist.length - 1) { // Play next song normally
-        currentSongIndex++;
-    } else {
-        console.log("Reached the end of the playlist. Stopping.");
-        audioPlayer.addEventListener('ended', handleSongEnd);
+    let nextSongIndex = currentSongIndex + 1;
+    let nextSong = null;
+
+    // ✅ If still in the fixed list, continue playing from the correct index
+    if (currentContext === 'bhojpuri' && nextSongIndex < fixedBhojpuri.length) {
+        nextSong = fixedBhojpuri[nextSongIndex];
+    } else if (currentContext === 'phonk' && nextSongIndex < fixedPhonk.length) {
+        nextSong = fixedPhonk[nextSongIndex];
+    } else if (currentContext === 'haryanvi' && nextSongIndex < fixedHaryanvi.length) {
+        nextSong = fixedHaryanvi[nextSongIndex];
+    }
+
+    // ✅ If fixed list is done, move to JSON songs (but keep the correct index)
+    if (!nextSong) {
+        if (currentContext === 'bhojpuri' && jsonBhojpuriSongs.length > 0) {
+            nextSongIndex = 0; // Start at index 0 in JSON
+            nextSong = jsonBhojpuriSongs[nextSongIndex];
+            currentContext = 'json-bhojpuri';
+            currentPlaylist = jsonBhojpuriSongs;
+        } else if (currentContext === 'phonk' && jsonPhonkSongs.length > 0) {
+            nextSongIndex = 0;
+            nextSong = jsonPhonkSongs[nextSongIndex];
+            currentContext = 'json-phonk';
+            currentPlaylist = jsonPhonkSongs;
+        } else if (currentContext === 'haryanvi' && jsonHaryanviSongs.length > 0) {
+            nextSongIndex = 0;
+            nextSong = jsonHaryanviSongs[nextSongIndex];
+            currentContext = 'json-haryanvi';
+            currentPlaylist = jsonHaryanviSongs;
+        }
+    }
+
+    // ✅ If JSON list also finishes, loop back to fixed but continue sequence
+    if (!nextSong) {
+        if (currentContext === 'json-bhojpuri') {
+            nextSongIndex = 0;
+            nextSong = fixedBhojpuri[nextSongIndex];
+            currentContext = 'bhojpuri';
+            currentPlaylist = fixedBhojpuri;
+        } else if (currentContext === 'json-phonk') {
+            nextSongIndex = 0;
+            nextSong = fixedPhonk[nextSongIndex];
+            currentContext = 'phonk';
+            currentPlaylist = fixedPhonk;
+        } else if (currentContext === 'json-haryanvi') {
+            nextSongIndex = 0;
+            nextSong = fixedHaryanvi[nextSongIndex];
+            currentContext = 'haryanvi';
+            currentPlaylist = fixedHaryanvi;
+        }
+    }
+
+    // ✅ If everything is finished, stop playback
+    if (!nextSong) {
+        console.log("All songs played. Stopping.");
         return;
     }
 
-    console.log(`Loading Next Song (${currentContext}):`, currentPlaylist[currentSongIndex].title);
-
-    // Load the next song from the SAME context
-    audioPlayer.src = currentPlaylist[currentSongIndex].link;
+    // ✅ Load and play the next song, ensuring correct index
+    console.log(`Playing Next Song (${currentContext} - Index: ${nextSongIndex}):`, nextSong.title);
+    currentSongIndex = nextSongIndex; // Update current index before playing
+    audioPlayer.src = nextSong.link;
     audioPlayer.load();
 
     let songStarted = false;
     let retries = 0;
     let maxRetries = 5;
 
-    // Ensure playback before moving to the next song
     audioPlayer.oncanplay = async () => {
-        console.log("Song Fully Loaded:", currentPlaylist[currentSongIndex].title);
+        console.log("Song Fully Loaded:", nextSong.title);
 
         while (retries < maxRetries) {
             try {
                 await audioPlayer.play();
-                console.log("Playing Successfully:", currentPlaylist[currentSongIndex].title);
+                console.log("Playing Successfully:", nextSong.title);
                 songStarted = true;
                 break;
             } catch (error) {
@@ -630,29 +672,58 @@ function handleSongEnd() {
 
         if (!songStarted && currentPlaylist.length > 1) {
             console.error("Max retries reached! Skipping to next song...");
-            // Skip to the next song BUT STAY IN SAME CONTEXT
             currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
             playSong(currentPlaylist[currentSongIndex].title, currentContext);
         }
 
-        // Add event listener back after playback starts
+        // ✅ Add event listener back after playback starts
         audioPlayer.addEventListener('ended', handleSongEnd);
-        updatePlayPauseButton(); // Sync the play/pause button
+        updatePlayPauseButton();
     };
 
-    // Confirm the song is playing
-    audioPlayer.onplaying = () => {
-        console.log("Confirmed: Song is playing:", currentPlaylist[currentSongIndex].title);
-        songStarted = true;
+    // ✅ Confirm the song is playing
+    audioPlayer.oncanplay = async () => {
+        console.log("Song Fully Loaded:", nextSong.title);
+    
+        let songStarted = false;
+        let retries = 0;
+        let maxRetries = 5;
+    
+        while (retries < maxRetries) {
+            try {
+                await audioPlayer.play();
+                console.log("Playing Successfully:", nextSong.title);
+                songStarted = true;
+                break;
+            } catch (error) {
+                console.error(`Playback Error (Attempt ${retries + 1}):`, error);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Retry after delay
+                retries++;
+            }
+        }
+    
+        if (!songStarted) {
+            console.error(`Max retries reached! Playback failed for ${nextSong.title}.`);
+            showPopup("Error playing next song!");
+    
+            // ✅ Skip to the next song instead of stopping
+            currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
+            playSong(currentPlaylist[currentSongIndex].title, currentContext);
+            return;
+        }
+    
+        // ✅ Add event listener back after playback starts
         audioPlayer.addEventListener('ended', handleSongEnd);
-        highlightCurrentSong(); // Highlight the currently playing song
+        updatePlayPauseButton();
     };
+    
 
-    // Ensure UI updates with new song info
-    updatePlayerUI(currentPlaylist[currentSongIndex]);
-    highlightCurrentSong(); // Also update highlighting when song changes
+    // ✅ Ensure UI updates with new song info
+    updatePlayerUI(nextSong);
+    highlightCurrentSong();
     updatePlayPauseButton();
 }
+
 
 let wakeLock = null;
 
