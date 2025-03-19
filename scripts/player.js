@@ -424,95 +424,43 @@ function searchSongs(query) {
     }
 }
 
-function playSong(title, context) {
+async function playSong(title, context) {
     let song;
-    let originalIndex = -1;
-    
-    // First attempt to find the song
+
+    // Select song based on category
     switch (context) {
-        case 'bhojpuri': 
-            song = fixedBhojpuri.find(s => s.title === title);
-            currentPlaylist = fixedBhojpuri;
-            currentContext = 'bhojpuri';
-            break;
-        case 'phonk': 
-            song = fixedPhonk.find(s => s.title === title);
-            currentPlaylist = fixedPhonk;
-            currentContext = 'phonk';
-            break;
-        case 'haryanvi': 
-            song = fixedHaryanvi.find(s => s.title === title);
-            currentPlaylist = fixedHaryanvi;
-            currentContext = 'haryanvi';
-            break;
-        case 'json-bhojpuri': 
-            song = jsonBhojpuriSongs.find(s => s.title === title);
-            currentPlaylist = jsonBhojpuriSongs;
-            currentContext = 'json-bhojpuri';
-            break;
-        case 'json-phonk': 
-            song = jsonPhonkSongs.find(s => s.title === title);
-            currentPlaylist = jsonPhonkSongs;
-            currentContext = 'json-phonk';
-            break;
-        case 'json-haryanvi': 
-            song = jsonHaryanviSongs.find(s => s.title === title);
-            currentPlaylist = jsonHaryanviSongs;
-            currentContext = 'json-haryanvi';
-            break;
-        case 'search':
-            song = searchSongsList.find(s => s.title === title);
-            // For search results, we need to recreate the currentPlaylist
-            // because it might have been filtered
-            if (song) {
-                // Find all matching songs that contain this title
-                currentPlaylist = searchSongsList.filter(s => 
-                    s.title.toLowerCase().includes(title.toLowerCase())
-                );
-                currentContext = 'search';
-            }
-            break;
+        case 'bhojpuri': song = fixedBhojpuri.find(s => s.title === title); break;
+        case 'phonk': song = fixedPhonk.find(s => s.title === title); break;
+        case 'haryanvi': song = fixedHaryanvi.find(s => s.title === title); break;
+        case 'json-bhojpuri': song = jsonBhojpuriSongs.find(s => s.title === title); break;
+        case 'json-phonk': song = jsonPhonkSongs.find(s => s.title === title); break;
+        case 'json-haryanvi': song = jsonHaryanviSongs.find(s => s.title === title); break;
+        case 'search': song = searchSongsList.find(s => s.title === title); break;
     }
 
-    // Safety check - if song not found, show error and exit
     if (!song) {
         console.error(`Song "${title}" not found in ${context} playlist`);
         showPopup("Song not found!");
         return;
     }
 
-    // Get the index in the current playlist
-    currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
-    
-    // Additional safety check - if index not found, use the first song
-    if (currentSongIndex === -1) {
-        console.warn(`Song "${title}" found but index is -1, using first song in playlist`);
-        currentSongIndex = 0;
-        song = currentPlaylist[0];
-        
-        // If somehow the playlist is empty, show error and exit
-        if (!song) {
-            console.error("Current playlist is empty!");
-            showPopup("Empty playlist!");
-            return;
-        }
-    }
+    console.log(`Playing "${song.title}" (Optimized)`);
 
-    // Log for debugging
-    console.log(`Playing "${song.title}" from ${context} (index: ${currentSongIndex}/${currentPlaylist.length-1})`);
-    
-    // Now play the song
-    audioPlayer.src = song.link;
-    audioPlayer.play()
-        .then(() => {
-            playerContainer.style.display = "flex";
-            updatePlayerUI(song);
-            highlightCurrentSong();
-        })
-        .catch(error => {
-            console.error("Playback failed:", error);
-            showPopup("Error playing song!");
-        });
+    try {
+        // ✅ Use standard streaming instead of MediaSource API (fix NotSupportedError)
+        audioPlayer.src = song.link;
+        audioPlayer.load(); // Force reload
+        await audioPlayer.play();
+
+        // ✅ Keep player UI updated
+        playerContainer.style.display = "flex";
+        updatePlayerUI(song);
+        highlightCurrentSong();
+
+    } catch (error) {
+        console.error("Playback failed:", error);
+        showPopup("Error playing song!");
+    }
 }
 
 // Smart title splitting with fallback
@@ -707,9 +655,6 @@ function handleSongEnd() {
 }
 
 let wakeLock = null;
-let silentAudio = new Audio("data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQA=");
-silentAudio.loop = true;
-silentAudio.volume = 0;
 
 // ✅ Function to Request Wake Lock
 async function requestWakeLock() {
@@ -736,18 +681,10 @@ async function requestWakeLock() {
     }
 }
 
-// ✅ Keep Silent Audio Playing
-function keepSilentAudioPlaying() {
-    silentAudio.play().catch(err => console.log("Silent audio error:", err));
-    setInterval(() => {
-        if (silentAudio.paused) silentAudio.play();
-    }, 5000); // Every 5 sec, restart if stopped
-}
 
 // ✅ Request Wake Lock when Audio Starts
 audioPlayer.addEventListener("play", () => {
     requestWakeLock();
-    keepSilentAudioPlaying();
 });
 
 // ✅ Reacquire Wake Lock when Screen Unlocks
