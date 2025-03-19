@@ -250,6 +250,7 @@ playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
 audioPlayer.addEventListener('timeupdate', updateSeekBar);
 
+
 // ✅ Display Fixed Sections
 async function displayFixedSections() {
     // ✅ Load Fixed Bhojpuri & Phonk Sections (No Changes)
@@ -705,10 +706,13 @@ function handleSongEnd() {
     updatePlayPauseButton();
 }
 
-document.addEventListener("visibilitychange", () => {
-    let audio = document.querySelector("audio");
-    if (document.visibilityState === "visible" && audio.paused) {
-        audio.play().catch(err => console.log("Autoplay prevented:", err));
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        // Handle background state
+        console.log('Tab is in the background');
+    } else {
+        // Handle foreground state
+        console.log('Tab is in the foreground');
     }
 });
 
@@ -718,6 +722,93 @@ document.addEventListener("click", () => {
         audio.play().catch(err => console.log("Playback error:", err));
     }
 }, { once: true });
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('scripts/service-worker.js')
+        .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(error => {
+            console.error('Service Worker registration failed:', error);
+        });
+}
+
+if ('mediaSession' in navigator) {
+    navigator.mediaSession.setActionHandler('play', () => {
+        audioPlayer.play().catch(error => {
+            console.error('Playback failed:', error);
+        });
+    });
+
+    navigator.mediaSession.setActionHandler('pause', () => {
+        audioPlayer.pause();
+    });
+
+    navigator.mediaSession.setActionHandler('seekbackward', details => {
+        audioPlayer.currentTime = Math.max(audioPlayer.currentTime - (details.seekOffset || 10), 0);
+    });
+
+    navigator.mediaSession.setActionHandler('seekforward', details => {
+        audioPlayer.currentTime = Math.min(audioPlayer.currentTime + (details.seekOffset || 10), audioPlayer.duration);
+    });
+
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+        // Implement logic to play the previous track
+    });
+
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+        // Implement logic to play the next track
+    });
+}
+
+audioPlayer.addEventListener('error', event => {
+    console.error('Audio playback error:', event);
+    switch (event.target.error.code) {
+        case event.target.error.MEDIA_ERR_ABORTED:
+            console.error('Media aborted.');
+            break;
+        case event.target.error.MEDIA_ERR_NETWORK:
+            console.error('Network error.');
+            break;
+        case event.target.error.MEDIA_ERR_DECODE:
+            console.error('Decoding error.');
+            break;
+        case event.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            console.error('Media format not supported.');
+            break;
+        default:
+            console.error('An unknown error occurred.');
+            break;
+    }
+});
+
+// Log the current state of the audio player
+console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
+
+// Log when the audio player starts playing
+audioPlayer.addEventListener('play', () => {
+    console.log('Playback started at:', audioPlayer.currentTime);
+});
+
+// Log when the audio player is paused
+audioPlayer.addEventListener('pause', () => {
+    console.log('Playback paused at:', audioPlayer.currentTime);
+});
+
+// Log when the audio player ends playback
+audioPlayer.addEventListener('ended', () => {
+    console.log('Playback ended.');
+});
+
+// Log visibility changes
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        console.log('Tab is in the background. Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
+    } else {
+        console.log('Tab is in the foreground. Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
+    }
+});
+
 
 // Make sure the next/previous functions also maintain context
 function nextSong() {
