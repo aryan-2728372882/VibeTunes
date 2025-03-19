@@ -706,23 +706,59 @@ function handleSongEnd() {
     updatePlayPauseButton();
 }
 
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-        // Handle background state
-        console.log('Tab is in the background');
-    } else {
-        // Handle foreground state
-        console.log('Tab is in the foreground');
+let wakeLock = null;
+let silentAudio = new Audio("data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQA=");
+silentAudio.loop = true;
+silentAudio.volume = 0;
+
+// ✅ Function to Request Wake Lock
+async function requestWakeLock() {
+    if (document.visibilityState === "hidden") {
+        console.warn("Cannot acquire Wake Lock: Page is not visible.");
+        return;
+    }
+
+    if (wakeLock !== null) return; // Prevent duplicate wake locks
+
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log("Wake Lock acquired");
+
+            wakeLock.addEventListener('release', () => {
+                console.log("Wake Lock released, re-requesting...");
+                wakeLock = null;
+                requestWakeLock(); // Automatically reacquire wake lock
+            });
+        }
+    } catch (err) {
+        console.error("Wake Lock error:", err);
+    }
+}
+
+// ✅ Keep Silent Audio Playing
+function keepSilentAudioPlaying() {
+    silentAudio.play().catch(err => console.log("Silent audio error:", err));
+    setInterval(() => {
+        if (silentAudio.paused) silentAudio.play();
+    }, 5000); // Every 5 sec, restart if stopped
+}
+
+// ✅ Request Wake Lock when Audio Starts
+audioPlayer.addEventListener("play", () => {
+    requestWakeLock();
+    keepSilentAudioPlaying();
+});
+
+// ✅ Reacquire Wake Lock when Screen Unlocks
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+        console.log("Screen unlocked, requesting Wake Lock...");
+        requestWakeLock();
     }
 });
 
-document.addEventListener("click", () => {
-    let audio = document.querySelector("audio");
-    if (audio.paused) {
-        audio.play().catch(err => console.log("Playback error:", err));
-    }
-}, { once: true });
-
+// ✅ Register Service Worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('scripts/service-worker.js')
         .then(registration => {
@@ -733,42 +769,62 @@ if ('serviceWorker' in navigator) {
         });
 }
 
+// ✅ Update Media Session API
 if ('mediaSession' in navigator) {
-    navigator.mediaSession.setActionHandler('play', () => {
-        audioPlayer.play().catch(error => {
-            console.error('Playback failed:', error);
+    function updateMediaSession() {
+        if (!currentPlaylist[currentSongIndex]) return;
+
+        let song = currentPlaylist[currentSongIndex];
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: song.title,
+            artist: "Unknown Artist",
+            album: "VibeTunes",
+            artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/png" }]
         });
+
+        navigator.mediaSession.setPositionState({
+            duration: audioPlayer.duration,
+            playbackRate: audioPlayer.playbackRate,
+            position: audioPlayer.currentTime
+        });
+    }
+
+    navigator.mediaSession.setActionHandler('play', () => {
+        audioPlayer.play();
+        requestWakeLock();
+        updateMediaSession();
     });
 
     navigator.mediaSession.setActionHandler('pause', () => {
         audioPlayer.pause();
     });
 
-    navigator.mediaSession.setActionHandler('seekbackward', details => {
-        audioPlayer.currentTime = Math.max(audioPlayer.currentTime - (details.seekOffset || 10), 0);
-    });
-
-    navigator.mediaSession.setActionHandler('seekforward', details => {
-        audioPlayer.currentTime = Math.min(audioPlayer.currentTime + (details.seekOffset || 10), audioPlayer.duration);
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+        nextSong();
+        updateMediaSession();
     });
 
     navigator.mediaSession.setActionHandler('previoustrack', () => {
-        // Implement logic to play the previous track
+        previousSong();
+        updateMediaSession();
     });
 
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-        // Implement logic to play the next track
-    });
+    // Update media session when song changes
+    audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
 }
 
+// ✅ Improved Error Handling (Auto-Retry on Network Error)
 audioPlayer.addEventListener('error', event => {
     console.error('Audio playback error:', event);
+
     switch (event.target.error.code) {
         case event.target.error.MEDIA_ERR_ABORTED:
             console.error('Media aborted.');
             break;
         case event.target.error.MEDIA_ERR_NETWORK:
-            console.error('Network error.');
+            console.error('Network error. Retrying in 2 seconds...');
+            setTimeout(() => audioPlayer.play().catch(console.error), 2000);
             break;
         case event.target.error.MEDIA_ERR_DECODE:
             console.error('Decoding error.');
@@ -782,25 +838,22 @@ audioPlayer.addEventListener('error', event => {
     }
 });
 
-// Log the current state of the audio player
+// ✅ Log Events for Debugging
 console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
 
-// Log when the audio player starts playing
 audioPlayer.addEventListener('play', () => {
     console.log('Playback started at:', audioPlayer.currentTime);
 });
 
-// Log when the audio player is paused
 audioPlayer.addEventListener('pause', () => {
     console.log('Playback paused at:', audioPlayer.currentTime);
 });
 
-// Log when the audio player ends playback
 audioPlayer.addEventListener('ended', () => {
     console.log('Playback ended.');
 });
 
-// Log visibility changes
+// ✅ Log Visibility Changes
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
         console.log('Tab is in the background. Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
@@ -808,7 +861,6 @@ document.addEventListener('visibilitychange', () => {
         console.log('Tab is in the foreground. Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
     }
 });
-
 
 // Make sure the next/previous functions also maintain context
 function nextSong() {
@@ -841,7 +893,6 @@ function toggleRepeat() {
     document.querySelector("#repeat-btn").textContent = ['🔁', '🔂', '🔄'][repeatMode];
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
 }
-
 
 // UI Updates
 function updatePlayerUI(song) {
