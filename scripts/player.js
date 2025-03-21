@@ -1,5 +1,4 @@
-// Fixed Songs Collections
-
+// Firebase Auth and Firestore (assumed included elsewhere)
 auth.onAuthStateChanged(user => {
     if (!user) {
         console.warn("No user logged in, skipping song tracking.");
@@ -11,56 +10,42 @@ auth.onAuthStateChanged(user => {
 
 function setupSongTracking(uid) {
     const audioPlayer = document.getElementById("audio-player");
-    
-    if (!audioPlayer) {
-        console.warn("Audio player not found.");
-        return;
-    }
+    if (!audioPlayer) return;
 
-    let totalPlayTime = 0;  // Stores the total playtime (in milliseconds)
-    let lastPlayTime = 0;    // Stores the last play timestamp
+    let totalPlayTime = 0;
+    let lastPlayTime = 0;
+    let songStarted = false;
 
-    // ✅ When the song starts or resumes
     audioPlayer.addEventListener("play", () => {
-        lastPlayTime = Date.now(); // Capture the time when song starts playing
+        if (!songStarted) {
+            lastPlayTime = Date.now();
+            songStarted = true;
+        }
     });
 
-    // ✅ When the song is paused
     audioPlayer.addEventListener("pause", () => {
         if (lastPlayTime) {
-            totalPlayTime += (Date.now() - lastPlayTime); // Add elapsed time
-            lastPlayTime = 0; // Reset last play timestamp
+            totalPlayTime += (Date.now() - lastPlayTime) / 1000; // Seconds
+            lastPlayTime = 0;
+            songStarted = false;
         }
     });
 
-    // ✅ When the song finishes playing
     audioPlayer.addEventListener("ended", () => {
         if (lastPlayTime) {
-            totalPlayTime += (Date.now() - lastPlayTime); // Final playtime update
+            totalPlayTime += (Date.now() - lastPlayTime) / 1000; // Seconds
             lastPlayTime = 0;
+            songStarted = false;
         }
-
-        let minutesPlayed = Math.floor(totalPlayTime / 60000); // Convert ms to minutes
-        totalPlayTime = 0; // Reset total playtime after updating
-
-        if (minutesPlayed > 0) {
-            updateUserStats(uid, minutesPlayed);
+        if (totalPlayTime >= 60) { // 1 minute threshold
+            updateUserStats(uid, Math.floor(totalPlayTime / 60));
         }
+        totalPlayTime = 0; // Reset for next song
     });
 }
 
-// ✅ Only Update Firestore with the Correct Value
 function updateUserStats(uid, minutesPlayed) {
-    if (!uid) {
-        console.warn("Cannot update stats: No user ID provided.");
-        return;
-    }
-
-    if (minutesPlayed < 1) {
-        console.warn("Playtime is less than 1 minute, not updating Firestore.");
-        return; // Ignore updates for playtime less than 1 minute
-    }
-
+    if (!uid || minutesPlayed < 1) return;
     const userRef = db.collection("users").doc(uid);
     userRef.update({
         songsPlayed: firebase.firestore.FieldValue.increment(1),
@@ -68,7 +53,6 @@ function updateUserStats(uid, minutesPlayed) {
     }).then(() => console.log(`Updated: +1 song, +${minutesPlayed} minutes`))
       .catch(error => console.error("Error updating user stats:", error));
 }
-
 
 const fixedBhojpuri = [
     {
@@ -174,8 +158,6 @@ const fixedPhonk = [
         "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/DERNIERE%20DANCE%20FUNK.mp3",
         "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d7/e9/ed/d7e9ed7d-8223-f1ea-c0b4-95e75073ea15/cover.jpg/800x800cc.jpg"
     },
-    // Add remaining 8 Phonk songs in same format
-    // ...
 ];
 
 
@@ -238,32 +220,83 @@ let jsonBhojpuriSongs = [];
 let jsonPhonkSongs = [];
 let jsonHaryanviSongs = [];
 let currentSongIndex = 0;
-let repeatMode = 0; // 0: No repeat, 1: Repeat all, 2: Repeat one
-let currentContext = 'bhojpuri'; // 'bhojpuri', 'phonk', or 'search'
+let repeatMode = 0;
+let currentContext = 'bhojpuri';
+let preloadedAudio = null;
+let wakeLock = null;
 
 const audioPlayer = document.getElementById("audio-player");
 const playerContainer = document.getElementById("music-player");
 const playPauseBtn = document.getElementById("play-pause-btn");
 
-// Initialize Player
 playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
 audioPlayer.addEventListener('timeupdate', updateSeekBar);
 
+// Background Playback and Wake Lock
+function enableBackgroundPlayback() {
+    audioPlayer.setAttribute('preload', 'auto');
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden" && !audioPlayer.paused) {
+            audioPlayer.play().catch(err => console.log("Background playback error:", err));
+            requestWakeLock();
+        } else if (document.visibilityState === "visible") {
+            console.log("Screen unlocked, requesting Wake Lock...");
+            requestWakeLock();
+        }
+    });
+    window.addEventListener("blur", () => {
+        if (!audioPlayer.paused) audioPlayer.play().catch(err => console.log("Blur playback error:", err));
+    });
+}
 
-// ✅ Display Fixed Sections
+async function requestWakeLock() {
+    if (wakeLock !== null || document.visibilityState !== "visible") return; // Only request if page is visible
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log("Wake Lock acquired");
+            wakeLock.addEventListener('release', () => {
+                console.log("Wake Lock released, re-requesting if playing and visible...");
+                wakeLock = null;
+                if (document.visibilityState === "visible" && !audioPlayer.paused) {
+                    requestWakeLock();
+                }
+            });
+        }
+    } catch (err) {
+        console.warn("Wake Lock request failed (likely not visible):", err); // Warn instead of error
+    }
+}
+
+// Preload Next Song (no fetch, just load)
+function preloadNextSong() {
+    if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length - 1) return;
+    const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
+    const url = currentPlaylist[nextIndex].link;
+    console.log(`Preloading: ${currentPlaylist[nextIndex].title}, URL: ${url}`);
+    preloadedAudio = new Audio(url);
+    preloadedAudio.preload = "auto";
+    preloadedAudio.load();
+}
+
+// Clear Cache
+function clearAudioCache() {
+    if ('caches' in window) {
+        caches.keys().then(cacheNames => cacheNames.forEach(name => caches.delete(name)));
+    }
+    if (preloadedAudio && preloadedAudio.src !== audioPlayer.src) {
+        preloadedAudio = null;
+    }
+}
+
 async function displayFixedSections() {
-    // ✅ Load Fixed Bhojpuri & Phonk Sections (No Changes)
     populateSection('bhojpuri-list', fixedBhojpuri, 'bhojpuri');
     populateSection('phonk-list', fixedPhonk, 'phonk');
-    // Add Haryanvi trending section
     populateSection('haryanvi-list', fixedHaryanvi, 'haryanvi');
-
-    // ✅ Load Dynamic Bhojpuri & Phonk Collection from JSON
     await loadFullJSONSongs();
 }
 
-// ✅ Keep original loadFullJSONSongs intact with additions
 async function loadFullJSONSongs() {
     try {
         const [bhojpuriSongs, phonkSongs, haryanviSongs] = await Promise.all([
@@ -271,27 +304,22 @@ async function loadFullJSONSongs() {
             fetch("phonk.json").then(response => response.json()),
             fetch("haryanvi.json").then(response => response.json())
         ]);
-
-        // Store JSON songs in global variables
         jsonBhojpuriSongs = bhojpuriSongs;
         jsonPhonkSongs = phonkSongs;
         jsonHaryanviSongs = haryanviSongs;
-
-        // Original population remains unchanged
-        populateSection('bhojpuri-collection', jsonBhojpuriSongs, 'json-bhojpuri'); 
-        populateSection('phonk-collection', jsonPhonkSongs, 'json-phonk'); 
-        // Add Haryanvi population
+        console.log("Loaded JSON songs:", { jsonBhojpuriSongs, jsonPhonkSongs, jsonHaryanviSongs });
+        populateSection('bhojpuri-collection', jsonBhojpuriSongs, 'json-bhojpuri');
+        populateSection('phonk-collection', jsonPhonkSongs, 'json-phonk');
         populateSection('haryanvi-collection', jsonHaryanviSongs, 'json-haryanvi');
-
     } catch (error) {
-        console.error("Error loading songs from JSON:", error);
+        console.error("Error loading JSON songs:", error);
     }
 }
 
 function populateSection(containerId, songs, context) {
     const container = document.getElementById(containerId);
-    container.innerHTML = ''; // Clear old content
-
+    if (!container) return;
+    container.innerHTML = '';
     songs.forEach(song => {
         const songElement = document.createElement('div');
         songElement.classList.add('song-item');
@@ -306,107 +334,32 @@ function populateSection(containerId, songs, context) {
     });
 }
 
-
-// Search Implementation
 let searchSongsList = [];
-// Search Implementation
 async function loadSearchSongs() {
     try {
-        // Make sure this runs after all JSON songs are loaded
-        await new Promise(resolve => {
-            // Check if JSON songs are already loaded
-            if (jsonBhojpuriSongs.length > 0 && jsonPhonkSongs.length > 0) {
-                resolve();
-            } else {
-                // Wait a bit and check again
-                setTimeout(() => {
-                    resolve();
-                }, 1000);
-            }
-        });
-        
-        // Combine all sources for search
-        searchSongsList = [
-            ...fixedBhojpuri,
-            ...fixedPhonk,
-            ...fixedHaryanvi,
-            ...jsonBhojpuriSongs,
-            ...jsonPhonkSongs,
-            ...jsonHaryanviSongs
-        ];
-        
-        console.log(`Search index built with ${searchSongsList.length} songs`);
+        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs];
     } catch (error) {
-        console.error("Error building search index:", error);
+        console.error("Error loading search songs:", error);
     }
 }
 
-// ✅ Updated searchSongs function (preserve original structure)
 function searchSongs(query) {
     const searchSection = document.getElementById('search-results-container');
     const searchContainer = searchSection.querySelector('.scroll-container');
-
     if (!query.trim()) {
         searchSection.style.display = 'none';
         return;
     }
-
-    // Create a new array for search results that includes source information
-    const results = [];
-    
-    // Check Bhojpuri songs
-    jsonBhojpuriSongs.forEach(song => {
-        if (song.title.toLowerCase().includes(query.toLowerCase())) {
-            results.push({...song, source: 'json-bhojpuri'});
-        }
-    });
-    
-    // Check Phonk songs
-    jsonPhonkSongs.forEach(song => {
-        if (song.title.toLowerCase().includes(query.toLowerCase())) {
-            results.push({...song, source: 'json-phonk'});
-        }
-    });
-    
-    // Check Haryanvi songs
-    jsonHaryanviSongs.forEach(song => {
-        if (song.title.toLowerCase().includes(query.toLowerCase())) {
-            results.push({...song, source: 'json-haryanvi'});
-        }
-    });
-    
-    // Check fixed Bhojpuri songs
-    fixedBhojpuri.forEach(song => {
-        if (song.title.toLowerCase().includes(query.toLowerCase())) {
-            results.push({...song, source: 'bhojpuri'});
-        }
-    });
-    
-    // Check fixed Phonk songs
-    fixedPhonk.forEach(song => {
-        if (song.title.toLowerCase().includes(query.toLowerCase())) {
-            results.push({...song, source: 'phonk'});
-        }
-    });
-    
-    // Check fixed Haryanvi songs
-    fixedHaryanvi.forEach(song => {
-        if (song.title.toLowerCase().includes(query.toLowerCase())) {
-            results.push({...song, source: 'haryanvi'});
-        }
-    });
-    
-    // Limit to top 10 results
-    const topResults = results.slice(0, 10);
-    
+    const results = searchSongsList
+        .filter(song => song.title.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 10);
     searchContainer.innerHTML = '';
-
-    if (topResults.length) {
-        topResults.forEach(song => {
+    if (results.length) {
+        results.forEach(song => {
             const songElement = document.createElement('div');
             songElement.classList.add('song-item');
             songElement.innerHTML = `
-                <div class="thumbnail-container" onclick="playSearchSong('${song.title}', '${song.source}')">
+                <div class="thumbnail-container" onclick="playSong('${song.title}', 'search')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                     <div class="hover-play">▶</div>
                 </div>
@@ -414,8 +367,9 @@ function searchSongs(query) {
             `;
             searchContainer.appendChild(songElement);
         });
-
-        currentPlaylist = topResults; // Keep track of search results
+        currentPlaylist = searchSongsList.filter(song => 
+            song.title.toLowerCase().includes(query.toLowerCase())
+        );
         currentContext = 'search';
         searchSection.style.display = 'block';
     } else {
@@ -426,373 +380,177 @@ function searchSongs(query) {
 
 async function playSong(title, context) {
     let song;
-
-    // Select song based on category
     switch (context) {
-        case 'bhojpuri': song = fixedBhojpuri.find(s => s.title === title); break;
-        case 'phonk': song = fixedPhonk.find(s => s.title === title); break;
-        case 'haryanvi': song = fixedHaryanvi.find(s => s.title === title); break;
-        case 'json-bhojpuri': song = jsonBhojpuriSongs.find(s => s.title === title); break;
-        case 'json-phonk': song = jsonPhonkSongs.find(s => s.title === title); break;
-        case 'json-haryanvi': song = jsonHaryanviSongs.find(s => s.title === title); break;
-        case 'search': song = searchSongsList.find(s => s.title === title); break;
+        case 'bhojpuri': song = fixedBhojpuri.find(s => s.title === title); currentPlaylist = fixedBhojpuri; currentContext = 'bhojpuri'; break;
+        case 'phonk': song = fixedPhonk.find(s => s.title === title); currentPlaylist = fixedPhonk; currentContext = 'phonk'; break;
+        case 'haryanvi': song = fixedHaryanvi.find(s => s.title === title); currentPlaylist = fixedHaryanvi; currentContext = 'haryanvi'; break;
+        case 'json-bhojpuri': song = jsonBhojpuriSongs.find(s => s.title === title); currentPlaylist = jsonBhojpuriSongs; currentContext = 'json-bhojpuri'; break;
+        case 'json-phonk': song = jsonPhonkSongs.find(s => s.title === title); currentPlaylist = jsonPhonkSongs; currentContext = 'json-phonk'; break;
+        case 'json-haryanvi': song = jsonHaryanviSongs.find(s => s.title === title); currentPlaylist = jsonHaryanviSongs; currentContext = 'json-haryanvi'; break;
+        case 'search': song = currentPlaylist.find(s => s.title === title); currentContext = 'search'; break;
     }
 
     if (!song) {
-        console.error(`Song "${title}" not found in ${context} playlist`);
-        showPopup("Song not found!");
-        return;
+        console.error(`Song not found: ${title} in context ${context}`);
+        return nextSong(); // Skip to next if not found
     }
 
-    console.log(`Playing "${song.title}" (Optimized)`);
+    currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
+    console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}`);
 
     try {
-        // ✅ Use standard streaming instead of MediaSource API (fix NotSupportedError)
+        audioPlayer.pause(); // Reset state
         audioPlayer.src = song.link;
-        audioPlayer.load(); // Force reload
+        audioPlayer.load();
         await audioPlayer.play();
-
-        // ✅ Keep player UI updated
         playerContainer.style.display = "flex";
         updatePlayerUI(song);
         highlightCurrentSong();
-
+        preloadNextSong();
+        clearAudioCache();
+        requestWakeLock();
+        updateMediaSession();
     } catch (error) {
-        console.error("Playback failed:", error);
-        showPopup("Error playing song!");
+        console.error(`Playback error for ${song.title}:`, error);
+        showPopup("Error playing song, skipping...");
+        nextSong(); // Skip on error instead of stopping
     }
-}
-
-// Smart title splitting with fallback
-function balanceSongTitles() {
-    document.querySelectorAll('.song-title').forEach(title => {
-        const text = title.textContent.trim();
-        if (text.length > 25) {
-            const third = Math.floor(text.length / 3);
-            const firstBreak = text.indexOf(' ', third);
-            const secondBreak = text.indexOf(' ', third * 2);
-            
-            let formatted = text;
-            if (firstBreak > -1 && secondBreak > -1) {
-                formatted = [
-                    text.slice(0, firstBreak),
-                    text.slice(firstBreak+1, secondBreak),
-                    text.slice(secondBreak+1)
-                ].join('\n');
-            }
-            title.innerHTML = formatted.replace(/\n/g, '<br>');
-        }
-    });
-}
-
-// Run on load and resize
-window.addEventListener('load', balanceSongTitles);
-window.addEventListener('resize', balanceSongTitles);
-
-// ✅ Updated playSong function (keep original cases)
-function playSearchSong(title, source) {
-    let song;
-    let sourcePlaylist;
-    
-    // Find the song in its original source
-    switch (source) {
-        case 'bhojpuri':
-            song = fixedBhojpuri.find(s => s.title === title);
-            sourcePlaylist = fixedBhojpuri;
-            break;
-        case 'phonk':
-            song = fixedPhonk.find(s => s.title === title);
-            sourcePlaylist = fixedPhonk;
-            break;
-        case 'haryanvi':
-            song = fixedHaryanvi.find(s => s.title === title);
-            sourcePlaylist = fixedHaryanvi;
-            break;
-        case 'json-bhojpuri':
-            song = jsonBhojpuriSongs.find(s => s.title === title);
-            sourcePlaylist = jsonBhojpuriSongs;
-            break;
-        case 'json-phonk':
-            song = jsonPhonkSongs.find(s => s.title === title);
-            sourcePlaylist = jsonPhonkSongs;
-            break;
-        case 'json-haryanvi':
-            song = jsonHaryanviSongs.find(s => s.title === title);
-            sourcePlaylist = jsonHaryanviSongs;
-            break;
-    }
-    
-    if (!song) {
-        console.error("Song not found:", title);
-        return;
-    }
-    
-    // Use the original source playlist for continuous playback
-    currentPlaylist = sourcePlaylist;
-    currentContext = source;
-    currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
-    
-    if (currentSongIndex === -1) {
-        console.error("Song index not found in source playlist");
-        return;
-    }
-    
-    console.log(`Playing "${title}" from ${source} (index: ${currentSongIndex}). Next songs will continue from this collection.`);
-    
-    audioPlayer.src = song.link;
-    audioPlayer.play()
-        .then(() => {
-            playerContainer.style.display = "flex";
-            updatePlayerUI(song);
-            highlightCurrentSong();
-            showPopup(`Playing from ${source.replace('json-', '')}`);
-        })
-        .catch(error => {
-            console.error("Playback failed:", error);
-            showPopup("Error playing song!");
-        });
 }
 
 function highlightCurrentSong() {
     document.querySelectorAll('.song-item').forEach(item => item.classList.remove('playing'));
     const allSongs = [...document.querySelectorAll('.song-title')];
     const currentSongElement = allSongs.find(el => el.textContent === currentPlaylist[currentSongIndex]?.title);
-    if (currentSongElement) {
-        currentSongElement.parentElement.classList.add('playing');
-    }
+    if (currentSongElement) currentSongElement.parentElement.classList.add('playing');
 }
 
-
-// Remove the duplicate at the bottom and keep this one
-document.addEventListener("DOMContentLoaded", () => {
-    displayFixedSections();
-    loadSearchSongs();
-    changeVolume(100); // This sets volume to 100% (300/300)
-});
-
-function handleSongEnd() {
-    console.log("Current Song Index Before:", currentSongIndex);
-    console.log("Repeat Mode:", repeatMode);
-    console.log("Current Context:", currentContext);
-
+async function handleSongEnd() {
+    console.log("Song ended, Repeat Mode:", repeatMode);
     audioPlayer.removeEventListener('ended', handleSongEnd);
 
-    if (repeatMode === 2) { // Repeat single song
+    if (repeatMode === 2) { // Repeat one
         audioPlayer.currentTime = 0;
-        audioPlayer.play().catch(error => console.error("Playback failed:", error));
-        console.log("Repeating the same song...");
+        await audioPlayer.play();
         audioPlayer.addEventListener('ended', handleSongEnd);
         updatePlayPauseButton();
+        preloadNextSong();
         return;
     }
 
-    let nextSongIndex = currentSongIndex + 1;
-    let nextSong = null;
-
-    // ✅ If still in the fixed list, continue playing from the correct index
-    if (currentContext === 'bhojpuri' && nextSongIndex < fixedBhojpuri.length) {
-        nextSong = fixedBhojpuri[nextSongIndex];
-    } else if (currentContext === 'phonk' && nextSongIndex < fixedPhonk.length) {
-        nextSong = fixedPhonk[nextSongIndex];
-    } else if (currentContext === 'haryanvi' && nextSongIndex < fixedHaryanvi.length) {
-        nextSong = fixedHaryanvi[nextSongIndex];
-    }
-
-    // ✅ If fixed list is done, move to JSON songs (but keep the correct index)
-    if (!nextSong) {
+    if (repeatMode === 1 || currentSongIndex < currentPlaylist.length - 1) { // Repeat all or next song
+        currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
+    } else {
         if (currentContext === 'bhojpuri' && jsonBhojpuriSongs.length > 0) {
-            nextSongIndex = 0; // Start at index 0 in JSON
-            nextSong = jsonBhojpuriSongs[nextSongIndex];
-            currentContext = 'json-bhojpuri';
             currentPlaylist = jsonBhojpuriSongs;
+            currentContext = 'json-bhojpuri';
+            currentSongIndex = 0;
         } else if (currentContext === 'phonk' && jsonPhonkSongs.length > 0) {
-            nextSongIndex = 0;
-            nextSong = jsonPhonkSongs[nextSongIndex];
-            currentContext = 'json-phonk';
             currentPlaylist = jsonPhonkSongs;
+            currentContext = 'json-phonk';
+            currentSongIndex = 0;
         } else if (currentContext === 'haryanvi' && jsonHaryanviSongs.length > 0) {
-            nextSongIndex = 0;
-            nextSong = jsonHaryanviSongs[nextSongIndex];
-            currentContext = 'json-haryanvi';
             currentPlaylist = jsonHaryanviSongs;
-        }
-    }
-
-    // ✅ If JSON list also finishes, loop back to fixed but continue sequence
-    if (!nextSong) {
-        if (currentContext === 'json-bhojpuri') {
-            nextSongIndex = 0;
-            nextSong = fixedBhojpuri[nextSongIndex];
-            currentContext = 'bhojpuri';
-            currentPlaylist = fixedBhojpuri;
-        } else if (currentContext === 'json-phonk') {
-            nextSongIndex = 0;
-            nextSong = fixedPhonk[nextSongIndex];
-            currentContext = 'phonk';
-            currentPlaylist = fixedPhonk;
-        } else if (currentContext === 'json-haryanvi') {
-            nextSongIndex = 0;
-            nextSong = fixedHaryanvi[nextSongIndex];
-            currentContext = 'haryanvi';
-            currentPlaylist = fixedHaryanvi;
-        }
-    }
-
-    // ✅ If everything is finished, stop playback
-    if (!nextSong) {
-        console.log("All songs played. Stopping.");
-        return;
-    }
-
-    // ✅ Load and play the next song, ensuring correct index
-    console.log(`Playing Next Song (${currentContext} - Index: ${nextSongIndex}):`, nextSong.title);
-    currentSongIndex = nextSongIndex; // Update current index before playing
-    audioPlayer.src = nextSong.link;
-    audioPlayer.load();
-
-    let songStarted = false;
-    let retries = 0;
-    let maxRetries = 5;
-
-    audioPlayer.oncanplay = async () => {
-        console.log("Song Fully Loaded:", nextSong.title);
-
-        while (retries < maxRetries) {
-            try {
-                await audioPlayer.play();
-                console.log("Playing Successfully:", nextSong.title);
-                songStarted = true;
-                break;
-            } catch (error) {
-                console.error(`Playback Error (Attempt ${retries + 1}):`, error);
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Retry after delay
-                retries++;
+            currentContext = 'json-haryanvi';
+            currentSongIndex = 0;
+        } else if (currentContext === 'search') {
+            const lastSong = currentPlaylist[currentSongIndex];
+            if (jsonBhojpuriSongs.some(s => s.title === lastSong.title)) {
+                currentPlaylist = jsonBhojpuriSongs;
+                currentContext = 'json-bhojpuri';
+                currentSongIndex = jsonBhojpuriSongs.findIndex(s => s.title === lastSong.title) + 1;
+            } else if (jsonPhonkSongs.some(s => s.title === lastSong.title)) {
+                currentPlaylist = jsonPhonkSongs;
+                currentContext = 'json-phonk';
+                currentSongIndex = jsonPhonkSongs.findIndex(s => s.title === lastSong.title) + 1;
+            } else if (jsonHaryanviSongs.some(s => s.title === lastSong.title)) {
+                currentPlaylist = jsonHaryanviSongs;
+                currentContext = 'json-haryanvi';
+                currentSongIndex = jsonHaryanviSongs.findIndex(s => s.title === lastSong.title) + 1;
             }
-        }
-
-        if (!songStarted && currentPlaylist.length > 1) {
-            console.error("Max retries reached! Skipping to next song...");
-            currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-            playSong(currentPlaylist[currentSongIndex].title, currentContext);
-        }
-
-        // ✅ Add event listener back after playback starts
-        audioPlayer.addEventListener('ended', handleSongEnd);
-        updatePlayPauseButton();
-    };
-
-    // ✅ Confirm the song is playing
-    audioPlayer.oncanplay = async () => {
-        console.log("Song Fully Loaded:", nextSong.title);
-    
-        let songStarted = false;
-        let retries = 0;
-        let maxRetries = 5;
-    
-        while (retries < maxRetries) {
-            try {
-                await audioPlayer.play();
-                console.log("Playing Successfully:", nextSong.title);
-                songStarted = true;
-                break;
-            } catch (error) {
-                console.error(`Playback Error (Attempt ${retries + 1}):`, error);
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Retry after delay
-                retries++;
+            if (currentSongIndex >= currentPlaylist.length) currentSongIndex = 0;
+        } else if (['json-bhojpuri', 'json-phonk', 'json-haryanvi'].includes(currentContext)) {
+            if (currentContext === 'json-bhojpuri' && jsonPhonkSongs.length > 0) {
+                currentPlaylist = jsonPhonkSongs;
+                currentContext = 'json-phonk';
+                currentSongIndex = 0;
+            } else if (currentContext === 'json-phonk' && jsonHaryanviSongs.length > 0) {
+                currentPlaylist = jsonHaryanviSongs;
+                currentContext = 'json-haryanvi';
+                currentSongIndex = 0;
+            } else if (currentContext === 'json-haryanvi' && jsonBhojpuriSongs.length > 0) {
+                currentPlaylist = jsonBhojpuriSongs;
+                currentContext = 'json-bhojpuri';
+                currentSongIndex = 0;
+            } else {
+                console.log("End of all playlists, stopping.");
+                return;
             }
-        }
-    
-        if (!songStarted) {
-            console.error(`Max retries reached! Playback failed for ${nextSong.title}.`);
-            showPopup("Error playing next song!");
-    
-            // ✅ Skip to the next song instead of stopping
-            currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-            playSong(currentPlaylist[currentSongIndex].title, currentContext);
+        } else {
+            console.log("End of playlist, stopping.");
             return;
         }
-    
-        // ✅ Add event listener back after playback starts
-        audioPlayer.addEventListener('ended', handleSongEnd);
-        updatePlayPauseButton();
-    };
-    
+    }
 
-    // ✅ Ensure UI updates with new song info
-    updatePlayerUI(nextSong);
-    highlightCurrentSong();
-    updatePlayPauseButton();
-}
-
-
-let wakeLock = null;
-
-// ✅ Function to Request Wake Lock
-async function requestWakeLock() {
-    if (document.visibilityState === "hidden") {
-        console.warn("Cannot acquire Wake Lock: Page is not visible.");
+    if (currentPlaylist.length === 0) {
+        console.error("Current playlist is empty!");
         return;
     }
 
-    if (wakeLock !== null) return; // Prevent duplicate wake locks
-
-    try {
-        if ('wakeLock' in navigator) {
-            wakeLock = await navigator.wakeLock.request('screen');
-            console.log("Wake Lock acquired");
-
-            wakeLock.addEventListener('release', () => {
-                console.log("Wake Lock released, re-requesting...");
-                wakeLock = null;
-                requestWakeLock(); // Automatically reacquire wake lock
-            });
-        }
-    } catch (err) {
-        console.error("Wake Lock error:", err);
-    }
+    playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
-
-// ✅ Request Wake Lock when Audio Starts
+// Event Listeners
 audioPlayer.addEventListener("play", () => {
+    console.log("Playback started at:", audioPlayer.currentTime);
     requestWakeLock();
 });
 
-// ✅ Reacquire Wake Lock when Screen Unlocks
-document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
-        console.log("Screen unlocked, requesting Wake Lock...");
-        requestWakeLock();
-    }
+audioPlayer.addEventListener("pause", () => {
+    console.log("Playback paused at:", audioPlayer.currentTime);
 });
 
-// ✅ Register Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('scripts/service-worker.js')
-        .then(registration => {
-            console.log('Service Worker registered with scope:', registration.scope);
-        })
-        .catch(error => {
-            console.error('Service Worker registration failed:', error);
-        });
-}
+audioPlayer.addEventListener("ended", () => {
+    console.log("Playback ended.");
+});
 
-// ✅ Update Media Session API
+audioPlayer.addEventListener('error', (e) => {
+    console.error("Audio error:", e.target.error);
+    showPopup("Song failed to play, skipping...");
+    nextSong();
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await displayFixedSections();
+    await loadSearchSongs();
+    changeVolume(100);
+    enableBackgroundPlayback();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('scripts/service-worker.js')
+            .then(reg => console.log('Service Worker registered:', reg.scope))
+            .catch(err => console.error('Service Worker error:', err));
+    }
+
+    playPauseBtn.addEventListener('click', togglePlay);
+});
+
+document.addEventListener("click", () => {
+    if (audioPlayer.paused) audioPlayer.play().catch(err => console.log("Initial playback error:", err));
+}, { once: true });
+
+// Media Session API
 if ('mediaSession' in navigator) {
     function updateMediaSession() {
         if (!currentPlaylist[currentSongIndex]) return;
-
-        let song = currentPlaylist[currentSongIndex];
-
+        const song = currentPlaylist[currentSongIndex];
         navigator.mediaSession.metadata = new MediaMetadata({
             title: song.title,
             artist: "Unknown Artist",
             album: "VibeTunes",
             artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/png" }]
         });
-
         navigator.mediaSession.setPositionState({
-            duration: audioPlayer.duration,
+            duration: audioPlayer.duration || 0,
             playbackRate: audioPlayer.playbackRate,
             position: audioPlayer.currentTime
         });
@@ -803,169 +561,55 @@ if ('mediaSession' in navigator) {
         requestWakeLock();
         updateMediaSession();
     });
-
-    navigator.mediaSession.setActionHandler('pause', () => {
-        audioPlayer.pause();
-    });
-
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-        nextSong();
-        updateMediaSession();
-    });
-
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-        previousSong();
-        updateMediaSession();
-    });
-
-    // Update media session when song changes
+    navigator.mediaSession.setActionHandler('pause', audioPlayer.pause.bind(audioPlayer));
+    navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+    navigator.mediaSession.setActionHandler('previoustrack', previousSong);
     audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
 }
 
-// ✅ Improved Error Handling (Auto-Retry on Network Error)
-audioPlayer.addEventListener('error', event => {
-    console.error('Audio playback error:', event);
-
-    switch (event.target.error.code) {
-        case event.target.error.MEDIA_ERR_ABORTED:
-            console.error('Media aborted.');
-            break;
-        case event.target.error.MEDIA_ERR_NETWORK:
-            console.error('Network error. Retrying in 2 seconds...');
-            setTimeout(() => audioPlayer.play().catch(console.error), 2000);
-            break;
-        case event.target.error.MEDIA_ERR_DECODE:
-            console.error('Decoding error.');
-            break;
-        case event.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            console.error('Media format not supported.');
-            break;
-        default:
-            console.error('An unknown error occurred.');
-            break;
-    }
-});
-
-// ✅ Log Events for Debugging
-console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
-
-audioPlayer.addEventListener('play', () => {
-    console.log('Playback started at:', audioPlayer.currentTime);
-});
-
-audioPlayer.addEventListener('pause', () => {
-    console.log('Playback paused at:', audioPlayer.currentTime);
-});
-
-audioPlayer.addEventListener('ended', () => {
-    console.log('Playback ended.');
-});
-
-// ✅ Log Visibility Changes
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-        console.log('Tab is in the background. Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
-    } else {
-        console.log('Tab is in the foreground. Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
-    }
-});
-
-// Make sure the next/previous functions also maintain context
 function nextSong() {
-    if (currentPlaylist.length === 0) return;
-
-    currentSongIndex++;
-    if (currentSongIndex >= currentPlaylist.length) {
-        console.log("Playlist ended. Restarting...");
-        currentSongIndex = 0; // Restart from the first song
-    }
-
+    currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
 function previousSong() {
-    if (currentPlaylist.length === 0) return;
-
-    currentSongIndex--;
-    if (currentSongIndex < 0) {
-        currentSongIndex = currentPlaylist.length - 1; // Go to the last song
-    }
-
+    currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
-
-// Repeat System
 function toggleRepeat() {
     repeatMode = (repeatMode + 1) % 3;
     document.querySelector("#repeat-btn").textContent = ['🔁', '🔂', '🔄'][repeatMode];
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
 }
 
-// UI Updates
 function updatePlayerUI(song) {
     document.getElementById("player-thumbnail").src = song.thumbnail;
     document.getElementById("player-title").textContent = song.title;
     updatePlayPauseButton();
 }
 
-// Modified togglePlay function
 function togglePlay() {
     if (audioPlayer.paused) {
-        audioPlayer.play()
-            .then(() => {
-                pendingPlayInteraction = false;
-                updatePlayPauseButton();
-            })
-            .catch(error => {
-                if (pendingPlayInteraction) {
-                    showPopup("Tap again to start playback");
-                } else {
-                    console.error("Playback error:", error);
-                    showPopup("Error starting playback");
-                }
+        if (!audioPlayer.src && currentPlaylist.length > 0) {
+            playSong(currentPlaylist[0].title, currentContext);
+        } else {
+            audioPlayer.play().catch(error => {
+                console.error("Toggle play error:", error);
+                showPopup("Click again to play");
             });
+        }
     } else {
         audioPlayer.pause();
-        updatePlayPauseButton();
     }
+    updatePlayPauseButton();
 }
-
 
 function updatePlayPauseButton() {
-    // Ensure we are accessing the button element correctly
     const playPauseBtn = document.getElementById('play-pause-btn');
-    
-    if (playPauseBtn) {
-        // Force a check of the actual player state
-        if (audioPlayer.paused || audioPlayer.ended || audioPlayer.readyState < 3) {
-            playPauseBtn.textContent = "▶"; // Play symbol
-        } else {
-            playPauseBtn.textContent = "⏸"; // Pause symbol
-        }
-    }
+    if (playPauseBtn) playPauseBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
 }
 
-// Add these event listeners to help with mobile device synchronization
-document.addEventListener("visibilitychange", () => {
-    // When page becomes visible again, update the button state immediately
-    if (document.visibilityState === "visible") {
-        updatePlayPauseButton();
-        
-        // Update again after a short delay in case the audio state is still changing
-        setTimeout(updatePlayPauseButton, 100);
-        setTimeout(updatePlayPauseButton, 500); // Another check after 500ms
-    }
-});
-
-// Add these additional event listeners to the audio player
-audioPlayer.addEventListener("play", updatePlayPauseButton);
-audioPlayer.addEventListener("pause", updatePlayPauseButton);
-audioPlayer.addEventListener("ended", updatePlayPauseButton);
-audioPlayer.addEventListener("waiting", updatePlayPauseButton);
-audioPlayer.addEventListener("canplay", updatePlayPauseButton);
-
-// Utility Functions
 function showPopup(message) {
     const popup = document.createElement("div");
     popup.className = "popup-notification";
@@ -983,41 +627,9 @@ function seekSong(value) {
     audioPlayer.currentTime = (value / 100) * audioPlayer.duration;
 }
 
-// Modified changeVolume function
 function changeVolume(value) {
-    // Change these two lines:
-    const volumeValue = value / 100;  // Now 100% = full volume
-    audioPlayer.volume = volumeValue;
+    audioPlayer.volume = value / 100;
     document.getElementById("volume-percentage").textContent = `${value}%`;
 }
 
-// Improved highlighting function
-function highlightCurrentSong() {
-    // First, remove 'playing' class from all song items
-    document.querySelectorAll('.song-item').forEach(item => item.classList.remove('playing'));
-    
-    // Find the current song element by matching title text
-    const currentSongTitle = currentPlaylist[currentSongIndex]?.title;
-    if (!currentSongTitle) return;
-    
-    // Get all song titles
-    const allSongTitles = document.querySelectorAll('.song-title');
-    
-    // Find the matching element and add 'playing' class to its parent
-    for (const titleElement of allSongTitles) {
-        if (titleElement.textContent.trim() === currentSongTitle) {
-            titleElement.parentElement.classList.add('playing');
-            // You might also want to scroll to the playing song
-            titleElement.parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            break;
-        }
-    }
-}
-
-// ✅ Modified initialization sequence
-document.addEventListener("DOMContentLoaded", async () => {
-    await displayFixedSections(); // First load JSON collections
-    await loadSearchSongs(); // Then prepare search list
-    changeVolume(100);
-});
-
+console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
