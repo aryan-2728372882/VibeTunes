@@ -1,30 +1,75 @@
 /* General Styles */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: #ffffff;
-    min-height: 100vh;
+html {
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal overscroll globally */
 }
 
-/* Navbar Styles - Fixed */
+body {
+    font-family: 'Orbitron', 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #0d0d1f 0%, #1a0033 100%);
+    color: #e0e0ff;
+    min-height: 100vh;
+    overflow-x: hidden; /* Reinforce horizontal containment */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.15), transparent 70%);
+    z-index: -1;
+    animation: pulse 12s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.03); }
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(147, 51, 234, 0.3)"/></svg>') repeat;
+    background-size: 15px 15px;
+    animation: drift 60s linear infinite;
+    z-index: -1;
+    opacity: 0.2;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-50px, -50px); }
+}
+
+/* Navbar Styles */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(90deg, rgba(17, 24, 39, 0.95), rgba(49, 46, 129, 0.9));
+    backdrop-filter: blur(15px) saturate(150%);
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 3px 15px rgba(147, 51, 234, 0.3);
+    border-bottom: 1px solid rgba(147, 51, 234, 0.2);
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevent navbar horizontal scroll */
 }
 
 .site-name {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #ffffff;
+    color: #d8b4fe;
 }
 
 .nav-links {
@@ -34,13 +79,34 @@ body {
 }
 
 .nav-links a {
-    color: #ffffff;
+    color: #d8b4fe;
     text-decoration: none;
-    transition: opacity 0.3s;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    position: relative;
+    transition: all 0.4s ease;
+}
+
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, #9333ea, #a5b4fc);
+    opacity: 0;
+    border-radius: 5px;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.nav-links a:hover::before {
+    opacity: 0.2;
 }
 
 .nav-links a:hover {
-    opacity: 0.8;
+    color: #fff;
+    transform: translateY(-2px);
+    text-shadow: 0 0 8px rgba(147, 51, 234, 0.7);
 }
 
 /* Mobile Navbar Fix */
@@ -54,10 +120,16 @@ body {
     .nav-links {
         margin-left: auto;
         font-size: 0.9rem;
+        gap: 0.75rem;
     }
     
     .site-name {
         display: none;
+    }
+    
+    .nav-links a {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
     }
 }
 
@@ -66,11 +138,28 @@ main {
     padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    flex: 1 0 auto;
+    overflow-x: hidden; /* Prevent horizontal overscroll */
+    overflow-y: auto; /* Scroll vertically within main */
+    box-sizing: border-box;
 }
 
 /* Horizontal Scroll Sections */
 .song-section {
     margin: 3rem 0;
+    padding: 0.75rem;
+    background: rgba(17, 24, 39, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(147, 51, 234, 0.2);
+    animation: sectionFadeIn 1s ease-out;
+    overflow-x: hidden; /* Contain horizontal scroll */
+}
+
+@keyframes sectionFadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 .section-header {
@@ -83,7 +172,30 @@ main {
 
 .section-title {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
+    background: linear-gradient(45deg, #9333ea, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.4);
+    padding: 0.3rem;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, #9333ea, transparent);
+    animation: titleLine 2s infinite ease-in-out;
+}
+
+@keyframes titleLine {
+    0% { width: 50%; }
+    50% { width: 80%; }
+    100% { width: 50%; }
 }
 
 .scroll-container {
@@ -93,7 +205,8 @@ main {
     gap: 1.5rem;
     padding: 1rem;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
+    overscroll-behavior-x: contain; /* Limit horizontal overscroll */
+    scrollbar-width: none;
 }
 
 .scroll-container::-webkit-scrollbar {
@@ -107,12 +220,21 @@ main {
     overflow: hidden;
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    background: linear-gradient(135deg, rgba(49, 46, 129, 0.4), rgba(17, 24, 39, 0.6));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s ease;
+    animation: itemPop 0.5s ease-out;
     margin-right: 15px;
 }
 
+@keyframes itemPop {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 .song-item:hover {
-    transform: scale(1.05);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 40px rgba(147, 51, 234, 0.5);
 }
 
 .thumbnail-container {
@@ -128,11 +250,12 @@ main {
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 0.3s ease;
+    transition: transform 0.5s ease;
 }
 
 .song-item:hover .thumbnail {
-    transform: scale(1.1);
+    transform: scale(1.15) rotate(3deg);
+    filter: brightness(1.3) contrast(1.1);
 }
 
 .song-title {
@@ -144,11 +267,17 @@ main {
     margin: 0;
     font-size: 0.9rem;
     font-weight: 600;
-    color: white;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    color: #e0e0ff;
+    background: linear-gradient(to top, rgba(17, 24, 39, 0.9), transparent);
+    text-shadow: 0 0 8px rgba(147, 51, 234, 0.5);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: all 0.3s ease;
+}
+
+.song-item:hover .song-title {
+    background: linear-gradient(to top, rgba(147, 51, 234, 0.8), transparent);
 }
 
 .hover-play {
@@ -157,7 +286,7 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 2rem;
-    background: rgba(0,0,0,0.7);
+    background: rgba(147, 51, 234, 0.8);
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -165,11 +294,13 @@ main {
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease;
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.6);
 }
 
 .song-item:hover .hover-play {
     opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
 }
 
 /* Search Components */
@@ -179,10 +310,26 @@ main {
     margin: 2rem 0;
     border: none;
     border-radius: 25px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(49, 46, 129, 0.4);
+    color: #e0e0ff;
     font-size: 1rem;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 3px 15px rgba(147, 51, 234, 0.2);
+    transition: all 0.4s ease;
+    animation: glowFade 3s infinite ease-in-out;
+    box-sizing: border-box;
+}
+
+#search-bar:focus {
+    outline: none;
+    box-shadow: 0 3px 20px rgba(147, 51, 234, 0.5);
+    background: rgba(49, 46, 129, 0.6);
+    transform: scale(1.02);
+}
+
+@keyframes glowFade {
+    0%, 100% { box-shadow: 0 3px 15px rgba(147, 51, 234, 0.2); }
+    50% { box-shadow: 0 3px 25px rgba(147, 51, 234, 0.4); }
 }
 
 #search-results-container {
@@ -204,9 +351,14 @@ main {
     padding: 1rem 2rem;
     display: flex;
     align-items: center;
-    gap: 2rem;
-    z-index: 1000;
+    gap: 1.5rem;
+    z-index: 2000;
     backdrop-filter: blur(10px);
+    height: 80px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .player-info {
@@ -214,6 +366,7 @@ main {
     align-items: center;
     gap: 1rem;
     min-width: 250px;
+    flex-shrink: 1;
 }
 
 #player-thumbnail {
@@ -221,6 +374,7 @@ main {
     height: 60px;
     border-radius: 8px;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 .player-controls {
@@ -239,6 +393,8 @@ main {
     cursor: pointer;
     padding: 0.5rem;
     transition: opacity 0.3s;
+    width: 20px;
+    height: 20px;
 }
 
 .player-controls button:hover {
@@ -249,22 +405,162 @@ main {
     flex-grow: 1;
     height: 4px;
     margin: 0 1rem;
-    accent-color: #ffffff;
+    accent-color: #9333ea;
 }
 
-.volume-controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    min-width: 150px;
+/* Explicitly Hide All Volume Elements */
+.volume-controls, 
+#volume-controls, 
+.volume-slider, 
+#volume-bar, 
+#volume-label, 
+.volume-icon, 
+#volume-percentage {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-#volume-bar {
-    width: 100px;
-    accent-color: #ffffff;
+/* Footer Styles */
+footer {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(90deg, rgba(17, 24, 39, 0.9), rgba(49, 46, 129, 0.85));
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow-x: hidden; /* Prevent footer horizontal scroll */
 }
 
-/* Contact Page Styles - Original Unmodified */
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(147, 51, 234, 0.1), transparent 70%);
+    animation: footerGlow 10s infinite ease-in-out;
+}
+
+@keyframes footerGlow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design for Music Player */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.5rem;
+    }
+
+    .song-item {
+        flex: 0 0 150px;
+    }
+
+    .thumbnail-container {
+        width: 150px;
+        height: 150px;
+    }
+
+    /* Fix Overscroll (Mobile) */
+    html, body {
+        height: 100%;
+        overflow-x: hidden; /* Reinforce horizontal containment */
+    }
+
+    body {
+        overflow-y: auto; /* Allow vertical scroll */
+        overscroll-behavior-y: contain; /* Prevent vertical overscroll */
+    }
+
+    main {
+        padding-bottom: 80px; /* Space for music player */
+        flex: 1 0 auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain; /* Reinforce no bounce */
+    }
+
+    footer {
+        flex-shrink: 0;
+        margin-top: 0;
+    }
+
+    /* Mobile Music Player Fix */
+    #music-player {
+        flex-wrap: nowrap;
+        padding: 0.5rem 0.5rem;
+        gap: 0.5rem;
+        height: 80px;
+        max-width: 412px;
+        z-index: 2000;
+    }
+
+    .player-info {
+        flex-direction: row;
+        min-width: 0;
+        gap: 0.3rem;
+        flex-shrink: 1;
+        max-width: 150px;
+    }
+
+    #player-thumbnail {
+        width: 40px;
+        height: 40px;
+    }
+
+    .player-controls {
+        flex-grow: 0;
+        gap: 1rem;
+        justify-content: flex-start;
+        margin-left: 0;
+        padding-right: 0;
+    }
+
+    .player-controls button {
+        font-size: 1.5rem;
+        padding: 0.4rem;
+        width: 30px;
+        height: 30px;
+    }
+
+    #seek-bar {
+        position: absolute;
+        top: 5px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        margin: 0;
+        height: 6px;
+        max-width: 412px;
+        background: rgba(255, 255, 255, 0.3);
+        accent-color: #9333ea;
+    }
+
+    .player-info .song-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 90px;
+        font-size: 0.85rem;
+        position: static;
+        background: none;
+        padding: 0;
+        color: inherit;
+    }
+}
+
+/* Contact Page Styles */
 .contact-container {
     max-width: 800px;
     margin: 4rem auto;
@@ -276,6 +572,7 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.1);
     transform: translateY(0);
     animation: float 6s ease-in-out infinite;
+    overflow-x: hidden; /* Contain contact page */
 }
 
 @keyframes float {
@@ -328,6 +625,7 @@ main {
     font-size: 1rem;
     transition: all 0.3s ease;
     border: 1px solid transparent;
+    box-sizing: border-box;
 }
 
 .form-input:focus {
@@ -445,88 +743,6 @@ main {
     transform: translateY(-3px);
 }
 
-/* Footer Styles */
-footer {
-    text-align: center;
-    padding: 2rem;
-    margin-top: auto;
-    background: rgba(0, 0, 0, 0.8);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .navbar {
-        padding: 0.5rem;
-    }
-
-    .song-item {
-        flex: 0 0 150px;
-    }
-
-    .thumbnail-container {
-        width: 150px;
-        height: 150px;
-    }
-
-    /* Mobile Music Player Fix */
-    #music-player {
-        flex-wrap: nowrap;
-        padding: 0.75rem 1rem;
-        gap: 1rem;
-        height: 80px;
-    }
-
-    .player-info {
-        flex-direction: row;
-        min-width: auto;
-        gap: 0.75rem;
-        flex-shrink: 0;
-        max-width: 60%;
-    }
-
-    #player-thumbnail {
-        width: 45px;
-        height: 45px;
-    }
-
-    .player-controls {
-        flex-grow: 0;
-        gap: 1rem;
-        justify-content: flex-start;
-    }
-
-    .player-controls button {
-        font-size: 1.3rem;
-        padding: 0.3rem;
-    }
-
-    #seek-bar {
-        position: absolute;
-        top: -5px;
-        left: 0;
-        right: 0;
-        width: 100%;
-        margin: 0;
-        height: 3px;
-    }
-
-    .volume-controls {
-        display: none !important;
-    }
-
-    .player-info .song-title {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100px;
-        font-size: 0.85rem;
-        position: static;
-        background: none;
-        padding: 0;
-        color: inherit;
-    }
-}
-
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -535,9 +751,6 @@ footer {
 
 .popup-notification {
     animation: fadeIn 0.3s ease-out;
-}
-
-.popup-notification {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -601,7 +814,7 @@ footer {
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.8);
+    background: linear-gradient(90deg, rgba(17, 24, 39, 0.95), rgba(49, 46, 129, 0.9));
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
@@ -619,7 +832,7 @@ footer {
 
 /* Contact Button Fix */
 .nav-links a[href="/contact"] {
-    color: #ffffff;
+    color: #d8b4fe;
     text-decoration: none;
     white-space: nowrap;
     padding: 0.5rem 1rem;
@@ -641,17 +854,11 @@ footer {
         padding-left: 0.5rem;
     }
     
-    .nav-links a {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
-    }
-    
     .nav-links a[href="/contact"] {
         padding: 0.4rem 0.8rem;
         margin-left: auto;
     }
     
-    /* Contact Page Specific Fixes */
     .contact-container {
         margin: 1rem;
         padding: 1.25rem;
@@ -689,23 +896,9 @@ footer {
     }
 }
 
-/* Hide all volume controls permanently */
-.volume-controls, 
-#volume-controls, 
-.volume-slider, 
-#volume-bar, 
-#volume-label, 
-.volume-icon {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-    opacity: 0 !important;
-}
-
 /* Adjust player layout for removed controls */
 #music-player {
-    padding-right: 1rem !important; /* Compensate removed volume space */
+    padding-right: 1rem !important;
 }
 
 /* Mobile optimization */
