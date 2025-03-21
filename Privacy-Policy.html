@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - VibeTunes</title>
+    <link rel="icon" href="/assets/favicon - Copy.ico" type="image/x-icon">
+    <style>
+        /* General Styles */
+        html {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0d0d1f 0%, #1a0033 100%);
+            color: #e0e0ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.15), transparent 70%);
+            z-index: -1;
+            animation: pulse 12s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.03); }
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: linear-gradient(90deg, rgba(17, 24, 39, 0.95), rgba(49, 46, 129, 0.9));
+            backdrop-filter: blur(15px) saturate(150%);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 3px 15px rgba(147, 51, 234, 0.3);
+            border-bottom: 1px solid rgba(147, 51, 234, 0.2);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            margin-left: auto;
+        }
+
+        .nav-links a {
+            color: #d8b4fe;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, #9333ea, #a5b4fc);
+            opacity: 0;
+            border-radius: 5px;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-links a:hover::before {
+            opacity: 0.2;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            text-shadow: 0 0 8px rgba(147, 51, 234, 0.7);
+        }
+
+        /* Privacy Container */
+        .privacy-container {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1 0 auto;
+            overflow-x: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Privacy Header */
+        .privacy-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .privacy-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #9333ea, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(147, 51, 234, 0.4);
+        }
+
+        .privacy-header p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Privacy Content */
+        .privacy-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .policy-section {
+            background: rgba(49, 46, 129, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .policy-section:hover {
+            background: rgba(49, 46, 129, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(147, 51, 234, 0.3);
+        }
+
+        .policy-section h2 {
+            font-size: 1.5rem;
+            color: #d8b4fe;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .policy-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, #9333ea, transparent);
+        }
+
+        .policy-section p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0.5rem 0;
+        }
+
+        .policy-section ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .policy-section li {
+            position: relative;
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .policy-section li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: #9333ea;
+            font-size: 1.2rem;
+        }
+
+        .policy-section a {
+            color: #a5b4fc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .policy-section a:hover {
+            color: #fff;
+            text-shadow: 0 0 5px rgba(147, 51, 234, 0.7);
+        }
+
+        /* Back to Top Button */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #9333ea, #a5b4fc);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        #back-to-top.visible {
+            opacity: 1;
+        }
+
+        #back-to-top:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.5);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(90deg, rgba(17, 24, 39, 0.9), rgba(49, 46, 129, 0.85));
+            text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-links {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: #d8b4fe;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.3rem 0.6rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, #9333ea, #a5b4fc);
+            opacity: 0;
+            border-radius: 5px;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .footer-links a:hover::before {
+            opacity: 0.2;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            text-shadow: 0 0 8px rgba(147, 51, 234, 0.7);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+
+            .nav-links {
+                gap: 0.75rem;
+            }
+
+            .privacy-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+
+            .privacy-header h1 {
+                font-size: 2rem;
+            }
+
+            .policy-section {
+                padding: 1rem;
+            }
+
+            .policy-section h2 {
+                font-size: 1.3rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main class="privacy-container">
+        <section class="privacy-header">
+            <h1>Privacy Policy</h1>
+            <p>Last Updated: March 21, 2025</p>
+        </section>
+
+        <section class="privacy-content">
+            <div class="policy-section">
+                <h2>1. Introduction</h2>
+                <p>Welcome to VibeTunes! We value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>2. Information We Collect</h2>
+                <p>We may collect the following personal information:</p>
+                <ul>
+                    <li><strong>Contact Form Data:</strong> Name, email address, and message content when you submit our contact form.</li>
+                    <li><strong>Usage Data:</strong> Information about how you interact with our site (e.g., pages visited, time spent), collected via cookies or analytics tools.</li>
+                </ul>
+            </div>
+
+            <div class="policy-section">
+                <h2>3. How We Use Your Information</h2>
+                <p>Your data is used to:</p>
+                <ul>
+                    <li>Respond to your inquiries or messages.</li>
+                    <li>Improve our website and user experience.</li>
+                    <li>Send updates or promotional content (with your consent).</li>
+                </ul>
+            </div>
+
+            <div class="policy-section">
+                <h2>4. Data Sharing and Disclosure</h2>
+                <p>We do not sell your personal information. We may share it with:</p>
+                <ul>
+                    <li>Service providers (e.g., email services) to process your requests.</li>
+                    <li>Legal authorities if required by law.</li>
+                </ul>
+            </div>
+
+            <div class="policy-section">
+                <h2>5. Data Security</h2>
+                <p>We implement reasonable measures (e.g., encryption, secure servers) to protect your data, but no system is 100% secure. Please contact us if you suspect a breach.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>6. Your Rights</h2>
+                <p>You can:</p>
+                <ul>
+                    <li>Request access to your data.</li>
+                    <li>Ask for corrections or deletion.</li>
+                    <li>Opt out of promotional emails.</li>
+                </ul>
+                <p>Email us at <a href="mailto:support@vibetunes.com">support@vibetunes.com</a> to exercise these rights.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>7. Cookies</h2>
+                <p>We use cookies to enhance your experience. You can disable them in your browser settings, but some features may not work.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>8. Changes to This Policy</h2>
+                <p>We may update this policy. Check this page for the latest version.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>9. Contact Us</h2>
+                <p>For questions, reach us at <a href="mailto:support@vibetunes.com">support@vibetunes.com</a>.</p>
+            </div>
+        </section>
+
+        <button id="back-to-top" aria-label="Back to Top">↑</button>
+    </main>
+
+    <footer>
+        <p>© 2025 VibeTunes. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+        </div>
+    </footer>
+
+    <script>
+        // Back to Top Button Functionality
+        const backToTopBtn = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
