@@ -54,6 +54,8 @@ function updateUserStats(uid, minutesPlayed) {
       .catch(error => console.error("Error updating user stats:", error));
 }
 
+// Song Lists (fixedBhojpuri, fixedPhonk, fixedHaryanvi remain unchanged)
+
 const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
@@ -223,10 +225,12 @@ let repeatMode = 0;
 let currentContext = 'bhojpuri';
 let preloadedAudio = null;
 let wakeLock = null;
+let manualPause = false;
 
 const audioPlayer = document.getElementById("audio-player");
 const playerContainer = document.getElementById("music-player");
 const playPauseBtn = document.getElementById("play-pause-btn");
+const seekBar = document.getElementById("seek-bar");
 
 playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
@@ -243,27 +247,43 @@ function throttle(func, limit) {
     };
 }
 
-audioPlayer.addEventListener('timeupdate', throttle(updateSeekBar, 200));
+audioPlayer.addEventListener('timeupdate', throttle(() => {
+    updateSeekBar();
+    updateMediaSessionPosition();
+}, 200));
 
 // Background Playback and Wake Lock
 function enableBackgroundPlayback() {
     audioPlayer.setAttribute('preload', 'auto');
+    let wasPlayingBeforeHide = false; // Track state before visibility change
+
     document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden" && !audioPlayer.paused) {
-            audioPlayer.play().catch(err => console.log("Background playback error:", err));
-            requestWakeLock();
+        if (document.visibilityState === "hidden") {
+            wasPlayingBeforeHide = !audioPlayer.paused; // Remember if it was playing
+            if (wasPlayingBeforeHide) {
+                audioPlayer.play().catch(err => console.log("Background playback error:", err));
+                requestWakeLock();
+            }
         } else if (document.visibilityState === "visible") {
-            console.log("Screen unlocked, requesting Wake Lock...");
-            requestWakeLock();
+            console.log("Screen visible, respecting current state...");
+            if (!audioPlayer.paused) {
+                requestWakeLock(); // Keep wake lock if playing
+                syncLockScreenControls();
+            } else {
+                syncLockScreenControls(); // Sync UI, no forced play
+            }
         }
     });
+
     window.addEventListener("blur", () => {
-        if (!audioPlayer.paused) audioPlayer.play().catch(err => console.log("Blur playback error:", err));
+        if (!audioPlayer.paused) {
+            audioPlayer.play().catch(err => console.log("Blur playback error:", err));
+        }
     });
 }
 
 async function requestWakeLock() {
-    if (wakeLock !== null || document.visibilityState !== "visible") return; // Only request if page is visible
+    if (wakeLock !== null || document.visibilityState !== "visible") return;
     try {
         if ('wakeLock' in navigator) {
             wakeLock = await navigator.wakeLock.request('screen');
@@ -277,11 +297,10 @@ async function requestWakeLock() {
             });
         }
     } catch (err) {
-        console.warn("Wake Lock request failed (likely not visible):", err);
+        console.warn("Wake Lock request failed:", err);
     }
 }
 
-// Preload Next Song (no fetch, just load)
 function preloadNextSong() {
     if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length - 1) return;
     const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
@@ -292,7 +311,6 @@ function preloadNextSong() {
     preloadedAudio.load();
 }
 
-// Clear Cache
 function clearAudioCache() {
     if ('caches' in window) {
         caches.keys().then(cacheNames => cacheNames.forEach(name => caches.delete(name)));
@@ -404,15 +422,15 @@ async function playSong(title, context) {
 
     if (!song) {
         console.error(`Song not found: ${title} in context ${context}`);
-        return nextSong(); // Skip to next if not found
+        return nextSong();
     }
 
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
     console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}`);
 
     try {
-        audioPlayer.pause(); // Reset state
-        audioPlayer.currentTime = 0; // Ensure reset
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
         audioPlayer.src = song.link;
         audioPlayer.load();
         await audioPlayer.play();
@@ -423,10 +441,11 @@ async function playSong(title, context) {
         clearAudioCache();
         requestWakeLock();
         updateMediaSession();
+        syncLockScreenControls();
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
         showPopup("Error playing song, skipping...");
-        nextSong(); // Skip on error instead of stopping
+        nextSong();
     }
 }
 
@@ -447,6 +466,7 @@ async function handleSongEnd() {
         audioPlayer.addEventListener('ended', handleSongEnd);
         updatePlayPauseButton();
         preloadNextSong();
+        syncLockScreenControls();
         return;
     }
 
@@ -516,14 +536,12 @@ async function handleSongEnd() {
 audioPlayer.addEventListener("play", () => {
     console.log("Playback started at:", audioPlayer.currentTime);
     requestWakeLock();
+    syncLockScreenControls();
 });
 
 audioPlayer.addEventListener("pause", () => {
     console.log("Playback paused at:", audioPlayer.currentTime);
-});
-
-audioPlayer.addEventListener("ended", () => {
-    console.log("Playback ended.");
+    syncLockScreenControls();
 });
 
 audioPlayer.addEventListener('error', (e) => {
@@ -545,13 +563,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     playPauseBtn.addEventListener('click', togglePlay);
+    seekBar.addEventListener('input', () => seekSong(seekBar.value));
 });
 
-document.addEventListener("click", () => {
-    if (audioPlayer.paused) audioPlayer.play().catch(err => console.log("Initial playback error:", err));
-}, { once: true });
-
-// Media Session API
+// Media Session API with Lock Screen Sync
 if ('mediaSession' in navigator) {
     function updateMediaSession() {
         if (!currentPlaylist[currentSongIndex]) return;
@@ -562,6 +577,29 @@ if ('mediaSession' in navigator) {
             album: "VibeTunes",
             artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/png" }]
         });
+        updateMediaSessionPosition();
+        navigator.mediaSession.setActionHandler('play', () => {
+            console.log("Media Session play handler triggered");
+            audioPlayer.play();
+            requestWakeLock();
+            updatePlayPauseButton();
+            syncLockScreenControls();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+            audioPlayer.pause();
+            updatePlayPauseButton();
+            syncLockScreenControls();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+        navigator.mediaSession.setActionHandler('previoustrack', previousSong);
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+            audioPlayer.currentTime = details.seekTime;
+            updateSeekBar();
+            syncLockScreenControls();
+        });
+    }
+
+    function updateMediaSessionPosition() {
         navigator.mediaSession.setPositionState({
             duration: audioPlayer.duration || 0,
             playbackRate: audioPlayer.playbackRate,
@@ -569,15 +607,14 @@ if ('mediaSession' in navigator) {
         });
     }
 
-    navigator.mediaSession.setActionHandler('play', () => {
-        audioPlayer.play();
-        requestWakeLock();
-        updateMediaSession();
-    });
-    navigator.mediaSession.setActionHandler('pause', audioPlayer.pause.bind(audioPlayer));
-    navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-    navigator.mediaSession.setActionHandler('previoustrack', previousSong);
     audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
+}
+
+function syncLockScreenControls() {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = audioPlayer.paused ? "paused" : "playing";
+        updateMediaSessionPosition();
+    }
 }
 
 function nextSong() {
@@ -592,14 +629,33 @@ function previousSong() {
 
 function toggleRepeat() {
     repeatMode = (repeatMode + 1) % 3;
-    document.querySelector("#repeat-btn").textContent = ['🔁', '🔂', '🔄'][repeatMode];
+    const repeatBtn = document.getElementById("repeat-btn");
+    if (repeatBtn) {
+        repeatBtn.textContent = ['🔁', '🔂', '🔄'][repeatMode];
+    } else {
+        console.error("Repeat button not found!");
+    }
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
+    console.log("Repeat mode changed to:", repeatMode);
+}
+
+function showPopup(message) {
+    console.log("Showing popup with message:", message);
+    const popup = document.createElement("div");
+    popup.className = "popup-notification";
+    popup.textContent = message;
+    document.body.appendChild(popup);
+    setTimeout(() => {
+        popup.remove();
+        console.log("Popup removed");
+    }, 3000);
 }
 
 function updatePlayerUI(song) {
     document.getElementById("player-thumbnail").src = song.thumbnail;
     document.getElementById("player-title").textContent = song.title;
     updatePlayPauseButton();
+    syncLockScreenControls();
 }
 
 function togglePlay() {
@@ -607,10 +663,12 @@ function togglePlay() {
         if (!audioPlayer.src && currentPlaylist.length > 0) {
             playSong(currentPlaylist[0].title, currentContext);
         } else {
+            manualPause = false; // Reset flag when playing
             audioPlayer.play()
                 .then(() => {
                     console.log("Playing");
                     updatePlayPauseButton();
+                    syncLockScreenControls();
                 })
                 .catch(error => {
                     console.error("Toggle play error:", error);
@@ -618,42 +676,43 @@ function togglePlay() {
                 });
         }
     } else {
+        manualPause = true; // Set flag when pausing
         audioPlayer.pause();
         console.log("Paused");
         updatePlayPauseButton();
+        syncLockScreenControls();
     }
 }
 
+audioPlayer.addEventListener('play', () => {
+    if (manualPause) {
+        audioPlayer.pause();
+        console.log("Blocked unwanted play after manual pause, triggered from:", new Error().stack);
+    } else {
+        console.log("Play event allowed (not manual pause)");
+    }
+});
+
 document.querySelectorAll('.scroll-container').forEach(container => {
     const items = container.querySelectorAll('.song-item').length;
-    const bufferWidth = Math.max(20, items * 5); // Minimum 20rem, or 5rem per item
+    const bufferWidth = Math.max(20, items * 5);
     container.style.setProperty('--buffer-width', `${bufferWidth}rem`);
 });
 
 function updatePlayPauseButton() {
     const playPauseBtn = document.getElementById('play-pause-btn');
     if (playPauseBtn) {
-        audioPlayer.onplay = () => playPauseBtn.textContent = "⏸";
-        audioPlayer.onpause = () => playPauseBtn.textContent = "▶";
         playPauseBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
     }
 }
 
-function showPopup(message) {
-    const popup = document.createElement("div");
-    popup.className = "popup-notification";
-    popup.textContent = message;
-    document.body.appendChild(popup);
-    setTimeout(() => popup.remove(), 3000);
-}
-
 function updateSeekBar() {
-    document.getElementById("seek-bar").value = 
-        (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
+    seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
 }
 
 function seekSong(value) {
     audioPlayer.currentTime = (value / 100) * audioPlayer.duration;
+    syncLockScreenControls();
 }
 
 function changeVolume(value) {

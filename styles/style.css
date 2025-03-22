@@ -846,3 +846,41 @@ footer {
         grid-template-columns: [thumbnail] 40px [info] 1fr [controls] auto;
     }
 }
+
+.popup-notification {
+    position: fixed;
+    bottom: 30px; /* Increased from 20px to ensure it’s not cut off */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9); /* Slightly more opaque for visibility */
+    color: #ffffff; /* Explicit white */
+    padding: 12px 24px; /* Slightly larger padding */
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+    font-size: 18px; /* Larger text */
+    font-family: Arial, sans-serif;
+    z-index: 9999; /* Very high z-index to ensure it’s on top */
+    min-width: 200px; /* Minimum width to avoid shrinking */
+    text-align: center; /* Center the text */
+    opacity: 0; /* Start invisible */
+    animation: fadeInOut 3s ease-in-out forwards; /* Matches JS timeout */
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(30px); /* Start lower */
+    }
+    20% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0); /* Move up */
+    }
+    80% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0); /* Stay in place */
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px); /* Move up and fade */
+    }
+}
