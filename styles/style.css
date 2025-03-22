@@ -18,36 +18,6 @@ body {
     height: 100%;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.15), transparent 70%);
-    z-index: -1;
-    animation: pulse 12s infinite ease-in-out;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.03); }
-}
-
-body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(147, 51, 234, 0.3)"/></svg>') repeat;
-    background-size: 15px 15px;
-    animation: drift 60s linear infinite;
-    z-index: -1;
-    opacity: 0.2;
-}
-
-@keyframes drift {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(-50px, -50px); }
-}
-
 /* Navbar Styles */
 .navbar {
     display: flex;
@@ -153,13 +123,7 @@ main {
     background: rgba(17, 24, 39, 0.5);
     border-radius: 10px;
     box-shadow: 0 8px 30px rgba(147, 51, 234, 0.2);
-    animation: sectionFadeIn 1s ease-out;
-    overflow-x: hidden; /* Contain horizontal scroll */
-}
-
-@keyframes sectionFadeIn {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
+    overflow: visible; /* Allow scroll-container to extend beyond bounds */
 }
 
 .section-header {
@@ -168,6 +132,11 @@ main {
     align-items: center;
     margin-bottom: 1.5rem;
     padding: 0 1rem;
+    position: sticky; /* Keep header fixed */
+    left: 0;
+    top: 0; /* Stick to the top of the section */
+    background: rgba(17, 24, 39, 0.5); /* Match section background */
+    z-index: 10; /* Ensure header stays above scrolling tiles */
 }
 
 .section-title {
@@ -181,41 +150,34 @@ main {
     position: relative;
 }
 
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50%;
-    height: 2px;
-    background: linear-gradient(90deg, #9333ea, transparent);
-    animation: titleLine 2s infinite ease-in-out;
-}
-
-@keyframes titleLine {
-    0% { width: 50%; }
-    50% { width: 80%; }
-    100% { width: 50%; }
-}
-
 .scroll-container {
     display: flex;
-    overflow-x: auto;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto; /* Enable horizontal scroll */
+    gap: 1.5rem; /* 24px gap between items */
+    padding: 1rem 10rem 1rem 1rem; /* Increased right padding for buffer */
     scroll-behavior: smooth;
-    gap: 1.5rem;
-    padding: 1rem;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+    scrollbar-width: none; /* Hide scrollbar */
     overscroll-behavior-x: contain; /* Limit horizontal overscroll */
-    scrollbar-width: none;
 }
 
+/* Hide scrollbar */
 .scroll-container::-webkit-scrollbar {
     display: none;
 }
 
+/* Add buffer space after last item */
+.scroll-container::after {
+    content: '';
+    display: block;
+    width: 10rem; /* Buffer space to ensure last song is fully scrollable */
+    flex-shrink: 0;
+}
+
 /* Song Item Styles */
 .song-item {
-    flex: 0 0 200px;
+    flex: 0 0 200px; /* Fixed width, no shrinking or growing */
     border-radius: 10px;
     overflow: hidden;
     position: relative;
@@ -223,13 +185,6 @@ main {
     background: linear-gradient(135deg, rgba(49, 46, 129, 0.4), rgba(17, 24, 39, 0.6));
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     transition: all 0.4s ease;
-    animation: itemPop 0.5s ease-out;
-    margin-right: 15px;
-}
-
-@keyframes itemPop {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
 }
 
 .song-item:hover {
@@ -239,7 +194,7 @@ main {
 
 .thumbnail-container {
     position: relative;
-    width: 200px;
+    width: 100%; /* Match song-item width */
     height: 200px;
     aspect-ratio: 1;
     overflow: hidden;
@@ -316,7 +271,6 @@ main {
     backdrop-filter: blur(10px);
     box-shadow: 0 3px 15px rgba(147, 51, 234, 0.2);
     transition: all 0.4s ease;
-    animation: glowFade 3s infinite ease-in-out;
     box-sizing: border-box;
 }
 
@@ -325,11 +279,6 @@ main {
     box-shadow: 0 3px 20px rgba(147, 51, 234, 0.5);
     background: rgba(49, 46, 129, 0.6);
     transform: scale(1.02);
-}
-
-@keyframes glowFade {
-    0%, 100% { box-shadow: 0 3px 15px rgba(147, 51, 234, 0.2); }
-    50% { box-shadow: 0 3px 25px rgba(147, 51, 234, 0.4); }
 }
 
 #search-results-container {
@@ -440,35 +389,27 @@ footer {
     overflow-x: hidden; /* Prevent footer horizontal scroll */
 }
 
-footer::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(147, 51, 234, 0.1), transparent 70%);
-    animation: footerGlow 10s infinite ease-in-out;
-}
-
-@keyframes footerGlow {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Responsive Design for Music Player */
+/* Responsive Design */
 @media (max-width: 768px) {
     .navbar {
         padding: 0.5rem;
     }
 
     .song-item {
-        flex: 0 0 150px;
+        flex: 0 0 150px; /* Adjusted for smaller screens */
     }
 
     .thumbnail-container {
         width: 150px;
         height: 150px;
+    }
+
+    .scroll-container {
+        padding-right: 12rem; /* Extra padding for mobile */
+    }
+
+    .scroll-container::after {
+        width: 12rem; /* Larger buffer for mobile */
     }
 
     /* Fix Overscroll (Mobile) */
@@ -570,14 +511,7 @@ footer::before {
     backdrop-filter: blur(12px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transform: translateY(0);
-    animation: float 6s ease-in-out infinite;
     overflow-x: hidden; /* Contain contact page */
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
 }
 
 .contact-header {
@@ -741,40 +675,6 @@ footer::before {
     background: #00ff88;
     color: #1a1a2e;
     transform: translateY(-3px);
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.popup-notification {
-    animation: fadeIn 0.3s ease-out;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    padding: 15px 25px;
-    border-radius: 5px;
-    font-size: 18px;
-    text-align: center;
-    z-index: 1000;
-    opacity: 1;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.popup-notification.fade-out {
-    opacity: 0;
-}
-
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translate(-50%, -55%); }
-    10% { opacity: 1; transform: translate(-50%, -50%); }
-    90% { opacity: 1; transform: translate(-50%, -50%); }
-    100% { opacity: 0; transform: translate(-50%, -45%); }
 }
 
 /* Logo Styling */

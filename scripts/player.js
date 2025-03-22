@@ -157,9 +157,8 @@ const fixedPhonk = [
         "title": "DERNIERE DANCE FUNK",
         "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/DERNIERE%20DANCE%20FUNK.mp3",
         "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d7/e9/ed/d7e9ed7d-8223-f1ea-c0b4-95e75073ea15/cover.jpg/800x800cc.jpg"
-    },
+    }
 ];
-
 
 const fixedHaryanvi = [
     {
@@ -231,7 +230,20 @@ const playPauseBtn = document.getElementById("play-pause-btn");
 
 playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
-audioPlayer.addEventListener('timeupdate', updateSeekBar);
+
+// Throttle function for UI updates
+function throttle(func, limit) {
+    let inThrottle;
+    return function (...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+audioPlayer.addEventListener('timeupdate', throttle(updateSeekBar, 200));
 
 // Background Playback and Wake Lock
 function enableBackgroundPlayback() {
@@ -265,7 +277,7 @@ async function requestWakeLock() {
             });
         }
     } catch (err) {
-        console.warn("Wake Lock request failed (likely not visible):", err); // Warn instead of error
+        console.warn("Wake Lock request failed (likely not visible):", err);
     }
 }
 
@@ -400,6 +412,7 @@ async function playSong(title, context) {
 
     try {
         audioPlayer.pause(); // Reset state
+        audioPlayer.currentTime = 0; // Ensure reset
         audioPlayer.src = song.link;
         audioPlayer.load();
         await audioPlayer.play();
@@ -594,20 +607,30 @@ function togglePlay() {
         if (!audioPlayer.src && currentPlaylist.length > 0) {
             playSong(currentPlaylist[0].title, currentContext);
         } else {
-            audioPlayer.play().catch(error => {
-                console.error("Toggle play error:", error);
-                showPopup("Click again to play");
-            });
+            audioPlayer.play()
+                .then(() => {
+                    console.log("Playing");
+                    updatePlayPauseButton();
+                })
+                .catch(error => {
+                    console.error("Toggle play error:", error);
+                    showPopup("Click again to play");
+                });
         }
     } else {
         audioPlayer.pause();
+        console.log("Paused");
+        updatePlayPauseButton();
     }
-    updatePlayPauseButton();
 }
 
 function updatePlayPauseButton() {
     const playPauseBtn = document.getElementById('play-pause-btn');
-    if (playPauseBtn) playPauseBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
+    if (playPauseBtn) {
+        audioPlayer.onplay = () => playPauseBtn.textContent = "⏸";
+        audioPlayer.onpause = () => playPauseBtn.textContent = "▶";
+        playPauseBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
+    }
 }
 
 function showPopup(message) {
