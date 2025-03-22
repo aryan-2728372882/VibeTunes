@@ -1,0 +1,19 @@
+{
+    "name": "vibetunes",
+    "version": "1.0.0",
+    "description": "VibeTunes - Web music player with Firebase authentication and Firestore integration",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "firebase-admin": "^11.10.1",
+      "cors": "^2.8.5",
+      "dotenv": "^16.0.3"
+    },
+    "engines": {
+      "node": ">=16"
+    }
+  }
+  
