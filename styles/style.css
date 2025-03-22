@@ -155,11 +155,12 @@ main {
     flex-wrap: nowrap; /* Prevent wrapping */
     overflow-x: auto; /* Enable horizontal scroll */
     gap: 1.5rem; /* 24px gap between items */
-    padding: 1rem 10rem 1rem 1rem; /* Increased right padding for buffer */
+    padding: 1rem 25rem 1rem 1rem; /* Default padding, overridden for desktop */
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
     scrollbar-width: none; /* Hide scrollbar */
     overscroll-behavior-x: contain; /* Limit horizontal overscroll */
+    box-sizing: border-box; /* Ensure padding is included in width calculations */
 }
 
 /* Hide scrollbar */
@@ -171,8 +172,19 @@ main {
 .scroll-container::after {
     content: '';
     display: block;
-    width: 10rem; /* Buffer space to ensure last song is fully scrollable */
+    width: 25rem; /* Default buffer, overridden for desktop */
     flex-shrink: 0;
+}
+
+/* Desktop-specific adjustments to prevent overscrolling */
+@media (min-width: 769px) {
+    .scroll-container {
+        padding: 1rem 100px 1rem 1rem; /* Reduced to minimize extra space */
+    }
+    
+    .scroll-container::after {
+        width: 0; /* No buffer to avoid extra scrolling */
+    }
 }
 
 /* Song Item Styles */
@@ -405,11 +417,11 @@ footer {
     }
 
     .scroll-container {
-        padding-right: 12rem; /* Extra padding for mobile */
+        padding-right: 30rem; /* Retains perfect fit for Android */
     }
 
     .scroll-container::after {
-        width: 12rem; /* Larger buffer for mobile */
+        width: 30rem; /* Retains perfect fit for Android */
     }
 
     /* Fix Overscroll (Mobile) */

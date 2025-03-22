@@ -624,6 +624,12 @@ function togglePlay() {
     }
 }
 
+document.querySelectorAll('.scroll-container').forEach(container => {
+    const items = container.querySelectorAll('.song-item').length;
+    const bufferWidth = Math.max(20, items * 5); // Minimum 20rem, or 5rem per item
+    container.style.setProperty('--buffer-width', `${bufferWidth}rem`);
+});
+
 function updatePlayPauseButton() {
     const playPauseBtn = document.getElementById('play-pause-btn');
     if (playPauseBtn) {
