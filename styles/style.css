@@ -83,7 +83,7 @@ body {
 @media (max-width: 768px) {
     .navbar {
         flex-direction: row !important;
-        padding: 1rem;
+        padding: 0.5rem; /* Reduced from 1rem */
         gap: 1rem;
     }
     
@@ -403,10 +403,50 @@ footer {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* Navbar */
     .navbar {
-        padding: 0.5rem;
+        padding: 0.5rem; /* Reduced from 1rem */
     }
 
+    /* Main (only adjusted for song-section spacing) */
+    main {
+        padding: 2rem;
+        padding-bottom: 80px; /* Space for music player */
+        flex: 1 0 auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain; /* Reinforce no bounce */
+    }
+
+    /* Song Sections (Haryanvi Collection, Trending Bhojpuri) */
+    .song-section {
+        margin: 1rem 0; /* Reduced from 3rem */
+        padding: 0.5rem; /* Reduced from 0.75rem */
+    }
+
+    .section-header {
+        margin-bottom: 1rem; /* Reduced from 1.5rem */
+        padding: 0 0.75rem; /* Reduced from 0 1rem */
+    }
+
+    .scroll-container {
+        padding: 0.75rem 30rem 0.75rem 1rem; /* Reduced vertical padding from 1rem */
+    }
+
+    /* Search Bar */
+    #search-bar {
+        padding: 0.75rem; /* Reduced from 1rem */
+        margin: 1rem 0; /* Reduced from 2rem 0 */
+    }
+
+    /* Footer */
+    footer {
+        padding: 1rem; /* Reduced from 2rem */
+        margin-top: 0;
+    }
+
+    /* Unchanged Mobile Styles */
     .song-item {
         flex: 0 0 150px; /* Adjusted for smaller screens */
     }
@@ -414,10 +454,6 @@ footer {
     .thumbnail-container {
         width: 150px;
         height: 150px;
-    }
-
-    .scroll-container {
-        padding-right: 30rem; /* Retains perfect fit for Android */
     }
 
     .scroll-container::after {
@@ -433,20 +469,6 @@ footer {
     body {
         overflow-y: auto; /* Allow vertical scroll */
         overscroll-behavior-y: contain; /* Prevent vertical overscroll */
-    }
-
-    main {
-        padding-bottom: 80px; /* Space for music player */
-        flex: 1 0 auto;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain; /* Reinforce no bounce */
-    }
-
-    footer {
-        flex-shrink: 0;
-        margin-top: 0;
     }
 
     /* Mobile Music Player Fix */
