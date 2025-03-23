@@ -15,19 +15,17 @@ function setupSongTracking(uid) {
     let totalPlayTime = 0;
     let lastPlayTime = 0;
     let songStarted = false;
-    let currentSongID = null;
 
     audioPlayer.addEventListener("play", () => {
         if (!songStarted) {
             lastPlayTime = Date.now();
             songStarted = true;
-            currentSongID = audioPlayer.getAttribute("data-song-id"); // Ensure song ID tracking
         }
     });
 
     audioPlayer.addEventListener("pause", () => {
         if (lastPlayTime) {
-            totalPlayTime += (Date.now() - lastPlayTime) / 1000; // Convert to seconds
+            totalPlayTime += (Date.now() - lastPlayTime) / 1000; // Seconds
             lastPlayTime = 0;
             songStarted = false;
         }
@@ -35,31 +33,26 @@ function setupSongTracking(uid) {
 
     audioPlayer.addEventListener("ended", () => {
         if (lastPlayTime) {
-            totalPlayTime += (Date.now() - lastPlayTime) / 1000;
+            totalPlayTime += (Date.now() - lastPlayTime) / 1000; // Seconds
             lastPlayTime = 0;
             songStarted = false;
         }
-
         if (totalPlayTime >= 60) { // 1 minute threshold
-            updateUserStats(uid, Math.floor(totalPlayTime / 60), currentSongID);
+            updateUserStats(uid, Math.floor(totalPlayTime / 60));
         }
-        
-        totalPlayTime = 0; // Reset only after updating
+        totalPlayTime = 0; // Reset for next song
     });
 }
 
-function updateUserStats(uid, minutesPlayed, songID) {
-    if (!uid || minutesPlayed < 1 || !songID) return;
+function updateUserStats(uid, minutesPlayed) {
+    if (!uid || minutesPlayed < 1) return;
     const userRef = db.collection("users").doc(uid);
-
     userRef.update({
-        minutesListened: firebase.firestore.FieldValue.increment(minutesPlayed),
-        songsPlayed: firebase.firestore.FieldValue.increment(1), // Now only increments after 1 min
-        songsListened: firebase.firestore.FieldValue.arrayUnion(songID) // Store song IDs
-    }).then(() => console.log(`Updated: +${minutesPlayed} minutes, +1 song played (ID: ${songID})`))
+        songsPlayed: firebase.firestore.FieldValue.increment(1),
+        minutesListened: firebase.firestore.FieldValue.increment(minutesPlayed)
+    }).then(() => console.log(`Updated: +1 song, +${minutesPlayed} minutes`))
       .catch(error => console.error("Error updating user stats:", error));
 }
-
 
 // Song Lists (fixedBhojpuri, fixedPhonk, fixedHaryanvi remain unchanged)
 
