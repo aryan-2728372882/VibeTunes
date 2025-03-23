@@ -268,9 +268,6 @@ function enableBackgroundPlayback() {
             console.log("Screen visible, respecting current state...");
             if (!audioPlayer.paused) {
                 requestWakeLock(); // Keep wake lock if playing
-                syncLockScreenControls();
-            } else {
-                syncLockScreenControls(); // Sync UI, no forced play
             }
         }
     });
@@ -441,7 +438,6 @@ async function playSong(title, context) {
         clearAudioCache();
         requestWakeLock();
         updateMediaSession();
-        syncLockScreenControls();
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
         showPopup("Error playing song, skipping...");
@@ -466,7 +462,6 @@ async function handleSongEnd() {
         audioPlayer.addEventListener('ended', handleSongEnd);
         updatePlayPauseButton();
         preloadNextSong();
-        syncLockScreenControls();
         return;
     }
 
@@ -536,12 +531,11 @@ async function handleSongEnd() {
 audioPlayer.addEventListener("play", () => {
     console.log("Playback started at:", audioPlayer.currentTime);
     requestWakeLock();
-    syncLockScreenControls();
 });
 
 audioPlayer.addEventListener("pause", () => {
     console.log("Playback paused at:", audioPlayer.currentTime);
-    syncLockScreenControls();
+
 });
 
 audioPlayer.addEventListener('error', (e) => {
@@ -583,19 +577,16 @@ if ('mediaSession' in navigator) {
             audioPlayer.play();
             requestWakeLock();
             updatePlayPauseButton();
-            syncLockScreenControls();
         });
         navigator.mediaSession.setActionHandler('pause', () => {
             audioPlayer.pause();
             updatePlayPauseButton();
-            syncLockScreenControls();
         });
         navigator.mediaSession.setActionHandler('nexttrack', nextSong);
         navigator.mediaSession.setActionHandler('previoustrack', previousSong);
         navigator.mediaSession.setActionHandler('seekto', (details) => {
             audioPlayer.currentTime = details.seekTime;
             updateSeekBar();
-            syncLockScreenControls();
         });
     }
 
@@ -610,12 +601,6 @@ if ('mediaSession' in navigator) {
     audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
 }
 
-function syncLockScreenControls() {
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = audioPlayer.paused ? "paused" : "playing";
-        updateMediaSessionPosition();
-    }
-}
 
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
@@ -655,7 +640,6 @@ function updatePlayerUI(song) {
     document.getElementById("player-thumbnail").src = song.thumbnail;
     document.getElementById("player-title").textContent = song.title;
     updatePlayPauseButton();
-    syncLockScreenControls();
 }
 
 function togglePlay() {
@@ -668,7 +652,6 @@ function togglePlay() {
                 .then(() => {
                     console.log("Playing");
                     updatePlayPauseButton();
-                    syncLockScreenControls();
                 })
                 .catch(error => {
                     console.error("Toggle play error:", error);
@@ -680,7 +663,6 @@ function togglePlay() {
         audioPlayer.pause();
         console.log("Paused");
         updatePlayPauseButton();
-        syncLockScreenControls();
     }
 }
 
@@ -712,7 +694,6 @@ function updateSeekBar() {
 
 function seekSong(value) {
     audioPlayer.currentTime = (value / 100) * audioPlayer.duration;
-    syncLockScreenControls();
 }
 
 function changeVolume(value) {
