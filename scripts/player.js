@@ -562,7 +562,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     seekBar.addEventListener('input', () => seekSong(seekBar.value));
 });
 
-// Media Session API with Lock Screen Sync
+// Replace your existing Media Session block
 if ('mediaSession' in navigator) {
     function updateMediaSession() {
         if (!currentPlaylist[currentSongIndex]) return;
@@ -574,16 +574,10 @@ if ('mediaSession' in navigator) {
             artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/jpeg" }]
         });
 
-        // Set initial position state
-        if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
-            navigator.mediaSession.setPositionState({
-                duration: audioPlayer.duration,
-                playbackRate: audioPlayer.playbackRate,
-                position: audioPlayer.currentTime
-            });
-        }
+        // Set initial position state when duration is available
+        updateMediaSessionPosition();
 
-        // Action handlers
+        // Action handlers for lock screen controls
         navigator.mediaSession.setActionHandler('play', () => {
             audioPlayer.play().catch(err => console.error("Media play error:", err));
             updatePlayPauseButton();
@@ -597,7 +591,8 @@ if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('previoustrack', previousSong);
         navigator.mediaSession.setActionHandler('seekto', (details) => {
             audioPlayer.currentTime = details.seekTime;
-            updateSeekBar();
+            updateSeekBar(); // Keep in-page seek bar in sync
+            updateMediaSessionPosition(); // Update lock screen position
         });
     }
 
@@ -611,13 +606,7 @@ if ('mediaSession' in navigator) {
         }
     }
 
-    // Update position on timeupdate (remove throttle if already applied)
-    audioPlayer.addEventListener('timeupdate', () => {
-        updateSeekBar();
-        updateMediaSessionPosition();
-    });
-
-    // Initial setup on metadata load and play
+    // Ensure Media Session updates on key events
     audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
     audioPlayer.addEventListener("play", updateMediaSession);
 }
