@@ -330,6 +330,7 @@ async function loadFullJSONSongs() {
             fetch("songs.json").then(response => response.json()),
             fetch("phonk.json").then(response => response.json()),
             fetch("haryanvi.json").then(response => response.json())
+
         ]);
         jsonBhojpuriSongs = bhojpuriSongs;
         jsonPhonkSongs = phonkSongs;
@@ -365,6 +366,7 @@ let searchSongsList = [];
 async function loadSearchSongs() {
     try {
         searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs];
+        
     } catch (error) {
         console.error("Error loading search songs:", error);
     }
@@ -437,7 +439,7 @@ async function playSong(title, context) {
         preloadNextSong();
         clearAudioCache();
         requestWakeLock();
-        updateMediaSession();
+        if ('mediaSession' in navigator) updateMediaSession(); // Ensure Media Session is updated
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
         showPopup("Error playing song, skipping...");
@@ -569,14 +571,23 @@ if ('mediaSession' in navigator) {
             title: song.title,
             artist: "Unknown Artist",
             album: "VibeTunes",
-            artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/png" }]
+            artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/jpeg" }]
         });
-        updateMediaSessionPosition();
+
+        // Set initial position state
+        if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
+            navigator.mediaSession.setPositionState({
+                duration: audioPlayer.duration,
+                playbackRate: audioPlayer.playbackRate,
+                position: audioPlayer.currentTime
+            });
+        }
+
+        // Action handlers
         navigator.mediaSession.setActionHandler('play', () => {
-            console.log("Media Session play handler triggered");
-            audioPlayer.play();
-            requestWakeLock();
+            audioPlayer.play().catch(err => console.error("Media play error:", err));
             updatePlayPauseButton();
+            requestWakeLock();
         });
         navigator.mediaSession.setActionHandler('pause', () => {
             audioPlayer.pause();
@@ -591,16 +602,25 @@ if ('mediaSession' in navigator) {
     }
 
     function updateMediaSessionPosition() {
-        navigator.mediaSession.setPositionState({
-            duration: audioPlayer.duration || 0,
-            playbackRate: audioPlayer.playbackRate,
-            position: audioPlayer.currentTime
-        });
+        if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
+            navigator.mediaSession.setPositionState({
+                duration: audioPlayer.duration,
+                playbackRate: audioPlayer.playbackRate,
+                position: audioPlayer.currentTime
+            });
+        }
     }
 
-    audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
-}
+    // Update position on timeupdate (remove throttle if already applied)
+    audioPlayer.addEventListener('timeupdate', () => {
+        updateSeekBar();
+        updateMediaSessionPosition();
+    });
 
+    // Initial setup on metadata load and play
+    audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
+    audioPlayer.addEventListener("play", updateMediaSession);
+}
 
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
@@ -694,6 +714,7 @@ function updateSeekBar() {
 
 function seekSong(value) {
     audioPlayer.currentTime = (value / 100) * audioPlayer.duration;
+    if ('mediaSession' in navigator) updateMediaSessionPosition();
 }
 
 function changeVolume(value) {
