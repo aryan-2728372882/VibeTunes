@@ -249,7 +249,7 @@ function throttle(func, limit) {
 
 audioPlayer.addEventListener('timeupdate', throttle(() => {
     updateSeekBar();
-    updateMediaSessionPosition();
+    if ('mediaSession' in navigator) updateMediaSessionPosition(); // Updates lock screen seek bar
 }, 200));
 
 // Background Playback and Wake Lock
@@ -574,7 +574,7 @@ if ('mediaSession' in navigator) {
             artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/jpeg" }]
         });
 
-        // Set initial position state when duration is available
+        // Set initial position state
         updateMediaSessionPosition();
 
         // Action handlers for lock screen controls
@@ -590,9 +590,9 @@ if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('nexttrack', nextSong);
         navigator.mediaSession.setActionHandler('previoustrack', previousSong);
         navigator.mediaSession.setActionHandler('seekto', (details) => {
-            audioPlayer.currentTime = details.seekTime;
-            updateSeekBar(); // Keep in-page seek bar in sync
-            updateMediaSessionPosition(); // Update lock screen position
+            audioPlayer.currentTime = details.seekTime; // Seek from lock screen
+            updateSeekBar(); // Sync in-page seek bar (keeps your original behavior)
+            updateMediaSessionPosition(); // Sync lock screen seek bar
         });
     }
 
@@ -606,7 +606,7 @@ if ('mediaSession' in navigator) {
         }
     }
 
-    // Ensure Media Session updates on key events
+    // Update Media Session on key events
     audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
     audioPlayer.addEventListener("play", updateMediaSession);
 }
