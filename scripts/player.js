@@ -303,7 +303,9 @@ async function requestWakeLock() {
             });
         }
     } catch (err) {
-        console.warn("Wake Lock request failed:", err);
+        if (err.name !== "NotAllowedError" || document.visibilityState === "visible") {
+            console.warn("Wake Lock request failed:", err);
+        }
     }
 }
 
@@ -624,7 +626,9 @@ function showPopup(message) {
 }
 
 function updatePlayerUI(song) {
-    document.getElementById("player-thumbnail").src = song.thumbnail;
+    const thumbnail = document.getElementById("player-thumbnail");
+    thumbnail.src = song.thumbnail || "https://via.placeholder.com/96";
+    thumbnail.onerror = () => thumbnail.src = "https://via.placeholder.com/96";
     document.getElementById("player-title").textContent = song.title;
     updatePlayPauseButton();
 }
