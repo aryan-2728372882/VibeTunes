@@ -10,22 +10,28 @@ auth.onAuthStateChanged(user => {
 
 function setupSongTracking(uid) {
     const audioPlayer = document.getElementById("audio-player");
-    if (!audioPlayer) return;
+    const seekBar = document.getElementById("seek-bar");
+    if (!audioPlayer || !seekBar) return;
 
-    let totalPlayTime = 0;
+    let totalPlayTime = 0; // Total playtime for the current song
+    let continuousPlayTime = 0; // Continuous playtime without seeking
     let lastPlayTime = 0;
     let songStarted = false;
+    let hasSeeked = false;
 
     audioPlayer.addEventListener("play", () => {
         if (!songStarted) {
             lastPlayTime = Date.now();
             songStarted = true;
+            hasSeeked = false; // Reset seeking flag on new play
         }
     });
 
     audioPlayer.addEventListener("pause", () => {
         if (lastPlayTime) {
-            totalPlayTime += (Date.now() - lastPlayTime) / 1000; // Seconds
+            const elapsed = (Date.now() - lastPlayTime) / 1000; // Seconds
+            totalPlayTime += elapsed;
+            if (!hasSeeked) continuousPlayTime += elapsed; // Only add to continuous if no seeking
             lastPlayTime = 0;
             songStarted = false;
         }
@@ -33,14 +39,32 @@ function setupSongTracking(uid) {
 
     audioPlayer.addEventListener("ended", () => {
         if (lastPlayTime) {
-            totalPlayTime += (Date.now() - lastPlayTime) / 1000; // Seconds
+            const elapsed = (Date.now() - lastPlayTime) / 1000; // Seconds
+            totalPlayTime += elapsed;
+            if (!hasSeeked) continuousPlayTime += elapsed; // Only add to continuous if no seeking
             lastPlayTime = 0;
             songStarted = false;
         }
-        if (totalPlayTime >= 60) { // 1 minute threshold
-            updateUserStats(uid, Math.floor(totalPlayTime / 60));
+        if (continuousPlayTime >= 60) {
+            const minutesPlayed = Math.round(totalPlayTime / 60); // Round total time for stats
+            updateUserStats(uid, minutesPlayed);
         }
-        totalPlayTime = 0; // Reset for next song
+        totalPlayTime = 0;
+        continuousPlayTime = 0; // Reset for next song
+    });
+
+    // Reset continuous playtime if seek bar is used
+    seekBar.addEventListener("input", () => {
+        if (songStarted) {
+            if (lastPlayTime) {
+                const elapsed = (Date.now() - lastPlayTime) / 1000;
+                totalPlayTime += elapsed;
+                if (!hasSeeked) continuousPlayTime += elapsed; // Add before resetting
+                lastPlayTime = Date.now(); // Restart timer
+            }
+            hasSeeked = true; // Mark as seeked
+            continuousPlayTime = 0; // Reset continuous playtime
+        }
     });
 }
 
@@ -51,10 +75,14 @@ function updateUserStats(uid, minutesPlayed) {
         songsPlayed: firebase.firestore.FieldValue.increment(1),
         minutesListened: firebase.firestore.FieldValue.increment(minutesPlayed)
     }).then(() => console.log(`Updated: +1 song, +${minutesPlayed} minutes`))
-      .catch(error => console.error("Error updating user stats:", error));
+      .catch(error => {
+          console.error("Error updating user stats:", error);
+          showPopup("Failed to update stats. Retrying...");
+          setTimeout(() => updateUserStats(uid, minutesPlayed), 2000);
+      });
 }
 
-// Song Lists
+// Song Lists (unchanged)
 const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
@@ -215,17 +243,19 @@ const fixedHaryanvi = [
 ];
 
 // Player State Management
+const MIN_PLAYTIME_THRESHOLD = 60; // Seconds
 let currentPlaylist = [];
 let jsonBhojpuriSongs = [];
 let jsonPhonkSongs = [];
 let jsonHaryanviSongs = [];
 let currentSongIndex = 0;
-let repeatMode = 0;
+let repeatMode = 0; // 0: off, 1: all, 2: one
 let currentContext = 'bhojpuri';
 let preloadedAudio = null;
 let wakeLock = null;
 let manualPause = false;
 let searchSongsList = [];
+let isPlaying = false;
 
 const audioPlayer = document.getElementById("audio-player");
 const playerContainer = document.getElementById("music-player");
@@ -238,7 +268,7 @@ const repeatBtn = document.getElementById("repeat-btn");
 playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
 
-// Throttle function for UI updates
+// Utility Functions
 function throttle(func, limit) {
     let inThrottle;
     return function (...args) {
@@ -250,7 +280,14 @@ function throttle(func, limit) {
     };
 }
 
-// Progress Bar Update with requestAnimationFrame
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 function updateProgress() {
     if (!audioPlayer.paused && !isNaN(audioPlayer.duration)) {
         seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
@@ -260,7 +297,21 @@ function updateProgress() {
 
 audioPlayer.addEventListener('timeupdate', throttle(() => {
     updateSeekBar();
-}, 200));
+}, 100));
+
+// Media Session API Integration
+function setupMediaSession(song) {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: song.title,
+            artwork: [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
+        });
+        navigator.mediaSession.setActionHandler('play', () => togglePlay());
+        navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+        navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
+        navigator.mediaSession.setActionHandler('previoustrack', () => previousSong());
+    }
+}
 
 // Background Playback and Wake Lock
 function enableBackgroundPlayback() {
@@ -272,14 +323,10 @@ function enableBackgroundPlayback() {
             wasPlayingBeforeHide = !audioPlayer.paused;
             if (wasPlayingBeforeHide) {
                 audioPlayer.play().catch(err => console.log("Background playback error:", err));
-                requestWakeLock();
             }
-        } else if (document.visibilityState === "visible") {
-            console.log("Screen visible, respecting current state...");
-            if (!audioPlayer.paused) {
-                requestWakeLock();
-                updateProgress(); // Ensure progress resumes
-            }
+        } else if (document.visibilityState === "visible" && !audioPlayer.paused) {
+            requestWakeLock();
+            updateProgress();
         }
     });
 
@@ -291,7 +338,7 @@ function enableBackgroundPlayback() {
 }
 
 async function requestWakeLock() {
-    if (wakeLock !== null) return;
+    if (wakeLock !== null || document.visibilityState !== "visible") return;
     try {
         if ('wakeLock' in navigator) {
             wakeLock = await navigator.wakeLock.request('screen');
@@ -299,13 +346,13 @@ async function requestWakeLock() {
             wakeLock.addEventListener('release', () => {
                 console.log("Wake Lock released");
                 wakeLock = null;
-                if (!audioPlayer.paused) requestWakeLock();
+                if (!audioPlayer.paused && document.visibilityState === "visible") requestWakeLock();
             });
+        } else {
+            console.warn("Wake Lock not supported in this browser.");
         }
     } catch (err) {
-        if (err.name !== "NotAllowedError" || document.visibilityState === "visible") {
-            console.warn("Wake Lock request failed:", err);
-        }
+        console.warn("Wake Lock request failed:", err);
     }
 }
 
@@ -314,7 +361,11 @@ function preloadNextSong() {
     const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
     const url = currentPlaylist[nextIndex].link;
     console.log(`Preloading: ${currentPlaylist[nextIndex].title}, URL: ${url}`);
-    preloadedAudio = new Audio(url);
+    if (preloadedAudio && preloadedAudio.src !== url) {
+        preloadedAudio.src = url;
+    } else if (!preloadedAudio) {
+        preloadedAudio = new Audio(url);
+    }
     preloadedAudio.preload = "auto";
     preloadedAudio.load();
 }
@@ -328,6 +379,7 @@ function clearAudioCache() {
     }
 }
 
+// Song Display and Loading
 async function displayFixedSections() {
     populateSection('bhojpuri-list', fixedBhojpuri, 'bhojpuri');
     populateSection('phonk-list', fixedPhonk, 'phonk');
@@ -351,6 +403,7 @@ async function loadFullJSONSongs() {
         populateSection('haryanvi-collection', jsonHaryanviSongs, 'json-haryanvi');
     } catch (error) {
         console.error("Error loading JSON songs:", error);
+        showPopup("Failed to load song collections.");
     }
 }
 
@@ -362,7 +415,7 @@ function populateSection(containerId, songs, context) {
         const songElement = document.createElement('div');
         songElement.classList.add('song-item');
         songElement.innerHTML = `
-            <div class="thumbnail-container" onclick="playSong('${song.title}', '${context}')">
+            <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', '${context}')">
                 <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                 <div class="hover-play">▶</div>
             </div>
@@ -396,7 +449,7 @@ function searchSongs(query) {
             const songElement = document.createElement('div');
             songElement.classList.add('song-item');
             songElement.innerHTML = `
-                <div class="thumbnail-container" onclick="playSong('${song.title}', 'search')">
+                <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', 'search')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                     <div class="hover-play">▶</div>
                 </div>
@@ -415,7 +468,15 @@ function searchSongs(query) {
     }
 }
 
-async function playSong(title, context) {
+// Playback Logic
+async function playSong(title, context, retryCount = 0) {
+    if (isPlaying) {
+        console.log(`Already playing, queuing: ${title}`);
+        showPopup(`"${title}" queued, waiting for current song to finish`);
+        return;
+    }
+    isPlaying = true;
+
     let song;
     switch (context) {
         case 'bhojpuri': song = fixedBhojpuri.find(s => s.title === title); currentPlaylist = fixedBhojpuri; currentContext = 'bhojpuri'; break;
@@ -429,6 +490,7 @@ async function playSong(title, context) {
 
     if (!song) {
         console.error(`Song not found: ${title} in context ${context}`);
+        isPlaying = false;
         return nextSong();
     }
 
@@ -436,24 +498,43 @@ async function playSong(title, context) {
     console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}`);
 
     try {
+        manualPause = false;
+        showPopup("Loading song...");
         audioPlayer.pause();
         audioPlayer.currentTime = 0;
         audioPlayer.src = song.link;
         audioPlayer.load();
         await audioPlayer.play();
+        document.querySelector(".popup-notification")?.remove();
         playerContainer.style.display = "flex";
         updatePlayerUI(song);
+        setupMediaSession(song);
         highlightCurrentSong();
         preloadNextSong();
         clearAudioCache();
         requestWakeLock();
-        updateProgress(); // Start progress updates
+        updateProgress();
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
-        showPopup("Error playing song, skipping...");
-        nextSong();
+        document.querySelector(".popup-notification")?.remove();
+        if (retryCount < 3) {
+            showPopup(`Retrying (${retryCount + 1}/3)...`);
+            setTimeout(() => {
+                isPlaying = false;
+                playSong(title, context, retryCount + 1);
+            }, 1000);
+        } else {
+            showPopup("Song failed after retries, skipping...");
+            isPlaying = false;
+            nextSong();
+        }
+        return;
     }
+    isPlaying = false;
 }
+
+// Debounced version of playSong
+const debouncedPlaySong = debounce(playSong, 500);
 
 function highlightCurrentSong() {
     document.querySelectorAll('.song-item').forEach(item => item.classList.remove('playing'));
@@ -541,15 +622,18 @@ async function handleSongEnd() {
 audioPlayer.addEventListener("play", () => {
     console.log("Playback started at:", audioPlayer.currentTime);
     requestWakeLock();
+    updatePlayPauseButton();
 });
 
 audioPlayer.addEventListener("pause", () => {
     console.log("Playback paused at:", audioPlayer.currentTime);
+    updatePlayPauseButton();
 });
 
 audioPlayer.addEventListener('error', (e) => {
     console.error("Audio error:", e.target.error);
     showPopup("Song failed to play, skipping...");
+    isPlaying = false;
     nextSong();
 });
 
@@ -565,30 +649,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             .catch(err => console.error('Service Worker error:', err));
     }
 
-    // Safely attach event listeners only to elements that exist
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    const seekBar = document.getElementById("seek-bar");
-    const repeatBtn = document.getElementById("repeat-btn");
+    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlay);
+    if (seekBar) seekBar.addEventListener('input', () => seekSong(seekBar.value));
+    if (nextBtn) nextBtn.addEventListener('click', nextSong);
+    if (prevBtn) prevBtn.addEventListener('click', previousSong);
+    if (repeatBtn) repeatBtn.addEventListener('click', toggleRepeat);
 
-    if (playPauseBtn) {
-        console.log("play-pause-btn found, inline onclick assumed");
-    } else {
-        console.error("play-pause-btn not found in DOM");
-    }
-
-    if (seekBar) {
-        seekBar.addEventListener('input', () => seekSong(seekBar.value));
-    } else {
-        console.error("seek-bar not found in DOM");
-    }
-
-    if (repeatBtn) {
-        console.log("repeat-btn found, inline onclick assumed");
-    } else {
-        console.error("repeat-btn not found in DOM");
-    }
-
-    console.log("Previous and Next buttons assumed to use inline onclick handlers");
+    console.log("DOM fully loaded and event listeners attached.");
 });
 
 function nextSong() {
@@ -603,11 +670,9 @@ function previousSong() {
 
 function toggleRepeat() {
     repeatMode = (repeatMode + 1) % 3;
-    const repeatBtn = document.getElementById("repeat-btn");
     if (repeatBtn) {
         repeatBtn.textContent = ['🔁', '🔂', '🔄'][repeatMode];
-    } else {
-        console.error("Repeat button not found!");
+        repeatBtn.style.color = ['#fff', '#0f0', '#00f'][repeatMode];
     }
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
     console.log("Repeat mode changed to:", repeatMode);
@@ -619,16 +684,11 @@ function showPopup(message) {
     popup.className = "popup-notification";
     popup.textContent = message;
     document.body.appendChild(popup);
-    setTimeout(() => {
-        popup.remove();
-        console.log("Popup removed");
-    }, 3000);
+    setTimeout(() => popup.remove(), 3000);
 }
 
 function updatePlayerUI(song) {
-    const thumbnail = document.getElementById("player-thumbnail");
-    thumbnail.src = song.thumbnail || "https://via.placeholder.com/96";
-    thumbnail.onerror = () => thumbnail.src = "https://via.placeholder.com/96";
+    document.getElementById("player-thumbnail").src = song.thumbnail;
     document.getElementById("player-title").textContent = song.title;
     updatePlayPauseButton();
 }
@@ -661,9 +721,7 @@ function togglePlay() {
 audioPlayer.addEventListener('play', () => {
     if (manualPause) {
         audioPlayer.pause();
-        console.log("Blocked unwanted play after manual pause, triggered from:", new Error().stack);
-    } else {
-        console.log("Play event allowed (not manual pause)");
+        console.log("Blocked unwanted play after manual pause.");
     }
 });
 
@@ -674,7 +732,6 @@ document.querySelectorAll('.scroll-container').forEach(container => {
 });
 
 function updatePlayPauseButton() {
-    const playPauseBtn = document.getElementById('play-pause-btn');
     if (playPauseBtn) {
         playPauseBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
     }
