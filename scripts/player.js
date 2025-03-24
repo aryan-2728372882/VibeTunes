@@ -254,14 +254,12 @@ function throttle(func, limit) {
 function updateProgress() {
     if (!audioPlayer.paused && !isNaN(audioPlayer.duration)) {
         seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
-        if ('mediaSession' in navigator) updateMediaSessionPosition();
     }
     requestAnimationFrame(updateProgress);
 }
 
 audioPlayer.addEventListener('timeupdate', throttle(() => {
     updateSeekBar();
-    if ('mediaSession' in navigator) updateMediaSessionPosition(); // Updates lock screen seek bar
 }, 200));
 
 // Background Playback and Wake Lock
@@ -447,7 +445,6 @@ async function playSong(title, context) {
         preloadNextSong();
         clearAudioCache();
         requestWakeLock();
-        if ('mediaSession' in navigator) updateMediaSession();
         updateProgress(); // Start progress updates
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
@@ -554,8 +551,6 @@ audioPlayer.addEventListener('error', (e) => {
     nextSong();
 });
 
-// Replace only the DOMContentLoaded block in your player.js with this:
-
 document.addEventListener("DOMContentLoaded", async () => {
     await displayFixedSections();
     await loadSearchSongs();
@@ -574,110 +569,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     const repeatBtn = document.getElementById("repeat-btn");
 
     if (playPauseBtn) {
-        // Remove this line if togglePlay is already inline: playPauseBtn.addEventListener('click', togglePlay);
         console.log("play-pause-btn found, inline onclick assumed");
     } else {
         console.error("play-pause-btn not found in DOM");
     }
 
     if (seekBar) {
-        // Remove inline oninput and use this instead
         seekBar.addEventListener('input', () => seekSong(seekBar.value));
     } else {
         console.error("seek-bar not found in DOM");
     }
 
     if (repeatBtn) {
-        // Remove this line if toggleRepeat is already inline: repeatBtn.addEventListener('click', toggleRepeat);
         console.log("repeat-btn found, inline onclick assumed");
     } else {
         console.error("repeat-btn not found in DOM");
     }
 
-    // No need to attach listeners for next/prev since they use inline onclick
     console.log("Previous and Next buttons assumed to use inline onclick handlers");
 });
-
-// Media Session for Lock Screen Controls
-if ('mediaSession' in navigator) {
-    // Initial setup with fallback metadata
-    navigator.mediaSession.metadata = new MediaMetadata({
-        title: "VibeTunes",
-        artist: "Unknown Artist",
-        album: "VibeTunes",
-        artwork: [{ src: "https://via.placeholder.com/96", sizes: "96x96", type: "image/png" }]
-    });
-
-    function updateMediaSession() {
-        if (!currentPlaylist[currentSongIndex]) return;
-        const song = currentPlaylist[currentSongIndex];
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: song.title || "Unknown Title",
-            artist: song.artist || "Unknown Artist", // Fallback if artist isn't in data
-            album: "VibeTunes",
-            artwork: [{ src: song.thumbnail || "https://via.placeholder.com/96", sizes: "512x512", type: "image/jpeg" }]
-        });
-        updateMediaSessionPosition();
-    }
-
-    function updateMediaSessionPosition() {
-        if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
-            navigator.mediaSession.setPositionState({
-                duration: audioPlayer.duration,
-                playbackRate: audioPlayer.playbackRate,
-                position: Math.min(audioPlayer.currentTime, audioPlayer.duration) // Prevent position > duration
-            });
-        }
-    }
-
-    // Action handlers for lock screen controls
-    navigator.mediaSession.setActionHandler('play', () => {
-        if (audioPlayer.paused) {
-            manualPause = false; // Reset manual pause flag
-            audioPlayer.play()
-                .then(() => {
-                    updatePlayPauseButton();
-                    requestWakeLock();
-                    updateMediaSessionPosition();
-                })
-                .catch(err => console.error("MediaSession play error:", err));
-        }
-    });
-
-    navigator.mediaSession.setActionHandler('pause', () => {
-        if (!audioPlayer.paused) {
-            manualPause = true;
-            audioPlayer.pause();
-            updatePlayPauseButton();
-            updateMediaSessionPosition();
-        }
-    });
-
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-        nextSong(); // Already defined, uses inline onclick in HTML
-    });
-
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-        previousSong(); // Already defined, uses inline onclick in HTML
-    });
-
-    navigator.mediaSession.setActionHandler('seekto', (details) => {
-        if (details.seekTime >= 0 && details.seekTime <= audioPlayer.duration) {
-            audioPlayer.currentTime = details.seekTime;
-            updateSeekBar();
-            updateMediaSessionPosition();
-        }
-    });
-
-    // Update Media Session on key events
-    audioPlayer.addEventListener("loadedmetadata", () => {
-        updateMediaSession();
-        updateProgress(); // Ensure progress bar starts updating
-    });
-    audioPlayer.addEventListener("play", updateMediaSession);
-    audioPlayer.addEventListener("pause", updateMediaSessionPosition);
-    audioPlayer.addEventListener("ended", updateMediaSessionPosition);
-}
 
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
@@ -772,7 +682,6 @@ function updateSeekBar() {
 
 function seekSong(value) {
     audioPlayer.currentTime = (value / 100) * audioPlayer.duration;
-    if ('mediaSession' in navigator) updateMediaSessionPosition();
 }
 
 function changeVolume(value) {
