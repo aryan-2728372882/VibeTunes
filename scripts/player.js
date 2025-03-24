@@ -1,4 +1,4 @@
-// Firebase Auth and Firestore (assumed included elsewhere)
+// Firebase Auth and Firestore
 auth.onAuthStateChanged(user => {
     if (!user) {
         console.warn("No user logged in, skipping song tracking.");
@@ -54,8 +54,7 @@ function updateUserStats(uid, minutesPlayed) {
       .catch(error => console.error("Error updating user stats:", error));
 }
 
-// Song Lists (fixedBhojpuri, fixedPhonk, fixedHaryanvi remain unchanged)
-
+// Song Lists
 const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
@@ -226,11 +225,15 @@ let currentContext = 'bhojpuri';
 let preloadedAudio = null;
 let wakeLock = null;
 let manualPause = false;
+let searchSongsList = [];
 
 const audioPlayer = document.getElementById("audio-player");
 const playerContainer = document.getElementById("music-player");
 const playPauseBtn = document.getElementById("play-pause-btn");
 const seekBar = document.getElementById("seek-bar");
+const nextBtn = document.getElementById("next-btn");
+const prevBtn = document.getElementById("prev-btn");
+const repeatBtn = document.getElementById("repeat-btn");
 
 playerContainer.style.display = "none";
 audioPlayer.addEventListener('ended', handleSongEnd);
@@ -247,6 +250,15 @@ function throttle(func, limit) {
     };
 }
 
+// Progress Bar Update with requestAnimationFrame
+function updateProgress() {
+    if (!audioPlayer.paused && !isNaN(audioPlayer.duration)) {
+        seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
+        if ('mediaSession' in navigator) updateMediaSessionPosition();
+    }
+    requestAnimationFrame(updateProgress);
+}
+
 audioPlayer.addEventListener('timeupdate', throttle(() => {
     updateSeekBar();
     if ('mediaSession' in navigator) updateMediaSessionPosition(); // Updates lock screen seek bar
@@ -255,11 +267,11 @@ audioPlayer.addEventListener('timeupdate', throttle(() => {
 // Background Playback and Wake Lock
 function enableBackgroundPlayback() {
     audioPlayer.setAttribute('preload', 'auto');
-    let wasPlayingBeforeHide = false; // Track state before visibility change
+    let wasPlayingBeforeHide = false;
 
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") {
-            wasPlayingBeforeHide = !audioPlayer.paused; // Remember if it was playing
+            wasPlayingBeforeHide = !audioPlayer.paused;
             if (wasPlayingBeforeHide) {
                 audioPlayer.play().catch(err => console.log("Background playback error:", err));
                 requestWakeLock();
@@ -267,7 +279,8 @@ function enableBackgroundPlayback() {
         } else if (document.visibilityState === "visible") {
             console.log("Screen visible, respecting current state...");
             if (!audioPlayer.paused) {
-                requestWakeLock(); // Keep wake lock if playing
+                requestWakeLock();
+                updateProgress(); // Ensure progress resumes
             }
         }
     });
@@ -280,17 +293,15 @@ function enableBackgroundPlayback() {
 }
 
 async function requestWakeLock() {
-    if (wakeLock !== null || document.visibilityState !== "visible") return;
+    if (wakeLock !== null) return;
     try {
         if ('wakeLock' in navigator) {
             wakeLock = await navigator.wakeLock.request('screen');
             console.log("Wake Lock acquired");
             wakeLock.addEventListener('release', () => {
-                console.log("Wake Lock released, re-requesting if playing and visible...");
+                console.log("Wake Lock released");
                 wakeLock = null;
-                if (document.visibilityState === "visible" && !audioPlayer.paused) {
-                    requestWakeLock();
-                }
+                if (!audioPlayer.paused) requestWakeLock();
             });
         }
     } catch (err) {
@@ -330,7 +341,6 @@ async function loadFullJSONSongs() {
             fetch("songs.json").then(response => response.json()),
             fetch("phonk.json").then(response => response.json()),
             fetch("haryanvi.json").then(response => response.json())
-
         ]);
         jsonBhojpuriSongs = bhojpuriSongs;
         jsonPhonkSongs = phonkSongs;
@@ -362,11 +372,9 @@ function populateSection(containerId, songs, context) {
     });
 }
 
-let searchSongsList = [];
 async function loadSearchSongs() {
     try {
         searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs];
-        
     } catch (error) {
         console.error("Error loading search songs:", error);
     }
@@ -439,7 +447,8 @@ async function playSong(title, context) {
         preloadNextSong();
         clearAudioCache();
         requestWakeLock();
-        if ('mediaSession' in navigator) updateMediaSession(); // Ensure Media Session is updated
+        if ('mediaSession' in navigator) updateMediaSession();
+        updateProgress(); // Start progress updates
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
         showPopup("Error playing song, skipping...");
@@ -537,7 +546,6 @@ audioPlayer.addEventListener("play", () => {
 
 audioPlayer.addEventListener("pause", () => {
     console.log("Playback paused at:", audioPlayer.currentTime);
-
 });
 
 audioPlayer.addEventListener('error', (e) => {
@@ -545,6 +553,8 @@ audioPlayer.addEventListener('error', (e) => {
     showPopup("Song failed to play, skipping...");
     nextSong();
 });
+
+// Replace only the DOMContentLoaded block in your player.js with this:
 
 document.addEventListener("DOMContentLoaded", async () => {
     await displayFixedSections();
@@ -558,26 +568,49 @@ document.addEventListener("DOMContentLoaded", async () => {
             .catch(err => console.error('Service Worker error:', err));
     }
 
-    playPauseBtn.addEventListener('click', togglePlay);
-    seekBar.addEventListener('input', () => seekSong(seekBar.value));
+    // Safely attach event listeners only to elements that exist
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const seekBar = document.getElementById("seek-bar");
+    const repeatBtn = document.getElementById("repeat-btn");
+
+    if (playPauseBtn) {
+        // Remove this line if togglePlay is already inline: playPauseBtn.addEventListener('click', togglePlay);
+        console.log("play-pause-btn found, inline onclick assumed");
+    } else {
+        console.error("play-pause-btn not found in DOM");
+    }
+
+    if (seekBar) {
+        // Remove inline oninput and use this instead
+        seekBar.addEventListener('input', () => seekSong(seekBar.value));
+    } else {
+        console.error("seek-bar not found in DOM");
+    }
+
+    if (repeatBtn) {
+        // Remove this line if toggleRepeat is already inline: repeatBtn.addEventListener('click', toggleRepeat);
+        console.log("repeat-btn found, inline onclick assumed");
+    } else {
+        console.error("repeat-btn not found in DOM");
+    }
+
+    // No need to attach listeners for next/prev since they use inline onclick
+    console.log("Previous and Next buttons assumed to use inline onclick handlers");
 });
 
-// Replace your existing Media Session block
+// Media Session for Lock Screen Controls
 if ('mediaSession' in navigator) {
     function updateMediaSession() {
         if (!currentPlaylist[currentSongIndex]) return;
         const song = currentPlaylist[currentSongIndex];
         navigator.mediaSession.metadata = new MediaMetadata({
             title: song.title,
-            artist: "Unknown Artist",
+            artist: song.artist, // Update if artist data is available
             album: "VibeTunes",
             artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/jpeg" }]
         });
-
-        // Set initial position state
         updateMediaSessionPosition();
 
-        // Action handlers for lock screen controls
         navigator.mediaSession.setActionHandler('play', () => {
             audioPlayer.play().catch(err => console.error("Media play error:", err));
             updatePlayPauseButton();
@@ -590,9 +623,9 @@ if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('nexttrack', nextSong);
         navigator.mediaSession.setActionHandler('previoustrack', previousSong);
         navigator.mediaSession.setActionHandler('seekto', (details) => {
-            audioPlayer.currentTime = details.seekTime; // Seek from lock screen
-            updateSeekBar(); // Sync in-page seek bar (keeps your original behavior)
-            updateMediaSessionPosition(); // Sync lock screen seek bar
+            audioPlayer.currentTime = details.seekTime;
+            updateSeekBar();
+            updateMediaSessionPosition();
         });
     }
 
@@ -606,7 +639,6 @@ if ('mediaSession' in navigator) {
         }
     }
 
-    // Update Media Session on key events
     audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
     audioPlayer.addEventListener("play", updateMediaSession);
 }
@@ -656,11 +688,12 @@ function togglePlay() {
         if (!audioPlayer.src && currentPlaylist.length > 0) {
             playSong(currentPlaylist[0].title, currentContext);
         } else {
-            manualPause = false; // Reset flag when playing
+            manualPause = false;
             audioPlayer.play()
                 .then(() => {
                     console.log("Playing");
                     updatePlayPauseButton();
+                    requestWakeLock();
                 })
                 .catch(error => {
                     console.error("Toggle play error:", error);
@@ -668,7 +701,7 @@ function togglePlay() {
                 });
         }
     } else {
-        manualPause = true; // Set flag when pausing
+        manualPause = true;
         audioPlayer.pause();
         console.log("Paused");
         updatePlayPauseButton();
