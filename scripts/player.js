@@ -600,33 +600,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Media Session for Lock Screen Controls
 if ('mediaSession' in navigator) {
+    // Initial setup with fallback metadata
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: "VibeTunes",
+        artist: "Unknown Artist",
+        album: "VibeTunes",
+        artwork: [{ src: "https://via.placeholder.com/96", sizes: "96x96", type: "image/png" }]
+    });
+
     function updateMediaSession() {
         if (!currentPlaylist[currentSongIndex]) return;
         const song = currentPlaylist[currentSongIndex];
         navigator.mediaSession.metadata = new MediaMetadata({
-            title: song.title,
-            artist: song.artist, // Update if artist data is available
+            title: song.title || "Unknown Title",
+            artist: song.artist || "Unknown Artist", // Fallback if artist isn't in data
             album: "VibeTunes",
-            artwork: [{ src: song.thumbnail, sizes: "512x512", type: "image/jpeg" }]
+            artwork: [{ src: song.thumbnail || "https://via.placeholder.com/96", sizes: "512x512", type: "image/jpeg" }]
         });
         updateMediaSessionPosition();
-
-        navigator.mediaSession.setActionHandler('play', () => {
-            audioPlayer.play().catch(err => console.error("Media play error:", err));
-            updatePlayPauseButton();
-            requestWakeLock();
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-            audioPlayer.pause();
-            updatePlayPauseButton();
-        });
-        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-        navigator.mediaSession.setActionHandler('previoustrack', previousSong);
-        navigator.mediaSession.setActionHandler('seekto', (details) => {
-            audioPlayer.currentTime = details.seekTime;
-            updateSeekBar();
-            updateMediaSessionPosition();
-        });
     }
 
     function updateMediaSessionPosition() {
@@ -634,13 +625,58 @@ if ('mediaSession' in navigator) {
             navigator.mediaSession.setPositionState({
                 duration: audioPlayer.duration,
                 playbackRate: audioPlayer.playbackRate,
-                position: audioPlayer.currentTime
+                position: Math.min(audioPlayer.currentTime, audioPlayer.duration) // Prevent position > duration
             });
         }
     }
 
-    audioPlayer.addEventListener("loadedmetadata", updateMediaSession);
+    // Action handlers for lock screen controls
+    navigator.mediaSession.setActionHandler('play', () => {
+        if (audioPlayer.paused) {
+            manualPause = false; // Reset manual pause flag
+            audioPlayer.play()
+                .then(() => {
+                    updatePlayPauseButton();
+                    requestWakeLock();
+                    updateMediaSessionPosition();
+                })
+                .catch(err => console.error("MediaSession play error:", err));
+        }
+    });
+
+    navigator.mediaSession.setActionHandler('pause', () => {
+        if (!audioPlayer.paused) {
+            manualPause = true;
+            audioPlayer.pause();
+            updatePlayPauseButton();
+            updateMediaSessionPosition();
+        }
+    });
+
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+        nextSong(); // Already defined, uses inline onclick in HTML
+    });
+
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+        previousSong(); // Already defined, uses inline onclick in HTML
+    });
+
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.seekTime >= 0 && details.seekTime <= audioPlayer.duration) {
+            audioPlayer.currentTime = details.seekTime;
+            updateSeekBar();
+            updateMediaSessionPosition();
+        }
+    });
+
+    // Update Media Session on key events
+    audioPlayer.addEventListener("loadedmetadata", () => {
+        updateMediaSession();
+        updateProgress(); // Ensure progress bar starts updating
+    });
     audioPlayer.addEventListener("play", updateMediaSession);
+    audioPlayer.addEventListener("pause", updateMediaSessionPosition);
+    audioPlayer.addEventListener("ended", updateMediaSessionPosition);
 }
 
 function nextSong() {
