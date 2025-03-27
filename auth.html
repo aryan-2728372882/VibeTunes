@@ -8,23 +8,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Enhanced Cyber-Neon Theme */
         :root {
-            --primary: #9333ea;         /* Neon purple */
-            --secondary: #a5b4fc;       /* Light indigo */
-            --dark-bg: #0d0d1f;         /* Deep space blue */
-            --dark-secondary: #1a0033;  /* Dark purple */
-            --text-primary: #e0e0ff;    /* Light text */
-            --text-secondary: #d8b4fe;  /* Subtle purple text */
-            --success: #22c55e;         /* Green for success */
+            --primary: #9333ea;
+            --secondary: #a5b4fc;
+            --dark-bg: #0d0d1f;
+            --dark-secondary: #1a0033;
+            --text-primary: #e0e0ff;
+            --text-secondary: #d8b4fe;
+            --success: #22c55e;
+            --accent: #ff6b6b;
+            --card-bg: rgba(17, 24, 39, 0.8);
         }
     
-        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Orbitron', 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
     
         body {
@@ -49,43 +49,29 @@
             50% { opacity: 0.6; transform: scale(1.05); }
         }
     
-        /* Premium Navigation */
         .navbar {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             background: linear-gradient(90deg, rgba(17, 24, 39, 0.95), rgba(49, 46, 129, 0.9));
-            padding: 0.75rem 1rem;
+            padding: 1rem 2rem;
             backdrop-filter: blur(12px) saturate(120%);
             box-shadow: 0 4px 20px rgba(147, 51, 234, 0.2);
         }
     
         .nav-links {
             display: flex;
-            gap: 0.75rem;
+            gap: 1.5rem;
         }
     
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
             border-radius: 5px;
-            position: relative;
             transition: all 0.3s ease;
-        }
-    
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
         }
     
         .nav-links a:hover {
@@ -94,244 +80,172 @@
             transform: translateY(-2px);
         }
     
-        .nav-links a:hover::after {
-            width: 70%;
-        }
-    
-        /* Modern Auth Containers */
         .container {
-            max-width: 90%;
-            margin: 2rem auto;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, rgba(17, 24, 39, 0.7), rgba(49, 46, 129, 0.5));
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: var(--card-bg);
             border: 1px solid rgba(147, 51, 234, 0.2);
-            border-radius: 10px;
+            border-radius: 12px;
             box-shadow: 0 10px 40px rgba(147, 51, 234, 0.3);
             transition: transform 0.3s ease;
         }
     
         .container:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
         }
     
-        /* Enhanced Form Elements */
         input {
             width: 100%;
-            padding: 0.7rem 1rem;
+            padding: 0.8rem 1.2rem;
             margin: 0.5rem 0;
             background: rgba(49, 46, 129, 0.3);
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 1rem;
             transition: all 0.3s ease;
         }
     
         input:focus {
             outline: none;
-            box-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+            box-shadow: 0 0 12px rgba(147, 51, 234, 0.4);
             background: rgba(49, 46, 129, 0.5);
         }
     
-        /* Gradient Buttons with Depth */
         button {
             width: 100%;
-            padding: 0.7rem;
+            padding: 0.8rem;
             margin: 0.5rem 0;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             color: #fff;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
     
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(147, 51, 234, 0.3);
+        button:hover:not(.loading) {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+        }
+    
+        button.loading {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    
+        button.loading::after {
+            content: "⏳";
+            position: absolute;
+            right: 15px;
+            animation: spin 1s linear infinite;
+        }
+    
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
         }
     
         .google-btn {
             background: linear-gradient(135deg, #db4437, #c1351a);
         }
     
-        /* Stats Section Styling */
-        .stats-section, .update-section {
-            background: rgba(17, 24, 39, 0.5);
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 6px;
-            border: 1px solid rgba(147, 51, 234, 0.1);
+        #accountDashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
         }
     
-        .stats-section p {
-            margin: 0.5rem 0;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-    
-        /* Account Dashboard Styling */
         #accountDashboard h2 {
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
+            grid-column: span 2;
+            font-size: 2rem;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+            text-shadow: 0 0 12px rgba(147, 51, 234, 0.3);
+            margin-bottom: 1.5rem;
         }
     
-        #accountDashboard h3 {
-            margin: 1rem 0 0.75rem;
+        .profile-card, .stats-card, .update-card {
+            background: rgba(17, 24, 39, 0.9);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(147, 51, 234, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+    
+        .profile-card h3, .stats-card h3, .update-card h3 {
+            font-size: 1.4rem;
             color: var(--primary);
-            font-size: 1.2rem;
+            margin-bottom: 1rem;
         }
     
-        p {
-            font-size: 0.9rem;
+        .profile-card p, .stats-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
         }
     
-        /* Responsive Design */
+        .profile-card span, .stats-card span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+    
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+    
+        .stat-item {
+            background: rgba(49, 46, 129, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+    
+        .stat-item span {
+            display: block;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+    
+        .logout-btn {
+            background: linear-gradient(135deg, #ff6b6b, #c0392b);
+            margin-top: 1rem;
+        }
+    
         @media (max-width: 768px) {
-            .navbar {
-                padding: 0.75rem 5%;
-                justify-content: center;
+            #accountDashboard {
+                grid-template-columns: 1fr;
             }
-    
-            .nav-links {
-                gap: 0.5rem;
-            }
-    
-            .nav-links a {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.8rem;
-            }
-    
             .container {
-                width: 90%;
-                margin: 1.5rem auto;
-                padding: 1.25rem;
+                max-width: 95%;
+                padding: 1.5rem;
             }
-    
-            input {
-                padding: 0.6rem 0.9rem;
-                font-size: 0.85rem;
+            .navbar {
+                padding: 0.75rem 1rem;
             }
-    
-            button {
-                padding: 0.6rem;
-                font-size: 0.85rem;
-            }
-    
-            #accountDashboard h2 {
-                font-size: 1.3rem;
-            }
-    
-            #accountDashboard h3 {
-                font-size: 1.1rem;
+            .nav-links {
+                gap: 0.75rem;
             }
         }
     
         @media (max-width: 480px) {
-            .nav-links {
-                flex-direction: row;
-                width: 100%;
-                justify-content: center;
-                gap: 0.5rem;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
-    
-            .nav-links a {
-                padding: 0.4rem 0.6rem;
-                font-size: 0.75rem;
-            }
-    
-            .container {
-                padding: 1rem;
-            }
-    
-            input, button {
-                padding: 0.5rem;
-                font-size: 0.8rem;
-            }
-    
-            .stats-section, .update-section {
-                padding: 0.75rem;
-            }
-    
-            .stats-section p {
-                font-size: 0.8rem;
-            }
-    
-            #accountDashboard h2 {
-                font-size: 1.2rem;
-            }
-    
-            #accountDashboard h3 {
-                font-size: 1rem;
-            }
-        }
-    
-        @media (min-width: 769px) {
-            .navbar {
-                padding: 1.2rem 5%;
-                justify-content: flex-end;
-            }
-    
-            .nav-links {
-                gap: 1.5rem;
-            }
-    
-            .nav-links a {
-                padding: 0.75rem 1.25rem;
-                font-size: 1rem;
-            }
-    
-            .container {
-                max-width: 440px;
-                margin: 3rem auto;
-                padding: 2rem;
-                border-radius: 12px;
-            }
-    
-            input {
-                padding: 0.9rem 1.25rem;
-                margin: 0.75rem 0;
-                font-size: 1rem;
-            }
-    
-            button {
-                padding: 0.9rem;
-                margin: 0.75rem 0;
-                font-size: 1rem;
-            }
-    
-            .stats-section, .update-section {
-                padding: 1.5rem;
-                margin: 1.5rem 0;
-            }
-    
-            #accountDashboard h2 {
-                font-size: 1.8rem;
-                margin-bottom: 1.5rem;
-            }
-    
-            #accountDashboard h3 {
-                font-size: 1.4rem;
-                margin: 1.5rem 0 1rem;
-            }
-    
-            p {
-                font-size: 1rem;
+            button, input {
+                font-size: 0.9rem;
+                padding: 0.7rem;
             }
         }
     </style>
-
-    
 </head>
 <body>
-
-    <!-- ✅ Navigation Bar -->
     <header>
         <div class="navbar">
             <nav class="nav-links">
@@ -342,16 +256,15 @@
         </div>
     </header>
 
-    <!-- ✅ Authentication Section -->
     <div class="container" id="auth-container">
         <div id="login-form" class="auth-form active-form">
             <h2>Login</h2>
             <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-password" placeholder="Password">
-            <button onclick="login()">Login</button>
-            <button class="google-btn" onclick="loginWithGoogle()">Continue with Google</button>
-            <p><a href="#" onclick="forgotPassword()">Forgot Password?</a></p>
-            <button onclick="showAuthForm('signup')">Create Account</button>
+            <button id="login-btn">Login</button>
+            <button class="google-btn" id="google-login-btn">Continue with Google</button>
+            <p><a href="#" id="forgot-password-link">Forgot Password?</a></p>
+            <button id="show-signup-btn">Create Account</button>
         </div>
 
         <div id="signup-form" class="auth-form" style="display: none;">
@@ -359,305 +272,332 @@
             <input type="email" id="signup-email" placeholder="Email">
             <input type="password" id="signup-password" placeholder="Password">
             <input type="text" id="signup-username" placeholder="Username">
-            <button onclick="signup()">Sign Up</button>
-            <button onclick="showAuthForm('login')">Already have an account?</button>
+            <button id="signup-btn">Sign Up</button>
+            <button id="show-login-btn">Already have an account?</button>
         </div>
     </div>
 
-    <!-- ✅ Account Overview -->
-    <div class="container account-container" id="accountDashboard">
-        <h2>Welcome to Your Account</h2>
-        <p>Email: <span id="user-email"></span></p>
-        <p>Username: <span id="username"></span></p>
-        <p>Password: <span id="stored-password">********</span></p>
-        <p>Password Last Updated: <span id="password-updated-time">N/A</span></p>
-        <button onclick="logout()">Logout</button>
-
-        <h3>Listening Statistics</h3>
-        <div class="stats-section">
-            <p>Minutes Listened: <span id="minutes-listened">0</span></p>
-            <p>Songs Played: <span id="songs-played">0</span></p>
+    <div class="container" id="accountDashboard" style="display: none;">
+        <h2>Your VibeTunes Dashboard</h2>
+        <div class="profile-card">
+            <h3>Profile</h3>
+            <p>Email: <span id="user-email"></span></p>
+            <p>Username: <span id="username"></span></p>
+            <p>Password: <span id="stored-password">********</span></p>
+            <p>Password Last Updated: <span id="password-updated-time">N/A</span></p>
+            <button class="logout-btn" id="logout-btn">Logout</button>
         </div>
-
-        <h3>Update Profile</h3>
-        <div class="update-section">
-            <input type="text" id="new-username" placeholder="New username">
-            <button onclick="updateUsername()">Update Username</button>
+        <div class="stats-card">
+            <h3>Listening Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <p>Minutes Listened</p>
+                    <span id="minutes-listened">0</span>
+                </div>
+                <div class="stat-item">
+                    <p>Songs Played</p>
+                    <span id="songs-played">0</span>
+                </div>
+            </div>
         </div>
-        <h3>Update Password</h3>
-        <div class="update-section">
-        <input type="password" id="current-password" placeholder="Current Password">
-        <input type="password" id="new-password" placeholder="New Password">
-        <button onclick="updatePassword()">Update Password</button>
+        <div class="update-card">
+            <h3>Update Profile</h3>
+            <input type="text" id="new-username" placeholder="New Username">
+            <button id="update-username-btn">Update Username</button>
+            <h3 style="margin-top: 1.5rem;">Update Password</h3>
+            <input type="password" id="current-password" placeholder="Current Password">
+            <input type="password" id="new-password" placeholder="New Password">
+            <button id="update-password-btn">Update Password</button>
         </div>
-
-
     </div>
 
-    <!-- ✅ Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK (Compat Versions) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyClIhXAaTVmlqhEPxU49C9w9fDkUag-1eQ",
-        authDomain: "vibe-tunes.firebaseapp.com",
-        databaseURL: "https://vibe-tunes-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "vibe-tunes",
-        storageBucket: "vibe-tunes.firebasestorage.app",
-        messagingSenderId: "792892627539",
-        appId: "1:792892627539:web:69817da08d2d4741a404a6",
-        measurementId: "G-7RQD85KP8Z"
-    };
+        document.addEventListener("DOMContentLoaded", () => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyClIhXAaTVmlqhEPxU49C9w9fDkUag-1eQ",
+                authDomain: "vibe-tunes.firebaseapp.com",
+                databaseURL: "https://vibe-tunes-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "vibe-tunes",
+                storageBucket: "vibe-tunes.firebasestorage.app",
+                messagingSenderId: "792892627539",
+                appId: "1:792892627539:web:69817da08d2d4741a404a6",
+                measurementId: "G-7RQD85KP8Z"
+            };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
 
-    // ✅ Ensure session persistence
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => console.log("Auth persistence set to LOCAL"))
-        .catch(error => console.error("Error setting auth persistence:", error));
+            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                .then(() => console.log("Auth persistence set to LOCAL"))
+                .catch(error => console.error("Error setting auth persistence:", error));
 
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("accountDashboard").style.display = "block";
-            document.getElementById("user-email").textContent = user.email;
-
-            // ✅ Store user data in sessionStorage for cross-page use
-            sessionStorage.setItem("userUID", user.uid);
-            sessionStorage.setItem("userEmail", user.email);
-
-            loadUserData(user.uid);
-        } else {
-            document.getElementById("auth-container").style.display = "block";
-            document.getElementById("accountDashboard").style.display = "none";
-            sessionStorage.clear(); // Clear stored user data on logout
-            setTimeout(() => showAuthForm('login'), 200);
-        }
-    });
-
-
-async function loginWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    try {
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
-
-        const userRef = db.collection("users").doc(user.uid);
-        const doc = await userRef.get();
-
-        if (!doc.exists) {
-            // Generate a username if the user is new
-            const firstName = user.displayName ? user.displayName.split(" ")[0] : "User";
-            const randomNumber = Math.floor(1000 + Math.random() * 9000);
-            const generatedUsername = firstName + randomNumber;
-
-            await userRef.set({
-                email: user.email,
-                username: generatedUsername,
-                minutesListened: 0,
-                songsPlayed: 0,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById("auth-container").style.display = "none";
+                    document.getElementById("accountDashboard").style.display = "block";
+                    document.getElementById("user-email").textContent = user.email;
+                    sessionStorage.setItem("userUID", user.uid);
+                    sessionStorage.setItem("userEmail", user.email);
+                    loadUserData(user.uid);
+                } else {
+                    document.getElementById("auth-container").style.display = "block";
+                    document.getElementById("accountDashboard").style.display = "none";
+                    sessionStorage.clear();
+                    setTimeout(() => showAuthForm('login'), 200);
+                }
             });
-        }
 
-        // ✅ Ensure UI updates correctly
-        document.getElementById("auth-container").style.display = "none";
-        document.getElementById("accountDashboard").style.display = "block";
-        document.getElementById("user-email").textContent = user.email;
-        loadUserData(user.uid);
-
-    } catch (error) {
-        console.error("Google Login Error:", error);
-        alert(error.message);
-    }
-}
-
-
-function showAuthForm(formType) {
-    document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
-    document.getElementById(`${formType}-form`).style.display = 'block';
-}
-
-// Call this when the page loads to default to the login form
-document.addEventListener("DOMContentLoaded", () => {
-    showAuthForm('login');
-});
-
-
-async function login() {
-    const email = document.getElementById("login-email").value;
-    const password = document.getElementById("login-password").value;
-
-    try {
-        await auth.signInWithEmailAndPassword(email, password);
-    } catch (error) {
-        console.error("Login Error:", error);
-        alert(error.message); // Display error message to user
-    }
-}
-
-async function signup() {
-    const email = document.getElementById("signup-email").value;
-    const password = document.getElementById("signup-password").value;
-    const username = document.getElementById("signup-username").value.trim();
-
-    if (!email || !password || !username) {
-        alert("Please fill in all fields.");
-        return;
-    }
-
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-
-        // Save user data in Firestore
-        await db.collection("users").doc(user.uid).set({
-            email: user.email,
-            username: username,
-            minutesListened: 0,
-            songsPlayed: 0,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("Signup successful! You can now log in.");
-        showAuthForm('login');
-    } catch (error) {
-        console.error("Signup Error:", error);
-        alert(error.message);
-    }
-}
-
-async function updatePassword() {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("You must be logged in to update your password.");
-        return;
-    }
-
-    const currentPassword = document.getElementById("current-password").value;
-    const newPassword = document.getElementById("new-password").value;
-
-    if (newPassword.length < 6) {
-        alert("Password must be at least 6 characters.");
-        return;
-    }
-
-    // ✅ Re-authenticate User Before Changing Password
-    const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
-
-    try {
-        await user.reauthenticateWithCredential(credential);
-        await user.updatePassword(newPassword);
-
-        // ❌ Storing Password in Plain Text (DANGEROUS)
-        const userRef = db.collection("users").doc(user.uid);
-        await userRef.update({
-            password: newPassword,  // ⚠️ This is a security risk!
-            passwordLastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("Password updated successfully!");
-    } catch (error) {
-        console.error("Error updating password:", error);
-        alert(error.message);
-    }
-}
-
-
-function forgotPassword() {
-    const email = document.getElementById("login-email").value.trim();
-    
-    if (!email) {
-        alert("Please enter your email before resetting the password.");
-        return;
-    }
-
-    auth.sendPasswordResetEmail(email)
-        .then(() => {
-            alert("Password reset email sent! Check your inbox.");
-        })
-        .catch(error => {
-            console.error("Error resetting password:", error);
-            alert(error.message);
-        });
-}
-
-function loadUserData(uid) {
-    db.collection("users").doc(uid).get().then(doc => {
-        if (doc.exists) {
-            const userData = doc.data();
-            document.getElementById("username").textContent = userData.username || "N/A";
-            document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
-            document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
-
-            // ✅ Show Password (Optional: Hide by Default)
-            document.getElementById("stored-password").textContent = userData.password || "N/A";
-
-            // ✅ Show Password Last Updated Time
-            if (userData.passwordLastUpdated) {
-                const timestamp = userData.passwordLastUpdated.toDate();
-                document.getElementById("password-updated-time").textContent = timestamp.toLocaleString();
-            } else {
-                document.getElementById("password-updated-time").textContent = "Never Changed";
+            function toggleButtonLoading(button, isLoading) {
+                button.disabled = isLoading;
+                button.classList.toggle("loading", isLoading);
             }
-        }
-    }).catch(error => console.error("Error loading user data:", error));
-}
 
+            async function loginWithGoogle() {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const button = document.getElementById("google-login-btn");
+                toggleButtonLoading(button, true);
 
-async function updateUsername() {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("You must be logged in to update your username.");
-        return;
-    }
+                try {
+                    let result;
+                    try {
+                        result = await auth.signInWithPopup(provider);
+                    } catch (popupError) {
+                        if (popupError.code === "auth/popup-blocked") {
+                            console.log("Popup blocked, falling back to redirect");
+                            await auth.signInWithRedirect(provider);
+                            result = await auth.getRedirectResult();
+                        } else {
+                            throw popupError;
+                        }
+                    }
+                    const user = result.user;
+                    const userRef = db.collection("users").doc(user.uid);
+                    const doc = await userRef.get();
 
-    const newUsername = document.getElementById("new-username").value.trim();
-    if (newUsername === "") {
-        alert("Username cannot be empty.");
-        return;
-    }
+                    if (!doc.exists) {
+                        const firstName = user.displayName ? user.displayName.split(" ")[0] : "User";
+                        const randomNumber = Math.floor(1000 + Math.random() * 9000);
+                        const generatedUsername = firstName + randomNumber;
 
-    const userRef = db.collection("users").doc(user.uid);
-    const doc = await userRef.get();
+                        await userRef.set({
+                            email: user.email,
+                            username: generatedUsername,
+                            minutesListened: 0,
+                            songsPlayed: 0,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
 
-    if (!doc.exists) {
-        alert("User data not found in Firestore. Try logging out and logging back in.");
-        return;
-    }
+                    document.getElementById("auth-container").style.display = "none";
+                    document.getElementById("accountDashboard").style.display = "block";
+                    document.getElementById("user-email").textContent = user.email;
+                    loadUserData(user.uid);
+                } catch (error) {
+                    console.error("Google Login Error:", error.code, error.message);
+                    alert(`Login failed: ${error.message}`);
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            }
 
-    try {
-        await userRef.update({ username: newUsername });
+            function showAuthForm(formType) {
+                document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+                document.getElementById(`${formType}-form`).style.display = 'block';
+            }
 
-        document.getElementById("username").textContent = newUsername;
-        alert("Username updated successfully!");
-    } catch (error) {
-        console.error("Error updating username:", error);
-        alert("Failed to update username. Please try again.");
-    }
-}
+            async function login() {
+                const email = document.getElementById("login-email").value;
+                const password = document.getElementById("login-password").value;
+                const button = document.getElementById("login-btn");
+                toggleButtonLoading(button, true);
 
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    console.error("Login Error:", error);
+                    alert(error.message);
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            }
 
-function logout() {
-    auth.signOut().then(() => {
-        document.getElementById("auth-container").style.display = "block";
-        document.getElementById("accountDashboard").style.display = "none";
-        document.getElementById("login-email").value = "";
-        document.getElementById("login-password").value = "";
-        document.getElementById("signup-email").value = "";
-        document.getElementById("signup-password").value = "";
-        document.getElementById("signup-username").value = "";
-        showAuthForm('login'); // Ensure login form is shown after logout
-    }).catch(error => {
-        console.error("Logout Error:", error);
-    });
-}
+            async function signup() {
+                const email = document.getElementById("signup-email").value;
+                const password = document.getElementById("signup-password").value;
+                const username = document.getElementById("signup-username").value.trim();
+                const button = document.getElementById("signup-btn");
+                toggleButtonLoading(button, true);
 
+                if (!email || !password || !username) {
+                    alert("Please fill in all fields.");
+                    toggleButtonLoading(button, false);
+                    return;
+                }
+
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+
+                    await db.collection("users").doc(user.uid).set({
+                        email: user.email,
+                        username: username,
+                        minutesListened: 0,
+                        songsPlayed: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    alert("Signup successful! You can now log in.");
+                    showAuthForm('login');
+                } catch (error) {
+                    console.error("Signup Error:", error);
+                    alert(error.message);
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            }
+
+            async function updatePassword() {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("You must be logged in to update your password.");
+                    return;
+                }
+
+                const currentPassword = document.getElementById("current-password").value;
+                const newPassword = document.getElementById("new-password").value;
+                const button = document.getElementById("update-password-btn");
+                toggleButtonLoading(button, true);
+
+                if (newPassword.length < 6) {
+                    alert("Password must be at least 6 characters.");
+                    toggleButtonLoading(button, false);
+                    return;
+                }
+
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+
+                try {
+                    await user.reauthenticateWithCredential(credential);
+                    await user.updatePassword(newPassword);
+
+                    const userRef = db.collection("users").doc(user.uid);
+                    await userRef.update({
+                        password: newPassword,
+                        passwordLastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    alert("Password updated successfully!");
+                } catch (error) {
+                    console.error("Error updating password:", error);
+                    alert(error.message);
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            }
+
+            function forgotPassword() {
+                const email = document.getElementById("login-email").value.trim();
+                if (!email) {
+                    alert("Please enter your email before resetting the password.");
+                    return;
+                }
+
+                auth.sendPasswordResetEmail(email)
+                    .then(() => alert("Password reset email sent! Check your inbox."))
+                    .catch(error => {
+                        console.error("Error resetting password:", error);
+                        alert(error.message);
+                    });
+            }
+
+            function loadUserData(uid) {
+                db.collection("users").doc(uid).onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById("username").textContent = userData.username || "N/A";
+                        document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
+                        document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
+                        document.getElementById("stored-password").textContent = userData.password || "********";
+                        if (userData.passwordLastUpdated) {
+                            const timestamp = userData.passwordLastUpdated.toDate();
+                            document.getElementById("password-updated-time").textContent = timestamp.toLocaleString();
+                        } else {
+                            document.getElementById("password-updated-time").textContent = "Never Changed";
+                        }
+                    }
+                }, (error) => console.error("Error listening to user data:", error));
+            }
+
+            async function updateUsername() {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("You must be logged in to update your username.");
+                    return;
+                }
+
+                const newUsername = document.getElementById("new-username").value.trim();
+                const button = document.getElementById("update-username-btn");
+                toggleButtonLoading(button, true);
+
+                if (newUsername === "") {
+                    alert("Username cannot be empty.");
+                    toggleButtonLoading(button, false);
+                    return;
+                }
+
+                const userRef = db.collection("users").doc(user.uid);
+                try {
+                    await userRef.update({ username: newUsername });
+                    document.getElementById("username").textContent = newUsername;
+                    alert("Username updated successfully!");
+                } catch (error) {
+                    console.error("Error updating username:", error);
+                    alert("Failed to update username. Please try again.");
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            }
+
+            async function logout() {
+                const button = document.getElementById("logout-btn");
+                toggleButtonLoading(button, true);
+
+                try {
+                    await auth.signOut();
+                    document.getElementById("auth-container").style.display = "block";
+                    document.getElementById("accountDashboard").style.display = "none";
+                    document.getElementById("login-email").value = "";
+                    document.getElementById("login-password").value = "";
+                    document.getElementById("signup-email").value = "";
+                    document.getElementById("signup-password").value = "";
+                    document.getElementById("signup-username").value = "";
+                    showAuthForm('login');
+                } catch (error) {
+                    console.error("Logout Error:", error);
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            }
+
+            // Attach Event Listeners
+            document.getElementById("login-btn").addEventListener("click", login);
+            document.getElementById("google-login-btn").addEventListener("click", loginWithGoogle);
+            document.getElementById("forgot-password-link").addEventListener("click", forgotPassword);
+            document.getElementById("show-signup-btn").addEventListener("click", () => showAuthForm('signup'));
+            document.getElementById("signup-btn").addEventListener("click", signup);
+            document.getElementById("show-login-btn").addEventListener("click", () => showAuthForm('login'));
+            document.getElementById("update-username-btn").addEventListener("click", updateUsername);
+            document.getElementById("update-password-btn").addEventListener("click", updatePassword);
+            document.getElementById("logout-btn").addEventListener("click", logout);
+
+            showAuthForm('login');
+        });
     </script>
 </body>
 </html>
