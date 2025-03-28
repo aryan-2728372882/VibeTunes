@@ -2,8 +2,10 @@
 auth.onAuthStateChanged(user => {
     if (!user) {
         console.warn("No user logged in, skipping song tracking.");
+        showPopup("Please log in to track your listening stats!");
     } else {
         console.log("User detected:", user.email);
+        showPopup(`Welcome, ${user.email}! Tracking your stats...`);
         setupSongTracking(user.uid);
     }
 });
@@ -11,7 +13,11 @@ auth.onAuthStateChanged(user => {
 function setupSongTracking(uid) {
     const audioPlayer = document.getElementById("audio-player");
     const seekBar = document.getElementById("seek-bar");
-    if (!audioPlayer || !seekBar) return;
+    if (!audioPlayer || !seekBar) {
+        console.error("Audio player or seek bar not found!");
+        showPopup("Error: Player setup failed. Refresh the page.");
+        return;
+    }
 
     let totalPlayTime = 0; // Total playtime for the current song
     let continuousPlayTime = 0; // Continuous playtime without seeking
@@ -24,6 +30,7 @@ function setupSongTracking(uid) {
             lastPlayTime = Date.now();
             songStarted = true;
             hasSeeked = false; // Reset seeking flag on new play
+            showPopup("Song started playing!");
         }
     });
 
@@ -34,6 +41,7 @@ function setupSongTracking(uid) {
             if (!hasSeeked) continuousPlayTime += elapsed; // Only add to continuous if no seeking
             lastPlayTime = 0;
             songStarted = false;
+            showPopup("Song paused.");
         }
     });
 
@@ -48,6 +56,9 @@ function setupSongTracking(uid) {
         if (continuousPlayTime >= 60) {
             const minutesPlayed = Math.round(totalPlayTime / 60); // Round total time for stats
             updateUserStats(uid, minutesPlayed);
+            showPopup(`Song finished! Stats updated: +${minutesPlayed} min`);
+        } else {
+            showPopup("Song ended");
         }
         totalPlayTime = 0;
         continuousPlayTime = 0; // Reset for next song
@@ -64,6 +75,7 @@ function setupSongTracking(uid) {
             }
             hasSeeked = true; // Mark as seeked
             continuousPlayTime = 0; // Reset continuous playtime
+            showPopup("Seeked in song - continuous playtime reset.");
         }
     });
 }
@@ -74,12 +86,23 @@ function updateUserStats(uid, minutesPlayed) {
     userRef.update({
         songsPlayed: firebase.firestore.FieldValue.increment(1),
         minutesListened: firebase.firestore.FieldValue.increment(minutesPlayed)
-    }).then(() => console.log(`Updated: +1 song, +${minutesPlayed} minutes`))
-      .catch(error => {
-          console.error("Error updating user stats:", error);
-          showPopup("Failed to update stats. Retrying...");
-          setTimeout(() => updateUserStats(uid, minutesPlayed), 2000);
-      });
+    }).then(() => {
+        console.log(`Updated: +1 song, +${minutesPlayed} minutes`);
+        showPopup(`Stats updated: +1 song, +${minutesPlayed} minutes`);
+    }).catch(error => {
+        console.error("Error updating user stats:", error);
+        showPopup("Failed to update stats. Retrying in 2 seconds...");
+        setTimeout(() => updateUserStats(uid, minutesPlayed), 2000);
+    });
+}
+
+// Popup Utility Function
+function showPopup(message) {
+    const popup = document.createElement("div");
+    popup.className = "popup-notification"; // Relies entirely on external CSS
+    popup.textContent = message;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 3000); // Matches CSS animation duration
 }
 
 // Song Lists (unchanged)
