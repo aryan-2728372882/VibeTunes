@@ -304,6 +304,7 @@ function setupMediaSession(song) {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: song.title,
+            artist: song.artist,
             artwork: [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
         });
         navigator.mediaSession.setActionHandler('play', () => togglePlay());
@@ -427,7 +428,7 @@ function populateSection(containerId, songs, context) {
 
 async function loadSearchSongs() {
     try {
-        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs];
+        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...fixedBhojpuri, ...fixedPhonk, ...fixedHaryanvi];
     } catch (error) {
         console.error("Error loading search songs:", error);
     }
@@ -750,4 +751,4 @@ function changeVolume(value) {
     document.getElementById("volume-percentage").textContent = `${value}%`;
 }
 
-console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
+console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing'); 
