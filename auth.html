@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Overview | VibeTunes</title>
     <link rel="icon" href="/assets/favicon - Copy.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -217,6 +218,7 @@
             background: linear-gradient(135deg, #ff6b6b, #c0392b);
             margin-top: 1rem;
         }
+        
     
         @media (max-width: 768px) {
             #accountDashboard {
@@ -248,10 +250,14 @@
 <body>
     <header>
         <div class="navbar">
+            <!-- Logo on Left -->
+            <a href="index.html" class="logo-container">
+                <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
+            </a>
+
+            <!-- Navigation Links on Right -->
             <nav class="nav-links">
                 <a href="index.html">Home</a>
-                <a href="contact.html">Contact Us</a>
-                <a href="Privacy-Policy.html">Privacy Policy</a>
             </nav>
         </div>
     </header>
@@ -599,5 +605,15 @@
             showAuthForm('login');
         });
     </script>
+
+    <footer class="footer">
+     <div class="footer-links">
+        <a href="Terms-Conditions.html">Terms of Service</a>
+        <a href="contact.html">Contact Support</a>
+        <a href="Privacy-Policy.html">Privacy Policy</a>
+     </div>
+    <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
+    </footer>
+
 </body>
 </html>

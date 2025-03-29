@@ -9,19 +9,20 @@
     <title>Contact Us - VibeTunes</title>
 </head>
 <body>
-    <header class="contact-header">
-        <nav class="navbar">
-            <!-- ✅ Clickable Logo -->
-            <a href="index.html">
+    <!-- Navigation Bar -->
+    <header>
+        <div class="navbar">
+            <!-- Logo on Left -->
+            <a href="index.html" class="logo-container">
                 <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
             </a>
-            <div class="nav-links">
+
+            <!-- Navigation Links on Right -->
+            <nav class="nav-links">
                 <a href="index.html">Home</a>
-                <a href="Privacy-Policy.html">Privacy Policy</a>
-            </div>
-        </nav>
+            </nav>
+        </div>
     </header>
-    
     <main>
         <div class="contact-container">
             <div class="contact-header">
@@ -87,22 +88,12 @@
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 VibeTunes. All rights reserved.</p>
         <div class="footer-links">
+            <a href="Terms-Conditions.html">Terms of Service</a>
+            <a href="Privacy-Policy.html">Privacy Policy</a>
         </div>
+        <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
     </footer>
-
-
-    <script>
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) {
-                console.warn("User not logged in, redirecting to login page.");
-                window.location.href = "auth.html";
-            } else {
-                console.log("User detected:", user.email);
-            }
-        });
-    </script>
     
     <script src="scripts/mail.js"></script>
     
