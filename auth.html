@@ -218,6 +218,30 @@
             background: linear-gradient(135deg, #ff6b6b, #c0392b);
             margin-top: 1rem;
         }
+
+        .delete-btn {
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.delete-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+}
+
+.delete-btn::after {
+    content: "⚠️";
+    position: absolute;
+    right: 15px;
+    animation: pulseWarning 1.5s infinite;
+}
+
+@keyframes pulseWarning {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
         
     
         @media (max-width: 768px) {
@@ -315,6 +339,14 @@
             <input type="password" id="new-password" placeholder="New Password">
             <button id="update-password-btn">Update Password</button>
         </div>
+
+        <h3 style="margin-top: 1.5rem; color: var(--accent);">Account Actions</h3>
+    <div class="delete-section">
+        <p style="color: var(--text-secondary); margin: 1rem 0;">
+            Warning: This will permanently delete your account and all associated data.
+        </p>
+        <button class="delete-btn" id="delete-account-btn">Delete My Account</button>
+    </div>
     </div>
 
     <!-- Firebase SDK (Compat Versions) -->
@@ -323,287 +355,231 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const firebaseConfig = {
-                apiKey: "AIzaSyClIhXAaTVmlqhEPxU49C9w9fDkUag-1eQ",
-                authDomain: "vibe-tunes.firebaseapp.com",
-                databaseURL: "https://vibe-tunes-default-rtdb.asia-southeast1.firebasedatabase.app",
-                projectId: "vibe-tunes",
-                storageBucket: "vibe-tunes.firebasestorage.app",
-                messagingSenderId: "792892627539",
-                appId: "1:792892627539:web:69817da08d2d4741a404a6",
-                measurementId: "G-7RQD85KP8Z"
-            };
+       document.addEventListener("DOMContentLoaded", () => {
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyClIhXAaTVmlqhEPxU49C9w9fDkUag-1eQ",
+        authDomain: "vibe-tunes.firebaseapp.com",
+        databaseURL: "https://vibe-tunes-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "vibe-tunes",
+        storageBucket: "vibe-tunes.firebasestorage.app",
+        messagingSenderId: "792892627539",
+        appId: "1:792892627539:web:69817da08d2d4741a404a6",
+        measurementId: "G-7RQD85KP8Z"
+    };
 
-            firebase.initializeApp(firebaseConfig);
-            const auth = firebase.auth();
-            const db = firebase.firestore();
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = app.auth();
+    const db = app.firestore();
 
-            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-                .then(() => console.log("Auth persistence set to LOCAL"))
-                .catch(error => console.error("Error setting auth persistence:", error));
+    // Utility Functions
+    const toggleButtonLoading = (button, isLoading) => {
+        button.disabled = isLoading;
+        button.classList.toggle("loading", isLoading);
+    };
 
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    document.getElementById("auth-container").style.display = "none";
-                    document.getElementById("accountDashboard").style.display = "block";
-                    document.getElementById("user-email").textContent = user.email;
-                    sessionStorage.setItem("userUID", user.uid);
-                    sessionStorage.setItem("userEmail", user.email);
-                    loadUserData(user.uid);
+    const showAuthForm = (formType) => {
+        document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+        document.getElementById(`${formType}-form`).style.display = 'block';
+    };
+
+    // Auth State Management
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => console.log("Auth persistence set to LOCAL"))
+        .catch(error => console.error("Auth persistence error:", error));
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("accountDashboard").style.display = "block";
+            document.getElementById("user-email").textContent = user.email;
+            sessionStorage.setItem("userUID", user.uid);
+            loadUserData(user.uid);
+        } else {
+            document.getElementById("auth-container").style.display = "block";
+            document.getElementById("accountDashboard").style.display = "none";
+            sessionStorage.clear();
+            showAuthForm('login');
+        }
+    });
+
+    const loadUserData = (uid) => {
+        db.collection("users").doc(uid).onSnapshot((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById("username").textContent = userData.username || "N/A";
+                document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
+                document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
+                document.getElementById("stored-password").textContent = userData.password ? "********" : "Not Set";
+                
+                if (userData.passwordLastUpdated) {
+                    const timestamp = userData.passwordLastUpdated.toDate();
+                    document.getElementById("password-updated-time").textContent = 
+                        timestamp.toLocaleDateString() + " " + timestamp.toLocaleTimeString();
                 } else {
-                    document.getElementById("auth-container").style.display = "block";
-                    document.getElementById("accountDashboard").style.display = "none";
-                    sessionStorage.clear();
-                    setTimeout(() => showAuthForm('login'), 200);
+                    document.getElementById("password-updated-time").textContent = "Never Changed";
                 }
+            }
+        }, (error) => {
+            console.error("Error loading user data:", error);
+            alert("Error loading profile data");
+        });
+    };
+
+    // Authentication Functions
+    const handleGoogleLogin = async () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const button = document.getElementById("google-login-btn");
+        toggleButtonLoading(button, true);
+
+        try {
+            const result = await auth.signInWithPopup(provider).catch(async error => {
+                if (error.code === "auth/popup-blocked") {
+                    await auth.signInWithRedirect(provider);
+                    return await auth.getRedirectResult();
+                }
+                throw error;
             });
 
-            function toggleButtonLoading(button, isLoading) {
-                button.disabled = isLoading;
-                button.classList.toggle("loading", isLoading);
+            const user = result.user;
+            const userRef = db.collection("users").doc(user.uid);
+            const doc = await userRef.get();
+
+            if (!doc.exists) {
+                const firstName = user.displayName?.split(" ")[0] || "User";
+                await userRef.set({
+                    email: user.email,
+                    username: `${firstName}${Math.floor(1000 + Math.random() * 9000)}`,
+                    minutesListened: 0,
+                    songsPlayed: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
             }
+        } catch (error) {
+            console.error("Google login error:", error);
+            alert(`Login failed: ${error.message}`);
+        } finally {
+            toggleButtonLoading(button, false);
+        }
+    };
 
-            async function loginWithGoogle() {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const button = document.getElementById("google-login-btn");
-                toggleButtonLoading(button, true);
+    const handleEmailLogin = async () => {
+        const email = document.getElementById("login-email").value;
+        const password = document.getElementById("login-password").value;
+        const button = document.getElementById("login-btn");
+        toggleButtonLoading(button, true);
 
-                try {
-                    let result;
-                    try {
-                        result = await auth.signInWithPopup(provider);
-                    } catch (popupError) {
-                        if (popupError.code === "auth/popup-blocked") {
-                            console.log("Popup blocked, falling back to redirect");
-                            await auth.signInWithRedirect(provider);
-                            result = await auth.getRedirectResult();
-                        } else {
-                            throw popupError;
-                        }
-                    }
-                    const user = result.user;
-                    const userRef = db.collection("users").doc(user.uid);
-                    const doc = await userRef.get();
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+        } catch (error) {
+            console.error("Login error:", error);
+            alert(error.message);
+        } finally {
+            toggleButtonLoading(button, false);
+        }
+    };
 
-                    if (!doc.exists) {
-                        const firstName = user.displayName ? user.displayName.split(" ")[0] : "User";
-                        const randomNumber = Math.floor(1000 + Math.random() * 9000);
-                        const generatedUsername = firstName + randomNumber;
+    const handleSignup = async () => {
+        const email = document.getElementById("signup-email").value;
+        const password = document.getElementById("signup-password").value;
+        const username = document.getElementById("signup-username").value.trim();
+        const button = document.getElementById("signup-btn");
+        toggleButtonLoading(button, true);
 
-                        await userRef.set({
-                            email: user.email,
-                            username: generatedUsername,
-                            minutesListened: 0,
-                            songsPlayed: 0,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-
-                    document.getElementById("auth-container").style.display = "none";
-                    document.getElementById("accountDashboard").style.display = "block";
-                    document.getElementById("user-email").textContent = user.email;
-                    loadUserData(user.uid);
-                } catch (error) {
-                    console.error("Google Login Error:", error.code, error.message);
-                    alert(`Login failed: ${error.message}`);
-                } finally {
-                    toggleButtonLoading(button, false);
-                }
-            }
-
-            function showAuthForm(formType) {
-                document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
-                document.getElementById(`${formType}-form`).style.display = 'block';
-            }
-
-            async function login() {
-                const email = document.getElementById("login-email").value;
-                const password = document.getElementById("login-password").value;
-                const button = document.getElementById("login-btn");
-                toggleButtonLoading(button, true);
-
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                } catch (error) {
-                    console.error("Login Error:", error);
-                    alert(error.message);
-                } finally {
-                    toggleButtonLoading(button, false);
-                }
-            }
-
-            async function signup() {
-                const email = document.getElementById("signup-email").value;
-                const password = document.getElementById("signup-password").value;
-                const username = document.getElementById("signup-username").value.trim();
-                const button = document.getElementById("signup-btn");
-                toggleButtonLoading(button, true);
-
-                if (!email || !password || !username) {
-                    alert("Please fill in all fields.");
-                    toggleButtonLoading(button, false);
-                    return;
-                }
-
-                try {
-                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                    const user = userCredential.user;
-
-                    await db.collection("users").doc(user.uid).set({
-                        email: user.email,
-                        username: username,
-                        minutesListened: 0,
-                        songsPlayed: 0,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    alert("Signup successful! You can now log in.");
-                    showAuthForm('login');
-                } catch (error) {
-                    console.error("Signup Error:", error);
-                    alert(error.message);
-                } finally {
-                    toggleButtonLoading(button, false);
-                }
-            }
-
-            async function updatePassword() {
-                const user = auth.currentUser;
-                if (!user) {
-                    alert("You must be logged in to update your password.");
-                    return;
-                }
-
-                const currentPassword = document.getElementById("current-password").value;
-                const newPassword = document.getElementById("new-password").value;
-                const button = document.getElementById("update-password-btn");
-                toggleButtonLoading(button, true);
-
-                if (newPassword.length < 6) {
-                    alert("Password must be at least 6 characters.");
-                    toggleButtonLoading(button, false);
-                    return;
-                }
-
-                const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
-
-                try {
-                    await user.reauthenticateWithCredential(credential);
-                    await user.updatePassword(newPassword);
-
-                    const userRef = db.collection("users").doc(user.uid);
-                    await userRef.update({
-                        password: newPassword,
-                        passwordLastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    alert("Password updated successfully!");
-                } catch (error) {
-                    console.error("Error updating password:", error);
-                    alert(error.message);
-                } finally {
-                    toggleButtonLoading(button, false);
-                }
-            }
-
-            function forgotPassword() {
-                const email = document.getElementById("login-email").value.trim();
-                if (!email) {
-                    alert("Please enter your email before resetting the password.");
-                    return;
-                }
-
-                auth.sendPasswordResetEmail(email)
-                    .then(() => alert("Password reset email sent! Check your inbox."))
-                    .catch(error => {
-                        console.error("Error resetting password:", error);
-                        alert(error.message);
-                    });
-            }
-
-            function loadUserData(uid) {
-                db.collection("users").doc(uid).onSnapshot((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        document.getElementById("username").textContent = userData.username || "N/A";
-                        document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
-                        document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
-                        document.getElementById("stored-password").textContent = userData.password || "********";
-                        if (userData.passwordLastUpdated) {
-                            const timestamp = userData.passwordLastUpdated.toDate();
-                            document.getElementById("password-updated-time").textContent = timestamp.toLocaleString();
-                        } else {
-                            document.getElementById("password-updated-time").textContent = "Never Changed";
-                        }
-                    }
-                }, (error) => console.error("Error listening to user data:", error));
-            }
-
-            async function updateUsername() {
-                const user = auth.currentUser;
-                if (!user) {
-                    alert("You must be logged in to update your username.");
-                    return;
-                }
-
-                const newUsername = document.getElementById("new-username").value.trim();
-                const button = document.getElementById("update-username-btn");
-                toggleButtonLoading(button, true);
-
-                if (newUsername === "") {
-                    alert("Username cannot be empty.");
-                    toggleButtonLoading(button, false);
-                    return;
-                }
-
-                const userRef = db.collection("users").doc(user.uid);
-                try {
-                    await userRef.update({ username: newUsername });
-                    document.getElementById("username").textContent = newUsername;
-                    alert("Username updated successfully!");
-                } catch (error) {
-                    console.error("Error updating username:", error);
-                    alert("Failed to update username. Please try again.");
-                } finally {
-                    toggleButtonLoading(button, false);
-                }
-            }
-
-            async function logout() {
-                const button = document.getElementById("logout-btn");
-                toggleButtonLoading(button, true);
-
-                try {
-                    await auth.signOut();
-                    document.getElementById("auth-container").style.display = "block";
-                    document.getElementById("accountDashboard").style.display = "none";
-                    document.getElementById("login-email").value = "";
-                    document.getElementById("login-password").value = "";
-                    document.getElementById("signup-email").value = "";
-                    document.getElementById("signup-password").value = "";
-                    document.getElementById("signup-username").value = "";
-                    showAuthForm('login');
-                } catch (error) {
-                    console.error("Logout Error:", error);
-                } finally {
-                    toggleButtonLoading(button, false);
-                }
-            }
-
-            // Attach Event Listeners
-            document.getElementById("login-btn").addEventListener("click", login);
-            document.getElementById("google-login-btn").addEventListener("click", loginWithGoogle);
-            document.getElementById("forgot-password-link").addEventListener("click", forgotPassword);
-            document.getElementById("show-signup-btn").addEventListener("click", () => showAuthForm('signup'));
-            document.getElementById("signup-btn").addEventListener("click", signup);
-            document.getElementById("show-login-btn").addEventListener("click", () => showAuthForm('login'));
-            document.getElementById("update-username-btn").addEventListener("click", updateUsername);
-            document.getElementById("update-password-btn").addEventListener("click", updatePassword);
-            document.getElementById("logout-btn").addEventListener("click", logout);
-
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            await db.collection("users").doc(userCredential.user.uid).set({
+                email,
+                username,
+                minutesListened: 0,
+                songsPlayed: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("Signup successful! Please login.");
             showAuthForm('login');
-        });
+        } catch (error) {
+            console.error("Signup error:", error);
+            alert(error.message);
+        } finally {
+            toggleButtonLoading(button, false);
+        }
+    };
+
+    // Account Management
+    const handlePasswordUpdate = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const currentPassword = document.getElementById("current-password").value;
+        const newPassword = document.getElementById("new-password").value;
+        const button = document.getElementById("update-password-btn");
+        toggleButtonLoading(button, true);
+
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+            await user.reauthenticateWithCredential(credential);
+            await user.updatePassword(newPassword);
+            await db.collection("users").doc(user.uid).update({
+                password: newPassword,
+                passwordLastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("Password updated successfully!");
+        } catch (error) {
+            console.error("Password update error:", error);
+            alert(error.message);
+        } finally {
+            toggleButtonLoading(button, false);
+        }
+    };
+
+    const handleAccountDeletion = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        if (!confirm("Permanently delete your account and all data?")) return;
+
+        const password = prompt("Enter password to confirm deletion:");
+        if (!password) return;
+
+        const button = document.getElementById("delete-account-btn");
+        toggleButtonLoading(button, true);
+
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+            await user.reauthenticateWithCredential(credential);
+            await db.collection("users").doc(user.uid).delete();
+            await user.delete();
+            alert("Account deleted successfully!");
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Account deletion error:", error);
+            alert(`Deletion failed: ${error.message}`);
+        } finally {
+            toggleButtonLoading(button, false);
+        }
+    };
+
+    // Event Listeners
+    document.getElementById("login-btn").addEventListener("click", handleEmailLogin);
+    document.getElementById("google-login-btn").addEventListener("click", handleGoogleLogin);
+    document.getElementById("signup-btn").addEventListener("click", handleSignup);
+    document.getElementById("update-password-btn").addEventListener("click", handlePasswordUpdate);
+    document.getElementById("delete-account-btn").addEventListener("click", handleAccountDeletion);
+    document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
+    document.getElementById("forgot-password-link").addEventListener("click", () => {
+        const email = document.getElementById("login-email").value.trim();
+        email && auth.sendPasswordResetEmail(email)
+            .then(() => alert("Password reset email sent!"))
+            .catch(error => alert(`Error: ${error.message}`));
+    });
+
+    document.getElementById("show-signup-btn").addEventListener("click", () => showAuthForm('signup'));
+    document.getElementById("show-login-btn").addEventListener("click", () => showAuthForm('login'));
+
+    // Initial Setup
+    showAuthForm('login');
+});
     </script>
 
     <footer class="footer">
