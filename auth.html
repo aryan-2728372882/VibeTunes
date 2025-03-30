@@ -220,29 +220,28 @@
         }
 
         .delete-btn {
-    background: linear-gradient(135deg, #ff4444, #cc0000);
-    margin-top: 1rem;
-    position: relative;
-    overflow: hidden;
-}
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-.delete-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
-}
+        .delete-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+        }
 
-.delete-btn::after {
-    content: "⚠️";
-    position: absolute;
-    right: 15px;
-    animation: pulseWarning 1.5s infinite;
-}
+        .delete-btn::after {
+            content: "⚠️";
+            position: absolute;
+            right: 15px;
+            animation: pulseWarning 1.5s infinite;
+        }
 
-@keyframes pulseWarning {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-        
+        @keyframes pulseWarning {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
     
         @media (max-width: 768px) {
             #accountDashboard {
@@ -269,17 +268,119 @@
                 padding: 0.7rem;
             }
         }
+
+        /* Dialog Styles */
+        .dialog-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--primary);
+            animation: dialogEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes dialogEnter {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .dialog-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .dialog-input {
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        /* Notification Styles */
+        .notification-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+        }
+
+        .notification-content {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--primary);
+            animation: dialogEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .notification-content.success {
+            border-color: var(--success);
+        }
+
+        .notification-content.error {
+            border-color: var(--accent);
+        }
+
+        .notification-content h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .notification-content.success h3 {
+            color: var(--success);
+        }
+
+        .notification-content.error h3 {
+            color: var(--accent);
+        }
+
+        .notification-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="navbar">
-            <!-- Logo on Left -->
             <a href="index.html" class="logo-container">
                 <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
             </a>
-
-            <!-- Navigation Links on Right -->
             <nav class="nav-links">
                 <a href="index.html">Home</a>
             </nav>
@@ -341,255 +442,339 @@
         </div>
 
         <h3 style="margin-top: 1.5rem; color: var(--accent);">Account Actions</h3>
-    <div class="delete-section">
-        <p style="color: var(--text-secondary); margin: 1rem 0;">
-            Warning: This will permanently delete your account and all associated data.
-        </p>
-        <button class="delete-btn" id="delete-account-btn">Delete My Account</button>
-    </div>
+        <div class="delete-section">
+            <p style="color: var(--text-secondary); margin: 1rem 0;">
+                Warning: This will permanently delete your account and all associated data.
+            </p>
+            <button class="delete-btn" id="delete-account-btn">Delete My Account</button>
+        </div>
     </div>
 
-    <!-- Firebase SDK (Compat Versions) -->
+    <!-- Delete Dialog -->
+    <div class="dialog-backdrop" id="deleteDialog">
+        <div class="dialog-content">
+            <h3 style="color: var(--accent); margin-bottom: 1rem;">⚠️ Delete Account</h3>
+            <p style="color: var(--text-secondary); line-height: 1.5;">
+                This will permanently delete all your data, playlists, and preferences. 
+                This action cannot be undone.
+            </p>
+            <input type="password" 
+                   id="deletePassword" 
+                   class="dialog-input" 
+                   placeholder="Enter password to confirm"
+                   autocomplete="current-password">
+            <p id="deleteError" style="color: var(--accent); display: none; margin-top: 0.5rem;"></p>
+            <div class="dialog-actions">
+                <button class="secondary-btn" id="cancelDelete">Cancel</button>
+                <button class="delete-btn" id="confirmDelete">Delete Forever</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Dialog -->
+    <div class="notification-backdrop" id="notificationDialog">
+        <div class="notification-content" id="notificationContent">
+            <h3 id="notificationTitle"></h3>
+            <p id="notificationMessage"></p>
+            <button class="secondary-btn" id="closeNotification">OK</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
-       document.addEventListener("DOMContentLoaded", () => {
-    // Firebase Configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyClIhXAaTVmlqhEPxU49C9w9fDkUag-1eQ",
-        authDomain: "vibe-tunes.firebaseapp.com",
-        databaseURL: "https://vibe-tunes-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "vibe-tunes",
-        storageBucket: "vibe-tunes.firebasestorage.app",
-        messagingSenderId: "792892627539",
-        appId: "1:792892627539:web:69817da08d2d4741a404a6",
-        measurementId: "G-7RQD85KP8Z"
-    };
+        document.addEventListener("DOMContentLoaded", () => {
+            // Firebase Configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyClIhXAaTVmlqhEPxU49C9w9fDkUag-1eQ",
+                authDomain: "vibe-tunes.firebaseapp.com",
+                databaseURL: "https://vibe-tunes-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "vibe-tunes",
+                storageBucket: "vibe-tunes.firebasestorage.app",
+                messagingSenderId: "792892627539",
+                appId: "1:792892627539:web:69817da08d2d4741a404a6",
+                measurementId: "G-7RQD85KP8Z"
+            };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = app.auth();
-    const db = app.firestore();
+            // Initialize Firebase
+            const app = firebase.initializeApp(firebaseConfig);
+            const auth = app.auth();
+            const db = app.firestore();
 
-    // Utility Functions
-    const toggleButtonLoading = (button, isLoading) => {
-        button.disabled = isLoading;
-        button.classList.toggle("loading", isLoading);
-    };
+            // Utility Functions
+            const toggleButtonLoading = (button, isLoading) => {
+                button.disabled = isLoading;
+                button.classList.toggle("loading", isLoading);
+            };
 
-    const showAuthForm = (formType) => {
-        document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
-        document.getElementById(`${formType}-form`).style.display = 'block';
-    };
+            const showAuthForm = (formType) => {
+                document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+                document.getElementById(`${formType}-form`).style.display = 'block';
+            };
 
-    // Auth State Management
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => console.log("Auth persistence set to LOCAL"))
-        .catch(error => console.error("Auth persistence error:", error));
+            // Notification System
+            const showNotification = (title, message, type = 'info') => {
+                const dialog = document.getElementById('notificationDialog');
+                const content = document.getElementById('notificationContent');
+                const titleElement = document.getElementById('notificationTitle');
+                const messageElement = document.getElementById('notificationMessage');
 
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("accountDashboard").style.display = "block";
-            document.getElementById("user-email").textContent = user.email;
-            sessionStorage.setItem("userUID", user.uid);
-            loadUserData(user.uid);
-        } else {
-            document.getElementById("auth-container").style.display = "block";
-            document.getElementById("accountDashboard").style.display = "none";
-            sessionStorage.clear();
-            showAuthForm('login');
-        }
-    });
+                titleElement.textContent = title;
+                messageElement.textContent = message;
+                content.className = `notification-content ${type}`;
+                dialog.style.display = 'flex';
+            };
 
-    const loadUserData = (uid) => {
-        db.collection("users").doc(uid).onSnapshot((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                document.getElementById("username").textContent = userData.username || "N/A";
-                document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
-                document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
-                document.getElementById("stored-password").textContent = userData.password ? "********" : "Not Set";
-                
-                if (userData.passwordLastUpdated) {
-                    const timestamp = userData.passwordLastUpdated.toDate();
-                    document.getElementById("password-updated-time").textContent = 
-                        timestamp.toLocaleDateString() + " " + timestamp.toLocaleTimeString();
+            const hideNotification = () => {
+                document.getElementById('notificationDialog').style.display = 'none';
+            };
+
+            document.getElementById('closeNotification').addEventListener('click', hideNotification);
+
+            // Delete Dialog Logic
+            let deleteAttempts = 0;
+            const MAX_ATTEMPTS = 3;
+
+            const showDeleteDialog = () => {
+                document.getElementById('deleteDialog').style.display = 'flex';
+                document.getElementById('deletePassword').focus();
+            };
+
+            const hideDeleteDialog = () => {
+                document.getElementById('deleteDialog').style.display = 'none';
+                document.getElementById('deletePassword').value = '';
+                document.getElementById('deleteError').style.display = 'none';
+            };
+
+            const handleAccountDeletion = async () => {
+                const password = document.getElementById('deletePassword').value;
+                const errorElement = document.getElementById('deleteError');
+                const user = auth.currentUser;
+
+                if (!password) {
+                    errorElement.textContent = 'Please enter your password';
+                    errorElement.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+                    await user.reauthenticateWithCredential(credential);
+                    await db.collection("users").doc(user.uid).delete();
+                    await user.delete();
+                    hideDeleteDialog();
+                    showNotification('Success', 'Account deleted successfully. Goodbye! 😢', 'success');
+                    setTimeout(() => window.location.href = '/', 2000);
+                } catch (error) {
+                    deleteAttempts++;
+                    errorElement.textContent = `Error: ${error.message}`;
+                    errorElement.style.display = 'block';
+                    
+                    if (deleteAttempts >= MAX_ATTEMPTS) {
+                        hideDeleteDialog();
+                        showNotification('Error', 'Too many failed attempts. Please try again later.', 'error');
+                        setTimeout(() => auth.signOut(), 2000);
+                    }
+                }
+            };
+
+            // Event Listeners for Delete Dialog
+            document.getElementById('delete-account-btn').addEventListener('click', showDeleteDialog);
+            document.getElementById('cancelDelete').addEventListener('click', hideDeleteDialog);
+            document.getElementById('confirmDelete').addEventListener('click', handleAccountDeletion);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (window.getComputedStyle(document.getElementById('deleteDialog')).display === 'flex') {
+                        hideDeleteDialog();
+                    }
+                    if (window.getComputedStyle(document.getElementById('notificationDialog')).display === 'flex') {
+                        hideNotification();
+                    }
+                }
+            });
+
+            // Auth State Management
+            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                .then(() => console.log("Auth persistence set to LOCAL"))
+                .catch(error => console.error("Auth persistence error:", error));
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById("auth-container").style.display = "none";
+                    document.getElementById("accountDashboard").style.display = "block";
+                    document.getElementById("user-email").textContent = user.email;
+                    sessionStorage.setItem("userUID", user.uid);
+                    loadUserData(user.uid);
                 } else {
-                    document.getElementById("password-updated-time").textContent = "Never Changed";
+                    document.getElementById("auth-container").style.display = "block";
+                    document.getElementById("accountDashboard").style.display = "none";
+                    sessionStorage.clear();
+                    showAuthForm('login');
                 }
-            }
-        }, (error) => {
-            console.error("Error loading user data:", error);
-            alert("Error loading profile data");
-        });
-    };
-
-    // Authentication Functions
-    const handleGoogleLogin = async () => {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const button = document.getElementById("google-login-btn");
-        toggleButtonLoading(button, true);
-
-        try {
-            const result = await auth.signInWithPopup(provider).catch(async error => {
-                if (error.code === "auth/popup-blocked") {
-                    await auth.signInWithRedirect(provider);
-                    return await auth.getRedirectResult();
-                }
-                throw error;
             });
 
-            const user = result.user;
-            const userRef = db.collection("users").doc(user.uid);
-            const doc = await userRef.get();
-
-            if (!doc.exists) {
-                const firstName = user.displayName?.split(" ")[0] || "User";
-                await userRef.set({
-                    email: user.email,
-                    username: `${firstName}${Math.floor(1000 + Math.random() * 9000)}`,
-                    minutesListened: 0,
-                    songsPlayed: 0,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            const loadUserData = (uid) => {
+                db.collection("users").doc(uid).onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById("username").textContent = userData.username || "N/A";
+                        document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
+                        document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
+                        document.getElementById("stored-password").textContent = userData.password ? "********" : "Not Set";
+                        
+                        if (userData.passwordLastUpdated) {
+                            const timestamp = userData.passwordLastUpdated.toDate();
+                            document.getElementById("password-updated-time").textContent = 
+                                timestamp.toLocaleDateString() + " " + timestamp.toLocaleTimeString();
+                        } else {
+                            document.getElementById("password-updated-time").textContent = "Never Changed";
+                        }
+                    }
+                }, (error) => {
+                    console.error("Error loading user data:", error);
+                    showNotification('Error', 'Error loading profile data', 'error');
                 });
-            }
-        } catch (error) {
-            console.error("Google login error:", error);
-            alert(`Login failed: ${error.message}`);
-        } finally {
-            toggleButtonLoading(button, false);
-        }
-    };
+            };
 
-    const handleEmailLogin = async () => {
-        const email = document.getElementById("login-email").value;
-        const password = document.getElementById("login-password").value;
-        const button = document.getElementById("login-btn");
-        toggleButtonLoading(button, true);
+            // Authentication Functions
+            const handleGoogleLogin = async () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const button = document.getElementById("google-login-btn");
+                toggleButtonLoading(button, true);
 
-        try {
-            await auth.signInWithEmailAndPassword(email, password);
-        } catch (error) {
-            console.error("Login error:", error);
-            alert(error.message);
-        } finally {
-            toggleButtonLoading(button, false);
-        }
-    };
+                try {
+                    const result = await auth.signInWithPopup(provider).catch(async error => {
+                        if (error.code === "auth/popup-blocked") {
+                            await auth.signInWithRedirect(provider);
+                            return await auth.getRedirectResult();
+                        }
+                        throw error;
+                    });
 
-    const handleSignup = async () => {
-        const email = document.getElementById("signup-email").value;
-        const password = document.getElementById("signup-password").value;
-        const username = document.getElementById("signup-username").value.trim();
-        const button = document.getElementById("signup-btn");
-        toggleButtonLoading(button, true);
+                    const user = result.user;
+                    const userRef = db.collection("users").doc(user.uid);
+                    const doc = await userRef.get();
 
-        try {
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            await db.collection("users").doc(userCredential.user.uid).set({
-                email,
-                username,
-                minutesListened: 0,
-                songsPlayed: 0,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    if (!doc.exists) {
+                        const firstName = user.displayName?.split(" ")[0] || "User";
+                        await userRef.set({
+                            email: user.email,
+                            username: `${firstName}${Math.floor(1000 + Math.random() * 9000)}`,
+                            minutesListened: 0,
+                            songsPlayed: 0,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                } catch (error) {
+                    console.error("Google login error:", error);
+                    showNotification('Error', `Login failed: ${error.message}`, 'error');
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            };
+
+            const handleEmailLogin = async () => {
+                const email = document.getElementById("login-email").value;
+                const password = document.getElementById("login-password").value;
+                const button = document.getElementById("login-btn");
+                toggleButtonLoading(button, true);
+
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    console.error("Login error:", error);
+                    showNotification('Error', error.message, 'error');
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            };
+
+            const handleSignup = async () => {
+                const email = document.getElementById("signup-email").value;
+                const password = document.getElementById("signup-password").value;
+                const username = document.getElementById("signup-username").value.trim();
+                const button = document.getElementById("signup-btn");
+                toggleButtonLoading(button, true);
+
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    await db.collection("users").doc(userCredential.user.uid).set({
+                        email,
+                        username,
+                        minutesListened: 0,
+                        songsPlayed: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showNotification('Success', 'Signup successful! Please login.', 'success');
+                    showAuthForm('login');
+                } catch (error) {
+                    console.error("Signup error:", error);
+                    showNotification('Error', error.message, 'error');
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            };
+
+            const handlePasswordUpdate = async () => {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const currentPassword = document.getElementById("current-password").value;
+                const newPassword = document.getElementById("new-password").value;
+                const button = document.getElementById("update-password-btn");
+                toggleButtonLoading(button, true);
+
+                try {
+                    const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+                    await user.reauthenticateWithCredential(credential);
+                    await user.updatePassword(newPassword);
+                    await db.collection("users").doc(user.uid).update({
+                        password: newPassword,
+                        passwordLastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showNotification('Success', 'Password updated successfully!', 'success');
+                } catch (error) {
+                    console.error("Password update error:", error);
+                    showNotification('Error', error.message, 'error');
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            };
+
+            // Event Listeners
+            document.getElementById("login-btn").addEventListener("click", handleEmailLogin);
+            document.getElementById("google-login-btn").addEventListener("click", handleGoogleLogin);
+            document.getElementById("signup-btn").addEventListener("click", handleSignup);
+            document.getElementById("update-password-btn").addEventListener("click", handlePasswordUpdate);
+            document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
+            document.getElementById("forgot-password-link").addEventListener("click", () => {
+                const email = document.getElementById("login-email").value.trim();
+                if (email) {
+                    auth.sendPasswordResetEmail(email)
+                        .then(() => showNotification('Success', 'Password reset email sent!', 'success'))
+                        .catch(error => showNotification('Error', `Error: ${error.message}`, 'error'));
+                }
             });
-            alert("Signup successful! Please login.");
+
+            document.getElementById("show-signup-btn").addEventListener("click", () => showAuthForm('signup'));
+            document.getElementById("show-login-btn").addEventListener("click", () => showAuthForm('login'));
+
+            // Initial Setup
             showAuthForm('login');
-        } catch (error) {
-            console.error("Signup error:", error);
-            alert(error.message);
-        } finally {
-            toggleButtonLoading(button, false);
-        }
-    };
-
-    // Account Management
-    const handlePasswordUpdate = async () => {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const currentPassword = document.getElementById("current-password").value;
-        const newPassword = document.getElementById("new-password").value;
-        const button = document.getElementById("update-password-btn");
-        toggleButtonLoading(button, true);
-
-        try {
-            const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
-            await user.reauthenticateWithCredential(credential);
-            await user.updatePassword(newPassword);
-            await db.collection("users").doc(user.uid).update({
-                password: newPassword,
-                passwordLastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("Password updated successfully!");
-        } catch (error) {
-            console.error("Password update error:", error);
-            alert(error.message);
-        } finally {
-            toggleButtonLoading(button, false);
-        }
-    };
-
-    const handleAccountDeletion = async () => {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        if (!confirm("Permanently delete your account and all data?")) return;
-
-        const password = prompt("Enter password to confirm deletion:");
-        if (!password) return;
-
-        const button = document.getElementById("delete-account-btn");
-        toggleButtonLoading(button, true);
-
-        try {
-            const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
-            await user.reauthenticateWithCredential(credential);
-            await db.collection("users").doc(user.uid).delete();
-            await user.delete();
-            alert("Account deleted successfully!");
-            window.location.href = "/";
-        } catch (error) {
-            console.error("Account deletion error:", error);
-            alert(`Deletion failed: ${error.message}`);
-        } finally {
-            toggleButtonLoading(button, false);
-        }
-    };
-
-    // Event Listeners
-    document.getElementById("login-btn").addEventListener("click", handleEmailLogin);
-    document.getElementById("google-login-btn").addEventListener("click", handleGoogleLogin);
-    document.getElementById("signup-btn").addEventListener("click", handleSignup);
-    document.getElementById("update-password-btn").addEventListener("click", handlePasswordUpdate);
-    document.getElementById("delete-account-btn").addEventListener("click", handleAccountDeletion);
-    document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
-    document.getElementById("forgot-password-link").addEventListener("click", () => {
-        const email = document.getElementById("login-email").value.trim();
-        email && auth.sendPasswordResetEmail(email)
-            .then(() => alert("Password reset email sent!"))
-            .catch(error => alert(`Error: ${error.message}`));
-    });
-
-    document.getElementById("show-signup-btn").addEventListener("click", () => showAuthForm('signup'));
-    document.getElementById("show-login-btn").addEventListener("click", () => showAuthForm('login'));
-
-    // Initial Setup
-    showAuthForm('login');
-});
+        });
     </script>
 
     <footer class="footer">
-     <div class="footer-links">
-        <a href="Terms-Conditions.html">Terms of Service</a>
-        <a href="contact.html">Contact Support</a>
-        <a href="Privacy-Policy.html">Privacy Policy</a>
-     </div>
-    <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
+        <div class="footer-links">
+            <a href="Terms-Conditions.html">Terms of Service</a>
+            <a href="contact.html">Contact Support</a>
+            <a href="Privacy-Policy.html">Privacy Policy</a>
+        </div>
+        <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
     </footer>
-
 </body>
 </html>
