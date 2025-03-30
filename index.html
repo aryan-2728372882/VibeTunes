@@ -62,18 +62,29 @@
     <!-- Navigation Bar -->
     <header>
         <div class="navbar">
-            <!-- Logo on Left -->
             <a href="index.html" class="logo-container">
                 <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
             </a>
-
-            <!-- Navigation Links on Right -->
+    
             <nav class="nav-links">
-                <span id="nav-account"><a href="auth.html">Login</a></span> <!-- Dynamic -->
+                <span id="nav-account"><a href="auth.html">Login</a></span>
+                <span id="notificationIcon" onclick="openNotificationDialog()">🔔
+                    <span id="notificationDot"></span>
+                </span>
             </nav>
         </div>
     </header>
-
+    
+    <!-- Notification Dialog -->
+    <div id="notificationPage">
+        <div class="notification-content">
+            <div id="notificationContainer"></div>
+            <p id="notificationMessage">No new messages.</p>
+            <button onclick="closeNotificationDialog()">Close</button>
+            <button onclick="clearNotifications()">Clear</button>
+        </div>
+    </div>
+    
     <main>
         <input type="text" id="search-bar" placeholder="Search for songs..." oninput="searchSongs(this.value)">
 
