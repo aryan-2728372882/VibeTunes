@@ -88,7 +88,6 @@ function updateUserStats(uid, minutesPlayed) {
         minutesListened: firebase.firestore.FieldValue.increment(minutesPlayed)
     }).then(() => {
         console.log(`Updated: +1 song, +${minutesPlayed} minutes`);
-        showPopup(`Stats updated: +1 song, +${minutesPlayed} minutes`);
     }).catch(error => {
         console.error("Error updating user stats:", error);
         showPopup("Failed to update stats. Retrying in 2 seconds...");
