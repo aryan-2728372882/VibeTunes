@@ -1032,3 +1032,228 @@ footer {
     margin: 0 0 10px 0;
     color: #fff;
 }
+
+/* Queue Panel Styles */
+#queue-panel {
+    position: fixed;
+    bottom: 90px; /* Adjusted to sit just above music player */
+    right: 15px;
+    width: 320px;
+    max-height: 450px;
+    background: rgba(20, 25, 45, 0.95); /* Slightly darker for contrast */
+    border-radius: 12px;
+    box-shadow: 0 10px 35px rgba(147, 51, 234, 0.4);
+    z-index: 1999;
+    overflow-y: auto;
+    padding: 15px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(147, 51, 234, 0.25);
+}
+
+.queue-header h3 {
+    margin: 0;
+    color: #e0e0ff;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba(147, 51, 234, 0.3);
+}
+
+#clear-queue-btn {
+    background: linear-gradient(45deg, #ff5555, #ff7777);
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+#clear-queue-btn:hover {
+    background: linear-gradient(45deg, #ff3333, #ff5555);
+    transform: scale(1.05);
+}
+
+.queue-list {
+    padding: 10px 0;
+}
+
+.queue-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(50, 55, 130, 0.5);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.queue-item:hover {
+    background: rgba(50, 55, 130, 0.7);
+    transform: translateX(5px);
+}
+
+.queue-item.dragging {
+    opacity: 0.6;
+    background: rgba(147, 51, 234, 0.6);
+    transform: scale(0.98);
+}
+
+.queue-thumbnail {
+    width: 45px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.queue-title {
+    flex-grow: 1;
+    color: #e0e0ff;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 4px rgba(147, 51, 234, 0.2);
+}
+
+.remove-queue-btn {
+    background: none;
+    border: none;
+    color: #ff6666;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 5px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.remove-queue-btn:hover {
+    color: #ff8888;
+    transform: scale(1.2);
+}
+
+.no-queue {
+    color: #a0a0ff;
+    text-align: center;
+    padding: 25px 0;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Queue Buttons in Song Items */
+.queue-btn, .play-next-btn {
+    position: absolute;
+    bottom: 12px;
+    background: linear-gradient(45deg, #9333ea, #a5b4fc); /* Gradient for vibrancy */
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: transform 0.2s ease, background 0.3s ease;
+    opacity: 1; /* Always visible */
+    box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
+}
+
+.queue-btn {
+    right: 65px; /* Adjusted spacing */
+}
+
+.play-next-btn {
+    right: 12px;
+}
+
+.queue-btn:hover, .play-next-btn:hover {
+    background: linear-gradient(45deg, #a5b4fc, #9333ea); /* Reverse gradient on hover */
+    transform: scale(1.05);
+}
+
+/* Queue Toggle Button in Music Player */
+#queue-toggle-btn {
+    background: none;
+    border: none;
+    color: #e0e0ff;
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+#queue-toggle-btn:hover {
+    color: #a5b4fc;
+    transform: scale(1.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #queue-panel {
+        width: 100%;
+        right: 0;
+        bottom: 85px; /* Adjusted for mobile music player */
+        max-height: 350px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .queue-header {
+        padding: 8px 12px;
+    }
+
+    .queue-item {
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .queue-thumbnail {
+        width: 35px;
+        height: 35px;
+    }
+
+    .queue-title {
+        font-size: 0.85rem;
+    }
+
+    .queue-btn, .play-next-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    .queue-btn {
+        right: 55px;
+    }
+
+    .play-next-btn {
+        right: 10px;
+    }
+}
+
+.queue-controls {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+
+#close-queue-btn {
+    background: linear-gradient(45deg, #ff5555, #ff7777); /* Matches clear button */
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+#close-queue-btn:hover {
+    background: linear-gradient(45deg, #ff3333, #ff5555);
+    transform: scale(1.05);
+}

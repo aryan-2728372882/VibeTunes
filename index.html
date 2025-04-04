@@ -33,7 +33,6 @@
         // Update Navbar Based on Auth State
         auth.onAuthStateChanged(user => {
             const accountNavItem = document.getElementById("nav-account");
-
             if (user) {
                 console.log("User is logged in:", user.email);
                 accountNavItem.innerHTML = `<a href="auth.html">Account</a>`;
@@ -65,7 +64,6 @@
             <a href="index.html" class="logo-container">
                 <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
             </a>
-    
             <nav class="nav-links">
                 <span id="nav-account"><a href="auth.html">Login</a></span>
                 <span id="notificationIcon" onclick="openNotificationDialog()">🔔
@@ -74,7 +72,7 @@
             </nav>
         </div>
     </header>
-    
+
     <!-- Notification Dialog -->
     <div id="notificationPage">
         <div class="notification-content">
@@ -84,7 +82,7 @@
             <button onclick="clearNotifications()">Clear</button>
         </div>
     </div>
-    
+
     <main>
         <input type="text" id="search-bar" placeholder="Search for songs..." oninput="searchSongs(this.value)">
 
@@ -133,13 +131,25 @@
         <div id="song-list"></div>
     </main>
 
+    <!-- Queue Panel with Close Button -->
+    <div id="queue-panel" style="display: none;">
+        <div class="queue-header">
+            <h3>Queue</h3>
+            <div class="queue-controls">
+                <button id="clear-queue-btn" onclick="clearQueue()">Clear Queue</button>
+                <button id="close-queue-btn" onclick="toggleQueuePanel()">✖ Close</button> <!-- Added Close Button -->
+            </div>
+        </div>
+        <div id="queue-list" class="queue-list"></div>
+    </div>
+
     <!-- Music Player -->
     <div id="music-player">
         <div class="player-info">
             <img id="player-thumbnail" src="" alt="Thumbnail">
             <div>
                 <h4 id="player-title">Song Title</h4>
-                <audio id="audio-player" ontimeupdate="updateSeekBar()" onended="handleSongEnd()"></audio>
+                <audio id="audio-player" ontimeupdate="updateSeekBar()" onended="handleSongEndWithQueue()"></audio>
                 <input type="range" id="seek-bar" value="0" max="100" step="1" oninput="seekSong(this.value)">
             </div>
         </div>
@@ -148,6 +158,7 @@
             <button id="play-pause-btn" onclick="togglePlay()">▶</button>
             <button onclick="nextSong()">⏭</button>
             <button id="repeat-btn" onclick="toggleRepeat()">🔁</button>
+            <button id="queue-toggle-btn">📜</button>
             <span id="volume-percentage"></span>
         </div>
     </div>
@@ -161,7 +172,8 @@
         <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
     </footer>
 
-    <!-- Player Script -->
-    <script src="scripts/player.js"></script> 
+    <!-- Scripts -->
+    <script src="scripts/player.js"></script>
+    <script src="scripts/queue.js"></script>
 </body>
 </html>

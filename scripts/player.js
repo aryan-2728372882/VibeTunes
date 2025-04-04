@@ -434,17 +434,43 @@ function populateSection(containerId, songs, context) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
-    songs.forEach(song => {
+    songs.forEach((song, index) => {
         const songElement = document.createElement('div');
         songElement.classList.add('song-item');
+        // Assign a unique ID to each song element for reference
+        const songId = `${context}-${index}`;
+        songElement.id = songId;
         songElement.innerHTML = `
             <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', '${context}')">
                 <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                 <div class="hover-play">▶</div>
             </div>
             <div class="song-title">${song.title}</div>
+            <button class="queue-btn" data-song-id="${songId}">➕ Queue</button>
+            <button class="play-next-btn" data-song-id="${songId}">⏵ Next</button>
         `;
         container.appendChild(songElement);
+
+        // Store song data in a global object to avoid inline JSON
+        window.songData = window.songData || {};
+        window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
+    });
+
+    // Add event listeners after DOM insertion
+    document.querySelectorAll('.queue-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const songId = btn.getAttribute('data-song-id');
+            const song = window.songData[songId];
+            addToQueue(song);
+        });
+    });
+
+    document.querySelectorAll('.play-next-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const songId = btn.getAttribute('data-song-id');
+            const song = window.songData[songId];
+            addToQueue(song, true);
+        });
     });
 }
 
