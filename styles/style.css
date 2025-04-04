@@ -1150,9 +1150,10 @@ footer {
 }
 
 /* Queue Buttons in Song Items */
-.queue-btn, .play-next-btn {
+.play-next-btn {
     position: absolute;
-    bottom: 12px;
+    top: 12px;
+    right: 12px;
     background: linear-gradient(45deg, #9333ea, #a5b4fc); /* Gradient for vibrancy */
     border: none;
     color: #fff;
@@ -1164,14 +1165,7 @@ footer {
     transition: transform 0.2s ease, background 0.3s ease;
     opacity: 1; /* Always visible */
     box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
-}
-
-.queue-btn {
-    right: 65px; /* Adjusted spacing */
-}
-
-.play-next-btn {
-    right: 12px;
+    z-index: 10; /* Ensure button appears above other elements */
 }
 
 .queue-btn:hover, .play-next-btn:hover {
@@ -1233,6 +1227,7 @@ footer {
     }
 
     .play-next-btn {
+        top: 10px;
         right: 10px;
     }
 }

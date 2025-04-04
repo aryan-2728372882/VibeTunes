@@ -19,8 +19,9 @@ function addToQueue(song, playNext = false) {
         return;
     }
 
+    // Always check for duplicates regardless of playNext flag
     const isDuplicate = songQueue.some(queuedSong => queuedSong.title === song.title && queuedSong.link === song.link);
-    if (isDuplicate && !playNext) {
+    if (isDuplicate) {
         showPopup(`"${song.title}" is already in the queue!`);
         return;
     }
@@ -298,8 +299,13 @@ async function playSong(title, context, retryCount = 0, queuedSong = null) {
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
     if (queueToggleBtn) queueToggleBtn.addEventListener("click", toggleQueuePanel);
-    audioPlayer.removeEventListener("ended", handleSongEnd);
-    audioPlayer.addEventListener("ended", handleSongEndWithQueue);
-    updateQueueUI();
-    console.log("Queue system initialized");
+    const audioPlayer = document.getElementById("audio-player");
+    if (audioPlayer) {
+        audioPlayer.removeEventListener("ended", handleSongEnd);
+        audioPlayer.addEventListener("ended", handleSongEndWithQueue);
+        updateQueueUI();
+        console.log("Queue system initialized");
+    } else {
+        console.error("Audio player element not found in queue.js");
+    }
 });

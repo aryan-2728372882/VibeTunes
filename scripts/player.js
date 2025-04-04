@@ -104,6 +104,121 @@ function showPopup(message) {
     setTimeout(() => popup.remove(), 3000); // Matches CSS animation duration
 }
 
+// Long-press context menu for song tiles
+function setupLongPressEvents(songElement, songId) {
+    let pressTimer;
+    let isLongPress = false;
+    let contextMenu = null;
+    
+    // Create context menu function
+    function createContextMenu() {
+        // Remove any existing context menus
+        document.querySelectorAll('.song-context-menu').forEach(menu => menu.remove());
+        
+        // Create new context menu
+        contextMenu = document.createElement('div');
+        contextMenu.className = 'song-context-menu';
+        contextMenu.innerHTML = `<button class="add-to-queue-btn">Add to Queue</button>`;
+        songElement.appendChild(contextMenu);
+        
+        // Add event listener to the Add to Queue button
+        const addToQueueBtn = contextMenu.querySelector('.add-to-queue-btn');
+        addToQueueBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent triggering other click events
+            const song = window.songData[songId];
+            addToQueue(song);
+            hideContextMenu();
+        });
+        
+        // Add styles to the context menu
+        contextMenu.style.position = 'absolute';
+        contextMenu.style.bottom = '0';
+        contextMenu.style.left = '0';
+        contextMenu.style.right = '0';
+        contextMenu.style.background = 'rgba(0, 0, 0, 0.8)';
+        contextMenu.style.padding = '10px';
+        contextMenu.style.borderRadius = '0 0 10px 10px';
+        contextMenu.style.zIndex = '100';
+        contextMenu.style.display = 'flex';
+        contextMenu.style.justifyContent = 'center';
+        contextMenu.style.animation = 'fadeIn 0.3s ease-in-out';
+        
+        // Add styles to the button
+        addToQueueBtn.style.background = 'linear-gradient(45deg, #9333ea, #a5b4fc)';
+        addToQueueBtn.style.border = 'none';
+        addToQueueBtn.style.color = 'white';
+        addToQueueBtn.style.padding = '8px 15px';
+        addToQueueBtn.style.borderRadius = '5px';
+        addToQueueBtn.style.cursor = 'pointer';
+        addToQueueBtn.style.fontWeight = 'bold';
+        addToQueueBtn.style.fontSize = '14px';
+        
+        // Add a style tag for the animation if it doesn't exist
+        if (!document.getElementById('context-menu-styles')) {
+            const styleTag = document.createElement('style');
+            styleTag.id = 'context-menu-styles';
+            styleTag.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(styleTag);
+        }
+        
+        return contextMenu;
+    }
+    
+    // Hide context menu function
+    function hideContextMenu() {
+        if (contextMenu) {
+            contextMenu.remove();
+            contextMenu = null;
+        }
+    }
+    
+    // Touch/mouse events for long press
+    songElement.addEventListener('mousedown', (e) => {
+        isLongPress = false;
+        pressTimer = setTimeout(() => {
+            isLongPress = true;
+            createContextMenu();
+        }, 2000); // 2 seconds for long press
+    });
+    
+    songElement.addEventListener('touchstart', (e) => {
+        isLongPress = false;
+        pressTimer = setTimeout(() => {
+            isLongPress = true;
+            createContextMenu();
+        }, 2000); // 2 seconds for long press
+    }, { passive: true });
+    
+    // Clear timer on mouse/touch end or move
+    songElement.addEventListener('mouseup', () => {
+        clearTimeout(pressTimer);
+    });
+    
+    songElement.addEventListener('mouseleave', () => {
+        clearTimeout(pressTimer);
+    });
+    
+    songElement.addEventListener('touchend', () => {
+        clearTimeout(pressTimer);
+    });
+    
+    songElement.addEventListener('touchmove', () => {
+        clearTimeout(pressTimer);
+    }, { passive: true });
+    
+    // Handle clicks outside the context menu
+    document.addEventListener('click', (e) => {
+        if (contextMenu && !contextMenu.contains(e.target) && !songElement.contains(e.target)) {
+            hideContextMenu();
+        }
+    });
+}
+
 // Song Lists (unchanged)
 const fixedBhojpuri = [
     {
@@ -446,31 +561,15 @@ function populateSection(containerId, songs, context) {
                 <div class="hover-play">▶</div>
             </div>
             <div class="song-title">${song.title}</div>
-            <button class="queue-btn" data-song-id="${songId}">➕ Queue</button>
-            <button class="play-next-btn" data-song-id="${songId}">⏵ Next</button>
         `;
         container.appendChild(songElement);
 
         // Store song data in a global object to avoid inline JSON
         window.songData = window.songData || {};
         window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
-    });
-
-    // Add event listeners after DOM insertion
-    document.querySelectorAll('.queue-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const songId = btn.getAttribute('data-song-id');
-            const song = window.songData[songId];
-            addToQueue(song);
-        });
-    });
-
-    document.querySelectorAll('.play-next-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const songId = btn.getAttribute('data-song-id');
-            const song = window.songData[songId];
-            addToQueue(song, true);
-        });
+        
+        // Add long-press event listeners for context menu
+        setupLongPressEvents(songElement, songId);
     });
 }
 
@@ -497,6 +596,8 @@ function searchSongs(query) {
         results.forEach(song => {
             const songElement = document.createElement('div');
             songElement.classList.add('song-item');
+            const songId = `search-${song.title}`;
+            songElement.id = songId;
             songElement.innerHTML = `
                 <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', 'search')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
@@ -504,8 +605,15 @@ function searchSongs(query) {
                 </div>
                 <div class="song-title">${song.title}</div>
             `;
+            // Store song data for the search result
+            window.songData = window.songData || {};
+            window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
             searchContainer.appendChild(songElement);
+            
+            // Add long-press event listeners for context menu
+            setupLongPressEvents(songElement, songId);
         });
+        
         currentPlaylist = searchSongsList.filter(song => 
             song.title.toLowerCase().includes(query.toLowerCase())
         );
@@ -901,6 +1009,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function nextSong() {
+    // Check if audio is playing before proceeding
+    if (!audioPlayer.src || audioPlayer.paused) {
+        // If not playing, just queue the next song instead of playing multiple
+        if (currentPlaylist.length > 0) {
+            const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
+            const nextSong = currentPlaylist[nextIndex];
+            // Add to queue but don't add duplicates
+            addToQueue(nextSong, true);
+            showPopup(`Added "${nextSong.title}" to queue`);
+        }
+        return;
+    }
+    
+    // Normal behavior when a song is already playing
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
@@ -962,8 +1084,14 @@ function togglePlay() {
 
 audioPlayer.addEventListener('play', () => {
     if (manualPause) {
-        audioPlayer.pause();
-        console.log("Blocked unwanted play after manual pause.");
+        // Reset manualPause when user explicitly clicks play
+        if (document.activeElement === playPauseBtn) {
+            manualPause = false;
+            console.log("Manual pause reset by user play action");
+        } else {
+            audioPlayer.pause();
+            console.log("Blocked unwanted play after manual pause.");
+        }
     }
 });
 
@@ -992,4 +1120,4 @@ function changeVolume(value) {
     document.getElementById("volume-percentage").textContent = `${value}%`;
 }
 
-console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing'); 
+console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
