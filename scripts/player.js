@@ -951,7 +951,7 @@ function previousSong() {
 function toggleRepeat() {
     repeatMode = (repeatMode + 1) % 3;
     if (repeatBtn) {
-        repeatBtn.textContent = ['🔁', '🔂', '🔄'][repeatMode];
+        repeatBtn.textContent = ['⏹️', '♾️', '➊'][repeatMode];
         repeatBtn.style.color = ['#fff', '#0f0', '#00f'][repeatMode];
     }
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
@@ -1019,7 +1019,7 @@ document.querySelectorAll('.scroll-container').forEach(container => {
 
 function updatePlayPauseButton() {
     if (playPauseBtn) {
-        playPauseBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
+        playPauseBtn.textContent = audioPlayer.paused ? "▶️" : "⏸️"; // Updated symbols
     }
 }
 
