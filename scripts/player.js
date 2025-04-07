@@ -104,121 +104,6 @@ function showPopup(message) {
     setTimeout(() => popup.remove(), 3000); // Matches CSS animation duration
 }
 
-// Long-press context menu for song tiles
-function setupLongPressEvents(songElement, songId) {
-    let pressTimer;
-    let isLongPress = false;
-    let contextMenu = null;
-    
-    // Create context menu function
-    function createContextMenu() {
-        // Remove any existing context menus
-        document.querySelectorAll('.song-context-menu').forEach(menu => menu.remove());
-        
-        // Create new context menu
-        contextMenu = document.createElement('div');
-        contextMenu.className = 'song-context-menu';
-        contextMenu.innerHTML = `<button class="add-to-queue-btn">Add to Queue</button>`;
-        songElement.appendChild(contextMenu);
-        
-        // Add event listener to the Add to Queue button
-        const addToQueueBtn = contextMenu.querySelector('.add-to-queue-btn');
-        addToQueueBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent triggering other click events
-            const song = window.songData[songId];
-            addToQueue(song);
-            hideContextMenu();
-        });
-        
-        // Add styles to the context menu
-        contextMenu.style.position = 'absolute';
-        contextMenu.style.bottom = '0';
-        contextMenu.style.left = '0';
-        contextMenu.style.right = '0';
-        contextMenu.style.background = 'rgba(0, 0, 0, 0.8)';
-        contextMenu.style.padding = '10px';
-        contextMenu.style.borderRadius = '0 0 10px 10px';
-        contextMenu.style.zIndex = '100';
-        contextMenu.style.display = 'flex';
-        contextMenu.style.justifyContent = 'center';
-        contextMenu.style.animation = 'fadeIn 0.3s ease-in-out';
-        
-        // Add styles to the button
-        addToQueueBtn.style.background = 'linear-gradient(45deg, #9333ea, #a5b4fc)';
-        addToQueueBtn.style.border = 'none';
-        addToQueueBtn.style.color = 'white';
-        addToQueueBtn.style.padding = '8px 15px';
-        addToQueueBtn.style.borderRadius = '5px';
-        addToQueueBtn.style.cursor = 'pointer';
-        addToQueueBtn.style.fontWeight = 'bold';
-        addToQueueBtn.style.fontSize = '14px';
-        
-        // Add a style tag for the animation if it doesn't exist
-        if (!document.getElementById('context-menu-styles')) {
-            const styleTag = document.createElement('style');
-            styleTag.id = 'context-menu-styles';
-            styleTag.textContent = `
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            `;
-            document.head.appendChild(styleTag);
-        }
-        
-        return contextMenu;
-    }
-    
-    // Hide context menu function
-    function hideContextMenu() {
-        if (contextMenu) {
-            contextMenu.remove();
-            contextMenu = null;
-        }
-    }
-    
-    // Touch/mouse events for long press
-    songElement.addEventListener('mousedown', (e) => {
-        isLongPress = false;
-        pressTimer = setTimeout(() => {
-            isLongPress = true;
-            createContextMenu();
-        }, 2000); // 2 seconds for long press
-    });
-    
-    songElement.addEventListener('touchstart', (e) => {
-        isLongPress = false;
-        pressTimer = setTimeout(() => {
-            isLongPress = true;
-            createContextMenu();
-        }, 2000); // 2 seconds for long press
-    }, { passive: true });
-    
-    // Clear timer on mouse/touch end or move
-    songElement.addEventListener('mouseup', () => {
-        clearTimeout(pressTimer);
-    });
-    
-    songElement.addEventListener('mouseleave', () => {
-        clearTimeout(pressTimer);
-    });
-    
-    songElement.addEventListener('touchend', () => {
-        clearTimeout(pressTimer);
-    });
-    
-    songElement.addEventListener('touchmove', () => {
-        clearTimeout(pressTimer);
-    }, { passive: true });
-    
-    // Handle clicks outside the context menu
-    document.addEventListener('click', (e) => {
-        if (contextMenu && !contextMenu.contains(e.target) && !songElement.contains(e.target)) {
-            hideContextMenu();
-        }
-    });
-}
-
 // Song Lists (unchanged)
 const fixedBhojpuri = [
     {
@@ -243,7 +128,7 @@ const fixedBhojpuri = [
     },
     {
         "title": "Balma Kadar na Jane",
-        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%B0%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
         "thumbnail": "https://c.saavncdn.com/659/Balma-Kadar-Na-Jane-Bhojpuri-2024-20241022172505-500x500.jpg"
     },
     {
@@ -268,7 +153,7 @@ const fixedBhojpuri = [
     },
     {
         "title": "samastipur jila ha",
-        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A1%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A6%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
         "thumbnail": "https://i.ytimg.com/vi/-EBdpD_aGls/maxresdefault.jpg"
     }
 ];
@@ -559,6 +444,9 @@ function populateSection(containerId, songs, context) {
             <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', '${context}')">
                 <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                 <div class="hover-play">▶</div>
+                <div class="song-actions-toggle">
+                    <button class="song-menu-btn" title="Options">⋮</button>
+                </div>
             </div>
             <div class="song-title">${song.title}</div>
         `;
@@ -568,8 +456,12 @@ function populateSection(containerId, songs, context) {
         window.songData = window.songData || {};
         window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
         
-        // Add long-press event listeners for context menu
-        setupLongPressEvents(songElement, songId);
+        // Add click event for song menu button (3-dot menu)
+        const menuBtn = songElement.querySelector('.song-menu-btn');
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent triggering the play song action
+            showSongMenu(e, songId);
+        });
     });
 }
 
@@ -582,18 +474,30 @@ async function loadSearchSongs() {
 }
 
 function searchSongs(query) {
-    const searchSection = document.getElementById('search-results-container');
-    const searchContainer = searchSection.querySelector('.scroll-container');
-    if (!query.trim()) {
-        searchSection.style.display = 'none';
+    if (!query || query.trim().length < 2) {
+        document.getElementById('search-results-container').style.display = 'none';
         return;
     }
-    const results = searchSongsList
-        .filter(song => song.title.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 10);
+
+    query = query.toLowerCase();
+    let allSongs = [...currentPlaylist, ...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs];
+    // Filter duplicates (same song title) from search
+    let songsHash = {};
+    allSongs.forEach(song => {
+        songsHash[song.title] = song;
+    });
+    allSongs = Object.values(songsHash);
+    
+    const searchSongsList = allSongs.filter(song => 
+        song.title.toLowerCase().includes(query)
+    );
+    
+    const searchContainer = document.querySelector('#search-results-container .scroll-container');
     searchContainer.innerHTML = '';
-    if (results.length) {
-        results.forEach(song => {
+    
+    if (searchSongsList.length > 0) {
+        document.getElementById('search-results-container').style.display = 'block';
+        searchSongsList.forEach(song => {
             const songElement = document.createElement('div');
             songElement.classList.add('song-item');
             const songId = `search-${song.title}`;
@@ -602,26 +506,29 @@ function searchSongs(query) {
                 <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', 'search')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                     <div class="hover-play">▶</div>
+                    <div class="song-actions-toggle">
+                        <button class="song-menu-btn" title="Options">⋮</button>
+                    </div>
                 </div>
                 <div class="song-title">${song.title}</div>
             `;
-            // Store song data for the search result
-            window.songData = window.songData || {};
+            
             window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
             searchContainer.appendChild(songElement);
             
-            // Add long-press event listeners for context menu
-            setupLongPressEvents(songElement, songId);
+            // Add click event for song menu button (3-dot menu)
+            const menuBtn = songElement.querySelector('.song-menu-btn');
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent triggering the play song action
+                showSongMenu(e, songId);
+            });
         });
         
         currentPlaylist = searchSongsList.filter(song => 
-            song.title.toLowerCase().includes(query.toLowerCase())
+            song.title.toLowerCase().includes(query)
         );
-        currentContext = 'search';
-        searchSection.style.display = 'block';
     } else {
-        searchContainer.innerHTML = '<p>No songs found</p>';
-        searchSection.style.display = 'block';
+        document.getElementById('search-results-container').style.display = 'none';
     }
 }
 
@@ -1121,3 +1028,49 @@ function changeVolume(value) {
 }
 
 console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
+
+function showSongMenu(event, songId) {
+    // Remove any existing menus
+    document.querySelectorAll('.song-context-menu').forEach(menu => menu.remove());
+    
+    // Create new menu
+    const contextMenu = document.createElement('div');
+    contextMenu.className = 'song-context-menu';
+    
+    // Position menu near the clicked button
+    const rect = event.target.getBoundingClientRect();
+    contextMenu.style.position = 'fixed';
+    contextMenu.style.top = `${rect.bottom + 5}px`;
+    contextMenu.style.left = `${rect.left}px`;
+    
+    // Add menu options - only Add to Queue and Share as requested
+    contextMenu.innerHTML = `
+        <button class="menu-option add-to-queue-btn">Add to Queue</button>
+        <button class="menu-option share-btn">Share</button>
+    `;
+    
+    // Add event listeners to menu options
+    const addToQueueBtn = contextMenu.querySelector('.add-to-queue-btn');
+    addToQueueBtn.addEventListener('click', () => {
+        const song = window.songData[songId];
+        addToQueue(song);
+        contextMenu.remove();
+    });
+    
+    const shareBtn = contextMenu.querySelector('.share-btn');
+    shareBtn.addEventListener('click', () => {
+        showPopup('Share feature coming soon!');
+        contextMenu.remove();
+    });
+    
+    // Add to document
+    document.body.appendChild(contextMenu);
+    
+    // Close menu when clicking elsewhere
+    document.addEventListener('click', function closeMenu(e) {
+        if (!contextMenu.contains(e.target) && e.target !== event.target) {
+            contextMenu.remove();
+            document.removeEventListener('click', closeMenu);
+        }
+    });
+}

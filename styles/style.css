@@ -144,6 +144,7 @@ main {
     font-weight: 700;
     background: linear-gradient(45deg, #9333ea, #a5b4fc);
     -webkit-background-clip: text;
+    background-clip: text; /* Added standard property for compatibility */
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 10px rgba(147, 51, 234, 0.4);
     padding: 0.3rem;
@@ -268,6 +269,70 @@ main {
 .song-item:hover .hover-play {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Song Actions Toggle Bar */
+.song-actions-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px; /* Reduced width for single button */
+    padding: 8px;
+    background: linear-gradient(270deg, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent);
+    display: flex;
+    justify-content: center; /* Center the single button */
+    align-items: center;
+    z-index: 20;
+    opacity: 1;
+    border-radius: 0 8px 0 0;
+}
+
+/* Only hide on PC/Desktop, but not on mobile */
+@media (min-width: 769px) {
+    .song-actions-toggle {
+        opacity: 0;
+    }
+    
+    .song-item:hover .song-actions-toggle {
+        opacity: 1;
+    }
+}
+
+.song-menu-btn {
+    background: linear-gradient(45deg, #9333ea, #a5b4fc);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px; /* Slightly bigger font */
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.song-menu-btn:hover {
+    transform: scale(1.15);
+    background: linear-gradient(45deg, #a5b4fc, #9333ea);
+}
+
+/* Mobile Adjustments for Song Actions */
+@media (max-width: 768px) {
+    .song-actions-toggle {
+        width: 40px; /* Reduced width for single button */
+        opacity: 1;
+        padding: 5px;
+    }
+    
+    .song-menu-btn {
+        width: 28px; /* Slightly larger for better visibility/tappability on mobile */
+        height: 28px;
+        font-size: 16px;
+    }
 }
 
 /* Search Components */
@@ -558,6 +623,7 @@ footer {
     margin-bottom: 0.5rem;
     background: linear-gradient(45deg, #00ff88, #00b4d8);
     -webkit-background-clip: text;
+    background-clip: text; /* Added standard property for compatibility */
     -webkit-text-fill-color: transparent;
 }
 
@@ -1147,6 +1213,43 @@ footer {
     padding: 25px 0;
     font-size: 1rem;
     opacity: 0.8;
+}
+
+/* Song Context Menu (Dropdown) */
+.song-context-menu {
+    position: fixed;
+    background: rgba(20, 20, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    animation: fadeInScale 0.2s ease-out;
+    min-width: 150px;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.menu-option {
+    background: none;
+    border: none;
+    color: #e0e0ff;
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.2s ease;
+    margin: 2px 0;
+}
+
+.menu-option:hover {
+    background: rgba(147, 51, 234, 0.3);
 }
 
 /* Queue Buttons in Song Items */
