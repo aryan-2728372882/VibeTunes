@@ -877,9 +877,16 @@ initializeNotifications();
 
 // Event Listeners
 audioPlayer.addEventListener("play", () => {
-    console.log("Playback started at:", audioPlayer.currentTime);
-    requestWakeLock();
-    updatePlayPauseButton();
+    if (manualPause) {
+        // Allow automatic play for new songs (currentTime === 0)
+        if (document.activeElement === playPauseBtn || audioPlayer.currentTime === 0) {
+            manualPause = false;
+            console.log("Manual pause reset by user action or new song");
+        } else {
+            audioPlayer.pause();
+            console.log("Blocked unwanted play after manual pause");
+        }
+    }
 });
 
 audioPlayer.addEventListener("pause", () => {
@@ -906,7 +913,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             .catch(err => console.error('Service Worker error:', err));
     }
 
-    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlay);
+    if (playPauseBtn) {
+        playPauseBtn.addEventListener('click', togglePlay);
+    }
     if (seekBar) seekBar.addEventListener('input', () => seekSong(seekBar.value));
     if (nextBtn) nextBtn.addEventListener('click', nextSong);
     if (prevBtn) prevBtn.addEventListener('click', previousSong);
