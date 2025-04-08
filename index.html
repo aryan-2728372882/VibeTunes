@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/style.css">
     <link rel="icon" href="/assets/favicon - Copy.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json" />
     <title>VibeTunes</title>
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: light)">
 
@@ -162,6 +163,14 @@
             <span id="volume-percentage"></span>
         </div>
     </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/scripts/service-worker.js')
+            .then(() => console.log('Service Worker registered'));
+        }
+      </script>
+      
 
     <footer class="footer">
         <div class="footer-links">
