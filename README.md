@@ -1,8 +1,8 @@
-# FutureStream 
+# VibeTunes
 
-FutureStream is a modern, self-hosted music streaming platform with a focus on regional content and phonk music, featuring a responsive UI and robust player controls.
+VibeTunes is a modern, self-hosted music streaming platform with a focus on regional content (Bhojpuri) and phonk music, featuring a responsive UI, robust player controls, and user authentication. The platform allows users to track their listening statistics and manage personalized playlists.
 
-![Demo](assets/favicon%20-%20Copy.ico) *Replace with actual demo image*
+![Demo](assets/VibeTunes%20logo-modified.png) *VibeTunes Logo*
 
 ## ✨ Features
 
@@ -13,8 +13,10 @@ FutureStream is a modern, self-hosted music streaming platform with a focus on r
 - ⏩ Smart song skipping with retry logic
 - 🔍 Real-time search with horizontal scroll
 
-**Content Management**
-- 📁 Local JSON integration for song management
+**User Experience**
+- 👤 Firebase authentication system
+- 📊 Personal listening statistics tracking
+- 📁 Queue management with play next functionality
 - 🖼️ Dynamic thumbnail loading
 - 📲 Responsive mobile-first design
 - 📩 Functional contact form
@@ -25,11 +27,31 @@ FutureStream is a modern, self-hosted music streaming platform with a focus on r
 - ⚡ Performance-optimized loading
 - 📊 Volume percentage display
 - 💾 Persistent player state
+- 🔄 Service worker for offline capabilities
 
 ## 🚀 Installation & Setup
 
 **Basic Usage**
 ```bash
-git clone https://github.com/yourusername/FutureStream.git
-cd FutureStream
+git clone https://github.com/aryan-2728372882/VibeTunes.git
+cd VibeTunes
 # Open index.html in any modern browser
+```
+
+**Firebase Setup**
+1. Create a Firebase project at [firebase.google.com](https://firebase.google.com)
+2. Enable Authentication and Firestore in your Firebase project
+3. Update the Firebase configuration in the index.html file with your own credentials
+
+## 📱 Technologies Used
+
+- HTML5, CSS3, JavaScript
+- Firebase Authentication
+- Firebase Firestore
+- Service Worker for offline capabilities
+- Local JSON data for song management
+
+## 📄 Legal
+
+- [Privacy Policy](Privacy-Policy.html)
+- [Terms & Conditions](Terms-Conditions.html)
