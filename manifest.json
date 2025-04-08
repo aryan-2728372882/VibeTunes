@@ -1,21 +1,36 @@
 {
-    "name": "Your App Name",
-    "short_name": "AppName",
-    "start_url": "/",
+    "name": "VibeTunes - Music with Respect",
+    "short_name": "VibeTunes",
+    "description": "Your personal music streaming app",
+    "start_url": "/index.html",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#4A90E2",
-    "orientation": "portrait",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "orientation": "any",
+    "categories": ["music", "entertainment"],
     "icons": [
       {
         "src": "assets/VibeTunes logo-modified.png",
         "type": "image/png",
-        "sizes": "192x192"
+        "sizes": "192x192",
+        "purpose": "any maskable"
       },
       {
         "src": "assets/VibeTunes logo-modified.png",
         "type": "image/png",
-        "sizes": "512x512"
+        "sizes": "512x512",
+        "purpose": "any maskable"
+      }
+    ],
+    "prefer_related_applications": false,
+    "shortcuts": [
+      {
+        "name": "Play Music",
+        "url": "/index.html",
+        "icons": [{
+          "src": "assets/VibeTunes logo-modified.png",
+          "sizes": "192x192"
+        }]
       }
     ]
   }
