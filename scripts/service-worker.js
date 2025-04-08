@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vibetunes-cache-v1';
+const CACHE_NAME = 'vibetunes-cache-v2';
 const AUDIO_CACHE = 'vibetunes-audio-cache';
 const STATIC_ASSETS = [
     '/',
@@ -12,8 +12,12 @@ const STATIC_ASSETS = [
     '/scripts/queue.js',
     '/scripts/mail.js',
     '/styles/style.css',
+    '/styles/mobile.css',
     '/assets/VibeTunes logo-modified.png',
-    '/assets/favicon - Copy.ico'
+    '/assets/favicon - Copy.ico',
+    '/haryanvi.json',
+    '/phonk.json',
+    '/songs.json'
 ];
 
 self.addEventListener('install', event => {
@@ -44,11 +48,13 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const requestUrl = new URL(event.request.url);
 
-    // Handle offline fallback
+    // Handle offline fallback with improved UX
     if (!navigator.onLine) {
         if (event.request.mode === 'navigate') {
             event.respondWith(
-                caches.match('/index.html')
+                caches.match('/index.html').then(response => {
+                    return response || new Response('You are offline. Please check your internet connection.');
+                })
             );
             return;
         }
