@@ -1,5 +1,7 @@
 # VibeTunes
 
+[![Website](https://img.shields.io/badge/Visit-VibeTunes-brightgreen)](https://vibe-tunes.vercel.app/)
+
 VibeTunes is a modern, self-hosted music streaming platform with a focus on regional content (Bhojpuri) and phonk music, featuring a responsive UI, robust player controls, and user authentication. The platform allows users to track their listening statistics and manage personalized playlists.
 
 ![Demo](assets/VibeTunes%20logo-modified.png) *VibeTunes Logo*
@@ -29,7 +31,13 @@ VibeTunes is a modern, self-hosted music streaming platform with a focus on regi
 - 💾 Persistent player state
 - 🔄 Service worker for offline capabilities
 - 🔗 Share songs with playable links (no login required)
- 
+- ⬇️ Direct song download to device from context menu
+
+## 🚀 Recent Updates
+
+- **Direct Download Feature**: Added a download button to the song context menu, enabling users to save songs directly to their devices without storing them on the website.
+- **Removed Downloads Page**: Eliminated the dedicated downloads page to streamline the user experience, focusing on direct downloads.
+
 ## 🚀 Installation & Setup
 
 **Basic Usage**
