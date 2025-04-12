@@ -2,7 +2,7 @@
 
 // Function to add download button to context menu
 function addDownloadButtonToMenu() {
-    const contextMenus = document.querySelectorAll('.context-menu');
+    const contextMenus = document.querySelectorAll('.context-menu:not([data-download-added="true"])');
     contextMenus.forEach(menu => {
         // Check if download button already exists to avoid duplicates
         if (menu.querySelector('.download-btn')) return;
@@ -20,6 +20,8 @@ function addDownloadButtonToMenu() {
         } else {
             menu.appendChild(downloadBtn);
         }
+        // Mark menu as processed to prevent duplicate processing
+        menu.setAttribute('data-download-added', 'true');
     });
 }
 

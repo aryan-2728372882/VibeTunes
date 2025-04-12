@@ -196,7 +196,7 @@
     <header>
         <div class="navbar">
             <a href="index.html" class="logo-container">
-                <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
+                <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo" loading="lazy">
             </a>
             <nav class="nav-links">
                 <span><a href="index.html">Home</a></span>
@@ -216,7 +216,7 @@
 
     <!-- Music Player - Structure copied from index.html -->
     <div id="music-player">
-        <img id="player-thumbnail" src="" alt="Thumbnail" onclick="togglePlay()" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 10px; display: none;">
+        <img id="player-thumbnail" src="" loading="lazy" alt="Thumbnail" onclick="togglePlay()" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 10px; display: none;">
         <span id="player-title">No song selected</span>
         <audio id="audio-player" preload="metadata"></audio>
         <div class="player-controls">
@@ -237,6 +237,7 @@
         <p style="margin-top: 1.5rem; opacity: 0.8;"> 2025 VibeTunes - Music with Respect</p>
     </footer>
 
+    <script src="scripts/utils.js"></script>
     <script src="scripts/shared.js"></script>
 </body>
 </html>

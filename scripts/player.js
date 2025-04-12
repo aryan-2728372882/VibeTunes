@@ -1112,7 +1112,7 @@ function downloadSong(songId) {
 
 // Function to generate a shareable link
 function generateShareLink(songId) {
-    const song = window.songData ? window.songData[songId] : (songs ? songs.find(s => s.id === songId) : null);
+    const song = getSongData(songId);
     if (!song) {
         showPopup("Song not found for sharing.");
         return;
@@ -1123,13 +1123,12 @@ function generateShareLink(songId) {
     // Construct the shareable link
     const shareLink = `${window.location.origin}/shared.html?song=${encodedSong}`;
     
-    // Copy to clipboard
-    navigator.clipboard.writeText(shareLink).then(() => {
-        showPopup("Share link copied to clipboard!");
-    }, () => {
-        showPopup("Failed to copy link. Please try manually.");
-        console.error("Clipboard copy failed");
-    });
+    // Copy to clipboard with fallback
+    copyToClipboard(shareLink, "Share link copied to clipboard!", "Failed to copy link.");
     
     console.log(`Generated share link: ${shareLink}`);
+}
+
+function getSongData(songId) {
+    return window.songData && window.songData[songId];
 }
