@@ -767,7 +767,7 @@ async function fetchLatestTelegramUpdates() {
             notificationContainer.innerHTML = `
                 <div class="no-notifications">
                     <svg viewBox="0 0 24 24" style="width:48px;height:48px;margin-bottom:10px;opacity:0.5">
-                        <path fill="currentColor" d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V8L12,13L20,8V18M20,6L12,11L4,6V6H20V6Z"/>
+                        <path fill="currentColor" d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,6L12,11L4,6V6H20V6Z"/>
                     </svg>
                     <p>No announcements available at this time.</p>
                 </div>
@@ -1052,10 +1052,11 @@ function showSongMenu(event, songId) {
     contextMenu.style.top = `${rect.bottom + 5}px`;
     contextMenu.style.left = `${rect.left}px`;
     
-    // Add menu options - only Add to Queue and Share as requested
+    // Add menu options - only Add to Queue, Share, and Download as requested
     contextMenu.innerHTML = `
         <button class="menu-option add-to-queue-btn">Add to Queue</button>
         <button class="menu-option share-btn">Share</button>
+        <button class="menu-option download-btn">Download</button>
     `;
     
     // Add event listeners to menu options
@@ -1072,6 +1073,12 @@ function showSongMenu(event, songId) {
         contextMenu.remove();
     });
     
+    const downloadBtn = contextMenu.querySelector('.download-btn');
+    downloadBtn.addEventListener('click', () => {
+        downloadSong(songId);
+        contextMenu.remove();
+    });
+    
     // Add to document
     document.body.appendChild(contextMenu);
     
@@ -1084,9 +1091,28 @@ function showSongMenu(event, songId) {
     });
 }
 
+// Function to download a song
+function downloadSong(songId) {
+    console.log('Downloading song with ID:', songId);
+    // Try window.songData first, then fall back to a global songs array if available
+    const song = window.songData ? window.songData[songId] : (songs ? songs.find(s => s.id === songId) : null);
+    if (!song || !song.link) {
+        showPopup('Error: Song data not found or no link available.');
+        return;
+    }
+
+    const link = document.createElement('a');
+    link.href = song.link;
+    link.download = song.title ? song.title + '.mp3' : 'song.mp3'; // Fallback filename if title is missing
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showPopup('Download started: ' + (song.title || 'Unknown Song'));
+}
+
 // Function to generate a shareable link
 function generateShareLink(songId) {
-    const song = window.songData[songId];
+    const song = window.songData ? window.songData[songId] : (songs ? songs.find(s => s.id === songId) : null);
     if (!song) {
         showPopup("Song not found for sharing.");
         return;

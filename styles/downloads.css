@@ -1,0 +1,24 @@
+/* downloads.css */
+
+/* Styling for download button in context menu */
+.download-btn {
+    background-color: #1ed760 !important;
+    color: #000 !important;
+}
+
+.download-btn:hover {
+    background-color: #1fdf64 !important;
+}
+
+/* Additional styling for downloads page */
+.download-item {
+    transition: background-color 0.3s ease;
+}
+
+.download-item:hover {
+    background-color: #2a2a2a;
+}
+
+.download-details button {
+    transition: background-color 0.3s ease;
+}

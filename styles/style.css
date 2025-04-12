@@ -1252,6 +1252,15 @@ footer {
     background: rgba(147, 51, 234, 0.3);
 }
 
+.download-btn {
+    background-color: #1ed760;
+    color: #000;
+}
+
+.download-btn:hover {
+    background-color: #1fdf64;
+}
+
 /* Queue Buttons in Song Items */
 .play-next-btn {
     position: absolute;
