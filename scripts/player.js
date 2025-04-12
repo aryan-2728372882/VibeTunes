@@ -128,7 +128,7 @@ const fixedBhojpuri = [
     },
     {
         "title": "Balma Kadar na Jane",
-        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%B0%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
         "thumbnail": "https://c.saavncdn.com/659/Balma-Kadar-Na-Jane-Bhojpuri-2024-20241022172505-500x500.jpg"
     },
     {
@@ -153,7 +153,7 @@ const fixedBhojpuri = [
     },
     {
         "title": "samastipur jila ha",
-        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A6%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A1%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
         "thumbnail": "https://i.ytimg.com/vi/-EBdpD_aGls/maxresdefault.jpg"
     }
 ];
@@ -578,6 +578,37 @@ async function playSong(title, context, retryCount = 0) {
         clearAudioCache();
         requestWakeLock();
         updateProgress();
+        
+        // Track the song in Recently Played
+        const songId = `${context}-${currentSongIndex}`;
+        if (typeof addToRecentlyPlayed === 'function') {
+            addToRecentlyPlayed(songId, song.title, song.thumbnail);
+        } else if (typeof addToRecentlyPlayedLocal === 'function') {
+            addToRecentlyPlayedLocal(songId);
+        }
+        
+        // Update Recently Played display
+        if (typeof displayRecentlyPlayed === 'function') {
+            setTimeout(displayRecentlyPlayed, 500);
+        }
+        
+        // Add ended event listener to track when song completes
+        audioPlayer.addEventListener('ended', function onSongEnded() {
+            // Track the song again to ensure it's in Recently Played
+            if (typeof addToRecentlyPlayed === 'function') {
+                addToRecentlyPlayed(songId, song.title, song.thumbnail);
+            } else if (typeof addToRecentlyPlayedLocal === 'function') {
+                addToRecentlyPlayedLocal(songId);
+            }
+            
+            // Update Recently Played display
+            if (typeof displayRecentlyPlayed === 'function') {
+                setTimeout(displayRecentlyPlayed, 500);
+            }
+            
+            // Remove this listener to avoid duplicates
+            audioPlayer.removeEventListener('ended', onSongEnded);
+        });
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
         document.querySelector(".popup-notification")?.remove();
@@ -767,7 +798,7 @@ async function fetchLatestTelegramUpdates() {
             notificationContainer.innerHTML = `
                 <div class="no-notifications">
                     <svg viewBox="0 0 24 24" style="width:48px;height:48px;margin-bottom:10px;opacity:0.5">
-                        <path fill="currentColor" d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,6L12,11L4,6V6H20V6Z"/>
+                        <path fill="currentColor" d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V8L12,13L20,8V18M20,6L12,11L4,6V6H20V6Z"/>
                     </svg>
                     <p>No announcements available at this time.</p>
                 </div>
@@ -1052,7 +1083,7 @@ function showSongMenu(event, songId) {
     contextMenu.style.top = `${rect.bottom + 5}px`;
     contextMenu.style.left = `${rect.left}px`;
     
-    // Add menu options - only Add to Queue, Share, and Download as requested
+    // Add menu options - only Add to Queue and Share as requested
     contextMenu.innerHTML = `
         <button class="menu-option add-to-queue-btn">Add to Queue</button>
         <button class="menu-option share-btn">Share</button>

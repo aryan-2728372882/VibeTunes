@@ -101,3 +101,27 @@ function fallbackCopy(text) {
     }
     document.body.removeChild(textArea);
 }
+
+// Add to recently played in localStorage (fallback)
+function addToRecentlyPlayedLocal(songId) {
+    if (!songId) return;
+    
+    const RECENTLY_PLAYED_KEY = 'vibeTunes_recentlyPlayed';
+    
+    // Get current recently played list
+    let recentlyPlayed = JSON.parse(localStorage.getItem(RECENTLY_PLAYED_KEY)) || [];
+    
+    // Remove the song if it's already in the list
+    recentlyPlayed = recentlyPlayed.filter(id => id !== songId);
+    
+    // Add the song to the beginning of the list
+    recentlyPlayed.unshift(songId);
+    
+    // Keep only the most recent songs
+    if (recentlyPlayed.length > 10) {
+        recentlyPlayed = recentlyPlayed.slice(0, 10);
+    }
+    
+    // Save back to localStorage
+    localStorage.setItem(RECENTLY_PLAYED_KEY, JSON.stringify(recentlyPlayed));
+}
