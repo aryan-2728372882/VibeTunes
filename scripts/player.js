@@ -1068,7 +1068,7 @@ function showSongMenu(event, songId) {
     
     const shareBtn = contextMenu.querySelector('.share-btn');
     shareBtn.addEventListener('click', () => {
-        showPopup('Share feature coming soon!');
+        generateShareLink(songId);
         contextMenu.remove();
     });
     
@@ -1082,4 +1082,28 @@ function showSongMenu(event, songId) {
             document.removeEventListener('click', closeMenu);
         }
     });
+}
+
+// Function to generate a shareable link
+function generateShareLink(songId) {
+    const song = window.songData[songId];
+    if (!song) {
+        showPopup("Song not found for sharing.");
+        return;
+    }
+    
+    // Encode the song details to create a URL-friendly string
+    const encodedSong = encodeURIComponent(JSON.stringify(song));
+    // Construct the shareable link
+    const shareLink = `${window.location.origin}/shared.html?song=${encodedSong}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareLink).then(() => {
+        showPopup("Share link copied to clipboard!");
+    }, () => {
+        showPopup("Failed to copy link. Please try manually.");
+        console.error("Clipboard copy failed");
+    });
+    
+    console.log(`Generated share link: ${shareLink}`);
 }

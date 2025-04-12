@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="icon" href="/assets/favicon - Copy.ico" type="image/x-icon">
+    <title>VibeTunes - Shared Song</title>
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: light)">
+    <style>
+        body {
+            padding-bottom: 80px; /* Space for the fixed player */
+        }
+        /* Responsive CSS for shared song thumbnail */
+        .song-item img.thumbnail {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .song-item img.thumbnail {
+                max-height: 200px;
+            }
+        }
+        @media (max-width: 480px) {
+            .song-item img.thumbnail {
+                max-height: 150px;
+            }
+        }
+        .song-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .song-details {
+            margin-top: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        /* Music Player Styles - Copied from main style.css */
+        #music-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+            height: 80px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+        
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 250px;
+            flex-shrink: 1;
+        }
+        
+        #player-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-grow: 1;
+            justify-content: center;
+        }
+        
+        .player-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: opacity 0.3s;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .player-controls button:hover {
+            opacity: 0.8;
+        }
+        
+        #seek-bar {
+            flex-grow: 1;
+            height: 4px;
+            margin: 0 1rem;
+            accent-color: #9333ea;
+        }
+        
+        /* Mobile Music Player Fix */
+        @media (max-width: 768px) {
+            #music-player {
+                flex-wrap: nowrap;
+                padding: 0.5rem 0.5rem;
+                gap: 0.5rem;
+                height: 80px;
+                max-width: 412px;
+                z-index: 2000;
+            }
+            
+            .player-info {
+                flex-direction: row;
+                min-width: 0;
+                gap: 0.3rem;
+                flex-shrink: 1;
+                max-width: 150px;
+            }
+            
+            #player-thumbnail {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .player-controls {
+                flex-grow: 0;
+                gap: 1rem;
+                justify-content: flex-start;
+                margin-left: 0;
+                padding-right: 0;
+            }
+            
+            .player-controls button {
+                font-size: 1.5rem;
+                padding: 0.4rem;
+                width: 30px;
+                height: 30px;
+            }
+            
+            #seek-bar {
+                position: absolute;
+                top: 5px;
+                left: 0;
+                right: 0;
+                width: 100%;
+                margin: 0;
+                height: 6px;
+                max-width: 412px;
+                background: rgba(255, 255, 255, 0.3);
+                accent-color: #9333ea;
+            }
+            
+            .player-info .song-title {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 90px;
+                font-size: 0.85rem;
+                position: static;
+                background: none;
+                padding: 0;
+                color: inherit;
+            }
+        }
+        
+        .footer {
+            margin-bottom: 0;
+            padding-bottom: 80px;
+        }
+        /* Popup notification */
+        .popup-notification {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <a href="index.html" class="logo-container">
+                <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
+            </a>
+            <nav class="nav-links">
+                <span><a href="index.html">Home</a></span>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h2>Shared Song</h2>
+        <div id="shared-song-container" class="song-section">
+            <p id="loading-message">Loading shared song...</p>
+        </div>
+    </main>
+
+    <!-- Music Player - Structure copied from index.html -->
+    <div id="music-player">
+        <img id="player-thumbnail" src="" alt="Thumbnail" onclick="togglePlay()" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 10px; display: none;">
+        <span id="player-title">No song selected</span>
+        <audio id="audio-player" preload="metadata"></audio>
+        <div class="player-controls">
+            <button disabled>⏮️</button>
+            <button id="play-pause-btn">▶️</button>
+            <button disabled>⏭️</button>
+            <button id="repeat-btn" style="opacity: 0.5;">🔁</button>
+        </div>
+        <input type="range" id="seek-bar" value="0" style="width: 100%;">
+    </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="Terms-Conditions.html">Terms of Service</a>
+            <a href="contact.html">Contact Support</a>
+            <a href="Privacy-Policy.html">Privacy Policy</a>
+        </div>
+        <p style="margin-top: 1.5rem; opacity: 0.8;"> 2025 VibeTunes - Music with Respect</p>
+    </footer>
+
+    <script src="scripts/shared.js"></script>
+</body>
+</html>

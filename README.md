@@ -28,7 +28,8 @@ VibeTunes is a modern, self-hosted music streaming platform with a focus on regi
 - 📊 Volume percentage display
 - 💾 Persistent player state
 - 🔄 Service worker for offline capabilities
-
+- 🔗 Share songs with playable links (no login required)
+ 
 ## 🚀 Installation & Setup
 
 **Basic Usage**
