@@ -104,7 +104,7 @@ function showPopup(message) {
     setTimeout(() => popup.remove(), 3000); // Matches CSS animation duration
 }
 
-// Song Lists (unchanged)
+// Song Lists
 const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
@@ -721,22 +721,20 @@ let notificationDot = document.getElementById("notificationDot");
 let notificationSeen = false;
 let clearedMessageIds = new Set();
 
-// ✅ New: First visit tracking for user-specific filtering
+// First visit tracking for user-specific filtering
 if (!localStorage.getItem('userFirstVisit')) {
     localStorage.setItem('userFirstVisit', Math.floor(Date.now() / 1000));
 }
 const userFirstVisit = parseInt(localStorage.getItem('userFirstVisit'));
 
-// ✅ Original element checks remain unchanged
 if (!notificationContainer) {
-    console.error("❌ Error: #notificationContainer not found in the DOM.");
+    console.error("Error: #notificationContainer not found in the DOM.");
 }
 
 if (!notificationDot) {
-    console.error("❌ Error: #notificationDot not found in the DOM.");
+    console.error("Error: #notificationDot not found in the DOM.");
 }
 
-// ✅ Enhanced fetch function with user-specific filtering
 async function fetchLatestTelegramUpdates() {
     if (!notificationContainer) return;
 
@@ -757,13 +755,10 @@ async function fetchLatestTelegramUpdates() {
                     const currentTime = Math.floor(Date.now() / 1000);
                     const sevenDays = 7 * 24 * 60 * 60;
 
-                    // ✅ New: Skip messages from before user's first visit
                     if (messageTime < userFirstVisit) return;
 
-                    // Original clearance check
                     if (clearedMessageIds.has(messageId)) return;
 
-                    // Original auto-delete logic
                     if (currentTime - messageTime > sevenDays) {
                         deleteTelegramMessage(messageId);
                         clearedMessageIds.add(messageId);
@@ -772,7 +767,6 @@ async function fetchLatestTelegramUpdates() {
 
                     activeMessageCount++;
                     
-                    // Original announcement creation
                     const announcementSection = document.createElement("section");
                     announcementSection.classList.add("notification-box");
                     announcementSection.setAttribute('data-message-id', messageId);
@@ -793,7 +787,6 @@ async function fetchLatestTelegramUpdates() {
             });
         }
 
-        // Original empty state handling
         if (activeMessageCount === 0) {
             notificationContainer.innerHTML = `
                 <div class="no-notifications">
@@ -809,7 +802,7 @@ async function fetchLatestTelegramUpdates() {
             if (!notificationSeen && notificationDot) notificationDot.style.display = "block";
         }
     } catch (error) {
-        console.error("❌ Error fetching Telegram updates:", error);
+        console.error("Error fetching Telegram updates:", error);
         notificationContainer.innerHTML = `
             <div class="error-notification">
                 <p>Unable to fetch announcements. Please try again later.</p>
@@ -818,7 +811,6 @@ async function fetchLatestTelegramUpdates() {
     }
 }
 
-// ✅ Enhanced clearance system
 function clearNotifications() {
     if (notificationContainer) {
         const messageElements = notificationContainer.querySelectorAll('.notification-box');
@@ -842,7 +834,6 @@ function clearNotifications() {
             </div>
         `;
         
-        // Store with user-specific key
         localStorage.setItem('userClearedMessages', JSON.stringify([...clearedMessageIds]));
         showNotificationPopup("Notifications cleared permanently for your account");
     }
@@ -850,9 +841,7 @@ function clearNotifications() {
     markAsSeen();
 }
 
-// ✅ Modified initialization
 function initializeNotifications() {
-    // Load user-specific cleared messages
     const savedClearedIds = localStorage.getItem('userClearedMessages');
     if (savedClearedIds) {
         clearedMessageIds = new Set(JSON.parse(savedClearedIds));
@@ -860,8 +849,6 @@ function initializeNotifications() {
     
     fetchLatestTelegramUpdates();
 }
-
-// ✅ All original functions remain unchanged below
 
 function markAsSeen() {
     if (notificationDot) notificationDot.style.display = "none";
@@ -882,7 +869,6 @@ function closeNotificationDialog() {
 }
 
 function showNotificationPopup(message) {
-    // Your existing popup implementation
     showPopup(message);
 }
 
@@ -894,22 +880,19 @@ async function deleteTelegramMessage(messageId) {
             body: JSON.stringify({ chat_id: chat_id, message_id: messageId })
         });
         const result = await response.json();
-        if (!result.ok) console.error("❌ Delete failed:", result);
+        if (!result.ok) console.error("Delete failed:", result);
     } catch (error) {
-        console.error("❌ Delete error:", error);
+        console.error("Delete error:", error);
     }
 }
 
-// Original interval setup
 setInterval(fetchLatestTelegramUpdates, 30000);
 
-// Initialize
 initializeNotifications();
 
 // Event Listeners
 audioPlayer.addEventListener("play", () => {
     if (manualPause) {
-        // Allow automatic play for new songs (currentTime === 0)
         if (document.activeElement === playPauseBtn || audioPlayer.currentTime === 0) {
             manualPause = false;
             console.log("Manual pause reset by user action or new song");
@@ -956,20 +939,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function nextSong() {
-    // Check if audio is playing before proceeding
     if (!audioPlayer.src || audioPlayer.paused) {
-        // If not playing, just queue the next song instead of playing multiple
         if (currentPlaylist.length > 0) {
             const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
             const nextSong = currentPlaylist[nextIndex];
-            // Add to queue but don't add duplicates
             addToQueue(nextSong, true);
             showPopup(`Added "${nextSong.title}" to queue`);
         }
         return;
     }
     
-    // Normal behavior when a song is already playing
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
@@ -987,15 +966,6 @@ function toggleRepeat() {
     }
     showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
     console.log("Repeat mode changed to:", repeatMode);
-}
-
-function showPopup(message) {
-    console.log("Showing popup with message:", message);
-    const popup = document.createElement("div");
-    popup.className = "popup-notification";
-    popup.textContent = message;
-    document.body.appendChild(popup);
-    setTimeout(() => popup.remove(), 3000);
 }
 
 function updatePlayerUI(song) {
@@ -1031,7 +1001,6 @@ function togglePlay() {
 
 audioPlayer.addEventListener('play', () => {
     if (manualPause) {
-        // Reset manualPause when user explicitly clicks play
         if (document.activeElement === playPauseBtn) {
             manualPause = false;
             console.log("Manual pause reset by user play action");
@@ -1050,7 +1019,7 @@ document.querySelectorAll('.scroll-container').forEach(container => {
 
 function updatePlayPauseButton() {
     if (playPauseBtn) {
-        playPauseBtn.textContent = audioPlayer.paused ? "▶️" : "⏸️"; // Updated symbols
+        playPauseBtn.textContent = audioPlayer.paused ? "▶️" : "⏸️";
     }
 }
 
@@ -1070,27 +1039,21 @@ function changeVolume(value) {
 console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
 
 function showSongMenu(event, songId) {
-    // Remove any existing menus
     document.querySelectorAll('.song-context-menu').forEach(menu => menu.remove());
     
-    // Create new menu
     const contextMenu = document.createElement('div');
     contextMenu.className = 'song-context-menu';
     
-    // Position menu near the clicked button
     const rect = event.target.getBoundingClientRect();
     contextMenu.style.position = 'fixed';
     contextMenu.style.top = `${rect.bottom + 5}px`;
     contextMenu.style.left = `${rect.left}px`;
     
-    // Add menu options - only Add to Queue and Share as requested
     contextMenu.innerHTML = `
         <button class="menu-option add-to-queue-btn">Add to Queue</button>
         <button class="menu-option share-btn">Share</button>
-        <button class="menu-option download-btn">Download</button>
     `;
     
-    // Add event listeners to menu options
     const addToQueueBtn = contextMenu.querySelector('.add-to-queue-btn');
     addToQueueBtn.addEventListener('click', () => {
         const song = window.songData[songId];
@@ -1104,16 +1067,8 @@ function showSongMenu(event, songId) {
         contextMenu.remove();
     });
     
-    const downloadBtn = contextMenu.querySelector('.download-btn');
-    downloadBtn.addEventListener('click', () => {
-        downloadSong(songId);
-        contextMenu.remove();
-    });
-    
-    // Add to document
     document.body.appendChild(contextMenu);
     
-    // Close menu when clicking elsewhere
     document.addEventListener('click', function closeMenu(e) {
         if (!contextMenu.contains(e.target) && e.target !== event.target) {
             contextMenu.remove();
@@ -1122,26 +1077,6 @@ function showSongMenu(event, songId) {
     });
 }
 
-// Function to download a song
-function downloadSong(songId) {
-    console.log('Downloading song with ID:', songId);
-    // Try window.songData first, then fall back to a global songs array if available
-    const song = window.songData ? window.songData[songId] : (songs ? songs.find(s => s.id === songId) : null);
-    if (!song || !song.link) {
-        showPopup('Error: Song data not found or no link available.');
-        return;
-    }
-
-    const link = document.createElement('a');
-    link.href = song.link;
-    link.download = song.title ? song.title + '.mp3' : 'song.mp3'; // Fallback filename if title is missing
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showPopup('Download started: ' + (song.title || 'Unknown Song'));
-}
-
-// Function to generate a shareable link
 function generateShareLink(songId) {
     const song = getSongData(songId);
     if (!song) {
@@ -1149,12 +1084,9 @@ function generateShareLink(songId) {
         return;
     }
     
-    // Encode the song details to create a URL-friendly string
     const encodedSong = encodeURIComponent(JSON.stringify(song));
-    // Construct the shareable link
     const shareLink = `${window.location.origin}/shared.html?song=${encodedSong}`;
     
-    // Copy to clipboard with fallback
     copyToClipboard(shareLink, "Share link copied to clipboard!", "Failed to copy link.");
     
     console.log(`Generated share link: ${shareLink}`);
