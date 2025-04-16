@@ -202,7 +202,7 @@ const fixedPhonk = [
     {
         "title": "Slay",
         "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/SLAY!.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/cpVgKG-5EK4/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGBMgGSh_MA8=&rs=AOn4CLBas-BI0W9ds6L03EMbJbrTu7meCw"
+        "thumbnail": "https://i.ytimg.com/vi/GOz19fuuZ8g/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGH8gEyh5MA8=&rs=AOn4CLBJoXKWv-g1K0zNg1Xxp93d1jviQg"
     },
     {
         "title": "DERNIERE DANCE FUNK",
