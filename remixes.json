@@ -226,5 +226,11 @@
         "thumbnail": "https://img.youtube.com/vi/Y051I06T3-E/default.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//AAYEGA%20MAZA%20AB%20BARSAT%20KA.mp3",
         "keywords": ["aayega", "maza", "barsat", "remix", "mc", "stan", "emiway"]
+    },
+    {
+        "title": "Tip Tip Barsa Paani",
+        "thumbnail": "https://img.youtube.com/vi/2l_vfFUZs6I/default.jpg",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Tip%20Tip%20Barsa%20Pani.mp3",
+        "keywords": ["tip", "tip", "barsa", "paani", "remix", "dj", "manik", "akshay"]
     }
 ]
