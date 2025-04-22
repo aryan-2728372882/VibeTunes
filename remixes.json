@@ -175,31 +175,31 @@
     },
     {
         "title": "Sau Tarah Ke",
-        "thumbnail": "",
+        "thumbnail": "https://c.saavncdn.com/231/Dishoom-Hindi-2016-500x500.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Sau%20Tarah%20ke.mp3",
         "keywords": ["sau", "tarah", "ke", "remix", "dj", "aaditya", "prince"]
     },
     {
         "title": "Nadiyon Paar",
-        "thumbnail": "",
+        "thumbnail": "https://c.saavncdn.com/505/Nadiyon-Paar-Let-the-Music-Play-Again-From-Roohi--Hindi-2021-20210303125809-500x500.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Nadiyon%20Paar.mp3",
         "keywords": ["nadiyon", "paar", "remix", "roohi", "shamur", "dj", "purvish"]
     },
     {
         "title": "Aankhon Aankhon",
-        "thumbnail": "",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/Rz4W8vKxD5/z4W8lRDJWx/size_m.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Aankhon%20Aankhon.mp3",
         "keywords": ["aankhon", "remix", "yo", "honey", "singh", "bhaag", "johnny"]
     },
     {
         "title": "Barbadiyan",
-        "thumbnail": "",
+        "thumbnail": "https://c.saavncdn.com/408/Shiddat-Hindi-2021-20210922172609-500x500.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Barbadiyan.mp3",
         "keywords": ["barbadiyan", "remix", "dj", "lalit", "shiddat", "sunny"]
     },
     {
         "title": "Nachange Saari Raat",
-        "thumbnail": "",
+        "thumbnail": "https://lyricsraag.com/wp-content/uploads/2016/05/Pulkit-SamratYami-Gautam.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Nachange%20Saari%20Raat.mp3",
         "keywords": ["nachange", "saari", "raat", "remix", "dj", "ravish", "chico"]
     },
@@ -211,19 +211,19 @@
     },
     {
         "title": "Tunak Tunak Tun",
-        "thumbnail": "",
+        "thumbnail": "https://i1.sndcdn.com/artworks-j4q4PJXtCwSc-0-t1080x1080.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Tunak%20Tunak%20Tun.mp3",
         "keywords": ["tunak", "remix", "bass", "daler", "mehndi"]
     },
     {
         "title": "Tere Liye",
-        "thumbnail": "",
+        "thumbnail": "https://pendujatt.com.se/uploads/album/tere-liye-remix-madan-mohan.webp",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Tere%20Liye.mp3",
         "keywords": ["tere", "liye", "remix", "dj", "umi", "prince", "atif"]
     },
     {
         "title": "AAYEGA MAZA AB BARSAT KA",
-        "thumbnail": "",
+        "thumbnail": "https://img.youtube.com/vi/Y051I06T3-E/default.jpg",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//AAYEGA%20MAZA%20AB%20BARSAT%20KA.mp3",
         "keywords": ["aayega", "maza", "barsat", "remix", "mc", "stan", "emiway"]
     }
