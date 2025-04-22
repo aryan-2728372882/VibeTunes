@@ -31,11 +31,6 @@ VibeTunes is a modern, self-hosted music streaming platform with a focus on regi
 - 💾 Persistent player state
 - 🔄 Service worker for offline capabilities
 - 🔗 Share songs with playable links (no login required)
-- ⬇️ Direct song download to device from context menu
-
-## 🚀 Recent Updates
-
-- **Direct Download Feature**: Added a download button to the song context menu, enabling users to save songs directly to their devices without storing them on the website.
 
 ## 🚀 Installation & Setup
 

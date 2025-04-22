@@ -1,4 +1,3 @@
-// utils.js
 
 // Utility function to get song data from available sources
 function getSongData(songId) {

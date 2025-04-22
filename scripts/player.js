@@ -270,6 +270,7 @@ let currentPlaylist = [];
 let jsonBhojpuriSongs = [];
 let jsonPhonkSongs = [];
 let jsonHaryanviSongs = [];
+let jsonRemixSongs = []; // Added for Hindi Remixes
 let currentSongIndex = 0;
 let repeatMode = 0; // 0: off, 1: all, 2: one
 let currentContext = 'bhojpuri';
@@ -412,18 +413,21 @@ async function displayFixedSections() {
 
 async function loadFullJSONSongs() {
     try {
-        const [bhojpuriSongs, phonkSongs, haryanviSongs] = await Promise.all([
+        const [bhojpuriSongs, phonkSongs, haryanviSongs, remixSongs] = await Promise.all([
             fetch("songs.json").then(response => response.json()),
             fetch("phonk.json").then(response => response.json()),
-            fetch("haryanvi.json").then(response => response.json())
+            fetch("haryanvi.json").then(response => response.json()),
+            fetch("remixes.json").then(response => response.json()) // Added remixes.json
         ]);
         jsonBhojpuriSongs = bhojpuriSongs;
         jsonPhonkSongs = phonkSongs;
         jsonHaryanviSongs = haryanviSongs;
-        console.log("Loaded JSON songs:", { jsonBhojpuriSongs, jsonPhonkSongs, jsonHaryanviSongs });
+        jsonRemixSongs = remixSongs; // Store remix songs
+        console.log("Loaded JSON songs:", { jsonBhojpuriSongs, jsonPhonkSongs, jsonHaryanviSongs, jsonRemixSongs });
         populateSection('bhojpuri-collection', jsonBhojpuriSongs, 'json-bhojpuri');
         populateSection('phonk-collection', jsonPhonkSongs, 'json-phonk');
         populateSection('haryanvi-collection', jsonHaryanviSongs, 'json-haryanvi');
+        populateSection('remix-collection', jsonRemixSongs, 'json-remixes'); // Populate remix section
     } catch (error) {
         console.error("Error loading JSON songs:", error);
         showPopup("Failed to load song collections.");
@@ -467,7 +471,7 @@ function populateSection(containerId, songs, context) {
 
 async function loadSearchSongs() {
     try {
-        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...fixedBhojpuri, ...fixedPhonk, ...fixedHaryanvi];
+        searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...jsonRemixSongs, ...fixedBhojpuri, ...fixedPhonk, ...fixedHaryanvi];
     } catch (error) {
         console.error("Error loading search songs:", error);
     }
@@ -480,7 +484,7 @@ function searchSongs(query) {
     }
 
     query = query.toLowerCase();
-    let allSongs = [...currentPlaylist, ...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs];
+    let allSongs = [...currentPlaylist, ...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...jsonRemixSongs];
     // Filter duplicates (same song title) from search
     let songsHash = {};
     allSongs.forEach(song => {
@@ -505,7 +509,7 @@ function searchSongs(query) {
             songElement.innerHTML = `
                 <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', 'search')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
-                    <div class="hover-play">▶</div>
+                    <div class add-to-queue-btn="hover-play">▶</div>
                     <div class="song-actions-toggle">
                         <button class="song-menu-btn" title="Options">⋮</button>
                     </div>
@@ -549,6 +553,7 @@ async function playSong(title, context, retryCount = 0) {
         case 'json-bhojpuri': song = jsonBhojpuriSongs.find(s => s.title === title); currentPlaylist = jsonBhojpuriSongs; currentContext = 'json-bhojpuri'; break;
         case 'json-phonk': song = jsonPhonkSongs.find(s => s.title === title); currentPlaylist = jsonPhonkSongs; currentContext = 'json-phonk'; break;
         case 'json-haryanvi': song = jsonHaryanviSongs.find(s => s.title === title); currentPlaylist = jsonHaryanviSongs; currentContext = 'json-haryanvi'; break;
+        case 'json-remixes': song = jsonRemixSongs.find(s => s.title === title); currentPlaylist = jsonRemixSongs; currentContext = 'json-remixes'; break; // Added remix context
         case 'search': song = currentPlaylist.find(s => s.title === title); currentContext = 'search'; break;
     }
 
@@ -666,6 +671,10 @@ async function handleSongEnd() {
             currentPlaylist = jsonHaryanviSongs;
             currentContext = 'json-haryanvi';
             currentSongIndex = 0;
+        } else if (currentContext === 'json-remixes' && jsonBhojpuriSongs.length > 0) { // Transition to Bhojpuri after Remixes
+            currentPlaylist = jsonBhojpuriSongs;
+            currentContext = 'json-bhojpuri';
+            currentSongIndex = 0;
         } else if (currentContext === 'search') {
             const lastSong = currentPlaylist[currentSongIndex];
             if (jsonBhojpuriSongs.some(s => s.title === lastSong.title)) {
@@ -680,9 +689,13 @@ async function handleSongEnd() {
                 currentPlaylist = jsonHaryanviSongs;
                 currentContext = 'json-haryanvi';
                 currentSongIndex = jsonHaryanviSongs.findIndex(s => s.title === lastSong.title) + 1;
+            } else if (jsonRemixSongs.some(s => s.title === lastSong.title)) {
+                currentPlaylist = jsonRemixSongs;
+                currentContext = 'json-remixes';
+                currentSongIndex = jsonRemixSongs.findIndex(s => s.title === lastSong.title) + 1;
             }
             if (currentSongIndex >= currentPlaylist.length) currentSongIndex = 0;
-        } else if (['json-bhojpuri', 'json-phonk', 'json-haryanvi'].includes(currentContext)) {
+        } else if (['json-bhojpuri', 'json-phonk', 'json-haryanvi', 'json-remixes'].includes(currentContext)) {
             if (currentContext === 'json-bhojpuri' && jsonPhonkSongs.length > 0) {
                 currentPlaylist = jsonPhonkSongs;
                 currentContext = 'json-phonk';
@@ -691,7 +704,11 @@ async function handleSongEnd() {
                 currentPlaylist = jsonHaryanviSongs;
                 currentContext = 'json-haryanvi';
                 currentSongIndex = 0;
-            } else if (currentContext === 'json-haryanvi' && jsonBhojpuriSongs.length > 0) {
+            } else if (currentContext === 'json-haryanvi' && jsonRemixSongs.length > 0) {
+                currentPlaylist = jsonRemixSongs;
+                currentContext = 'json-remixes';
+                currentSongIndex = 0;
+            } else if (currentContext === 'json-remixes' && jsonBhojpuriSongs.length > 0) {
                 currentPlaylist = jsonBhojpuriSongs;
                 currentContext = 'json-bhojpuri';
                 currentSongIndex = 0;
