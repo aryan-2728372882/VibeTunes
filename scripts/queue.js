@@ -1,13 +1,10 @@
-// Remove redeclarations; rely on player.js variables
-// let isQueueActive = false;
-// let songQueue = [];
-let queueIndex = 0; // Keep as it's unique to queue.js
+let queueIndex = 0; // Unique to queue.js
 
-const audioPlayer = document.getElementById("audio-player");
 const queueList = document.getElementById("queue-list");
 const clearQueueBtn = document.getElementById("clear-queue-btn");
-const toggleQueueBtn = document.getElementById("toggle-queue-btn");
-const queueContainer = document.getElementById("queue-container");
+const toggleQueueBtn = document.getElementById("queue-toggle-btn"); // Updated to queue-toggle-btn
+const queuePanel = document.getElementById("queue-panel"); // Targets queue-panel
+const closeQueueBtn = document.getElementById("close-queue-btn");
 
 function addToQueue(song, playImmediately = false) {
     if (!song || !song.title || !song.link || !song.thumbnail) {
@@ -37,17 +34,27 @@ function clearQueue() {
     showPopup("Queue cleared!");
 }
 
-function toggleQueue() {
-    if (queueContainer) {
-        queueContainer.style.display = queueContainer.style.display === "none" ? "block" : "none";
-        if (queueContainer.style.display === "block") {
+function toggleQueuePanel() {
+    console.log("toggleQueuePanel called, queuePanel:", queuePanel);
+    if (queuePanel) {
+        const currentDisplay = queuePanel.style.display;
+        queuePanel.style.display = currentDisplay === "none" || !currentDisplay ? "block" : "none";
+        console.log("Queue panel display set to:", queuePanel.style.display);
+        if (queuePanel.style.display === "block") {
             updateQueueUI();
         }
+    } else {
+        console.error("Queue panel not found in DOM!");
+        showPopup("Queue UI not available.");
     }
 }
 
 function updateQueueUI() {
-    if (!queueList) return;
+    if (!queueList) {
+        console.error("Queue list element not found!");
+        showPopup("Queue UI not available.");
+        return;
+    }
     queueList.innerHTML = "";
     songQueue.forEach((song, index) => {
         const queueItem = document.createElement("div");
@@ -57,11 +64,18 @@ function updateQueueUI() {
             <span>${song.title}</span>
             <button class="remove-queue-btn" data-index="${index}">🗑️</button>
         `;
+        queueItem.addEventListener("click", () => {
+            console.log("Queue item clicked:", index);
+            queueIndex = index;
+            playSong(song.title, getSongContext(song));
+            updateQueueUI();
+        });
         queueList.appendChild(queueItem);
     });
 
     document.querySelectorAll(".remove-queue-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
             const index = parseInt(btn.dataset.index);
             songQueue.splice(index, 1);
             if (index < queueIndex) queueIndex--;
@@ -103,7 +117,7 @@ function handleSongEndWithQueue() {
         queueIndex = 0;
         songQueue = [];
         updateQueueUI();
-        handleSongEnd(); // Fall back to player.js navigation
+        handleSongEnd();
     }
 }
 
@@ -178,8 +192,25 @@ async function playSong(title, context) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    if (clearQueueBtn) clearQueueBtn.addEventListener("click", clearQueue);
-    if (toggleQueueBtn) toggleQueueBtn.addEventListener("click", toggleQueue);
+    console.log("Attaching queue event listeners...");
+    if (clearQueueBtn) {
+        clearQueueBtn.addEventListener("click", clearQueue);
+        console.log("Clear queue button listener attached");
+    } else {
+        console.error("Clear queue button not found!");
+    }
+    if (toggleQueueBtn) {
+        toggleQueueBtn.addEventListener("click", toggleQueuePanel);
+        console.log("Toggle queue button listener attached");
+    } else {
+        console.error("Toggle queue button not found!");
+    }
+    if (closeQueueBtn) {
+        closeQueueBtn.addEventListener("click", toggleQueuePanel);
+        console.log("Close queue button listener attached");
+    } else {
+        console.error("Close queue button not found!");
+    }
     
     audioPlayer.onended = handleSongEndWithQueue;
 
