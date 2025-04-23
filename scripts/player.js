@@ -127,7 +127,7 @@ const fixedBhojpuri = [
         "thumbnail": "https://c.saavncdn.com/405/Chuwe-Mor-Jawani-Bhojpuri-2024-20240417122251-500x500.jpg"
     },
     {
-        "title": "Balma Kadar na Jane",
+        "title": "Balma Kadar na Jane   Jane",
         "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%B0%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
         "thumbnail": "https://c.saavncdn.com/659/Balma-Kadar-Na-Jane-Bhojpuri-2024-20241022172505-500x500.jpg"
     },
@@ -289,7 +289,6 @@ const prevBtn = document.getElementById("prev-btn");
 const repeatBtn = document.getElementById("repeat-btn");
 
 playerContainer.style.display = "none";
-audioPlayer.addEventListener('ended', handleSongEnd);
 
 // Utility Functions
 function throttle(func, limit) {
@@ -327,7 +326,7 @@ function setupMediaSession(song) {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: song.title,
-            artist: song.artist,
+            artist: song.artist || 'Unknown Artist', // Fallback for missing artist
             artwork: [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
         });
         navigator.mediaSession.setActionHandler('play', () => togglePlay());
@@ -419,10 +418,10 @@ async function loadFullJSONSongs() {
             fetch("haryanvi.json").then(response => response.json()),
             fetch("remixes.json").then(response => response.json()) // Added remixes.json
         ]);
-        jsonBhojpuriSongs = bhojpuriSongs;
-        jsonPhonkSongs = phonkSongs;
-        jsonHaryanviSongs = haryanviSongs;
-        jsonRemixSongs = remixSongs; // Store remix songs
+        jsonBhojpuriSongs = bhojpuriSongs.filter(song => isValidSong(song)); // Validate songs
+        jsonPhonkSongs = phonkSongs.filter(song => isValidSong(song));
+        jsonHaryanviSongs = haryanviSongs.filter(song => isValidSong(song));
+        jsonRemixSongs = remixSongs.filter(song => isValidSong(song)); // Validate remix songs
         console.log("Loaded JSON songs:", { jsonBhojpuriSongs, jsonPhonkSongs, jsonHaryanviSongs, jsonRemixSongs });
         populateSection('bhojpuri-collection', jsonBhojpuriSongs, 'json-bhojpuri');
         populateSection('phonk-collection', jsonPhonkSongs, 'json-phonk');
@@ -434,6 +433,17 @@ async function loadFullJSONSongs() {
     }
 }
 
+// New function to validate song data
+function isValidSong(song) {
+    const isValid = song && typeof song.title === 'string' && song.title.trim() &&
+                   typeof song.link === 'string' && song.link.trim() &&
+                   typeof song.thumbnail === 'string' && song.thumbnail.trim();
+    if (!isValid) {
+        console.warn("Invalid song data:", song);
+    }
+    return isValid;
+}
+
 function populateSection(containerId, songs, context) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -441,7 +451,6 @@ function populateSection(containerId, songs, context) {
     songs.forEach((song, index) => {
         const songElement = document.createElement('div');
         songElement.classList.add('song-item');
-        // Assign a unique ID to each song element for reference
         const songId = `${context}-${index}`;
         songElement.id = songId;
         songElement.innerHTML = `
@@ -456,14 +465,12 @@ function populateSection(containerId, songs, context) {
         `;
         container.appendChild(songElement);
 
-        // Store song data in a global object to avoid inline JSON
         window.songData = window.songData || {};
         window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
         
-        // Add click event for song menu button (3-dot menu)
         const menuBtn = songElement.querySelector('.song-menu-btn');
         menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent triggering the play song action
+            e.stopPropagation();
             showSongMenu(e, songId);
         });
     });
@@ -485,7 +492,6 @@ function searchSongs(query) {
 
     query = query.toLowerCase();
     let allSongs = [...currentPlaylist, ...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...jsonRemixSongs];
-    // Filter duplicates (same song title) from search
     let songsHash = {};
     allSongs.forEach(song => {
         songsHash[song.title] = song;
@@ -509,7 +515,7 @@ function searchSongs(query) {
             songElement.innerHTML = `
                 <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', 'search')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
-                    <div class add-to-queue-btn="hover-play">▶</div>
+                    <div class="hover-play">▶</div>
                     <div class="song-actions-toggle">
                         <button class="song-menu-btn" title="Options">⋮</button>
                     </div>
@@ -520,10 +526,9 @@ function searchSongs(query) {
             window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
             searchContainer.appendChild(songElement);
             
-            // Add click event for song menu button (3-dot menu)
-            const menuBtn = songElement.querySelector('.song-menu-btn');
+            const menuBtn = event.target;
             menuBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent triggering the play song action
+                e.stopPropagation();
                 showSongMenu(e, songId);
             });
         });
@@ -541,6 +546,7 @@ async function playSong(title, context, retryCount = 0) {
     if (isPlaying) {
         console.log(`Already playing, queuing: ${title}`);
         showPopup(`"${title}" queued, waiting for current song to finish`);
+        addToQueue({ title, link: currentPlaylist.find(s => s.title === title)?.link, thumbnail: currentPlaylist.find(s => s.title === title)?.thumbnail }); // Add to queue
         return;
     }
     isPlaying = true;
@@ -553,18 +559,24 @@ async function playSong(title, context, retryCount = 0) {
         case 'json-bhojpuri': song = jsonBhojpuriSongs.find(s => s.title === title); currentPlaylist = jsonBhojpuriSongs; currentContext = 'json-bhojpuri'; break;
         case 'json-phonk': song = jsonPhonkSongs.find(s => s.title === title); currentPlaylist = jsonPhonkSongs; currentContext = 'json-phonk'; break;
         case 'json-haryanvi': song = jsonHaryanviSongs.find(s => s.title === title); currentPlaylist = jsonHaryanviSongs; currentContext = 'json-haryanvi'; break;
-        case 'json-remixes': song = jsonRemixSongs.find(s => s.title === title); currentPlaylist = jsonRemixSongs; currentContext = 'json-remixes'; break; // Added remix context
+        case 'json-remixes': song = jsonRemixSongs.find(s => s.title === title); currentPlaylist = jsonRemixSongs; currentContext = 'json-remixes'; break;
         case 'search': song = currentPlaylist.find(s => s.title === title); currentContext = 'search'; break;
     }
 
-    if (!song) {
-        console.error(`Song not found: ${title} in context ${context}`);
+    if (!song || !isValidSong(song)) {
+        console.error(`Song not found or invalid: ${title} in context ${context}`, song);
         isPlaying = false;
+        showPopup(`Song "${title}" not found or invalid, skipping...`);
         return nextSong();
     }
 
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
-    console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}`);
+    if (currentSongIndex === -1) {
+        console.error(`Song index not found for ${title} in ${context}`);
+        isPlaying = false;
+        return nextSong();
+    }
+    console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}, Index: ${currentSongIndex}`);
 
     try {
         manualPause = false;
@@ -584,7 +596,6 @@ async function playSong(title, context, retryCount = 0) {
         requestWakeLock();
         updateProgress();
         
-        // Track the song in Recently Played
         const songId = `${context}-${currentSongIndex}`;
         if (typeof addToRecentlyPlayed === 'function') {
             addToRecentlyPlayed(songId, song.title, song.thumbnail);
@@ -592,45 +603,25 @@ async function playSong(title, context, retryCount = 0) {
             addToRecentlyPlayedLocal(songId);
         }
         
-        // Update Recently Played display
         if (typeof displayRecentlyPlayed === 'function') {
             setTimeout(displayRecentlyPlayed, 500);
         }
-        
-        // Add ended event listener to track when song completes
-        audioPlayer.addEventListener('ended', function onSongEnded() {
-            // Track the song again to ensure it's in Recently Played
-            if (typeof addToRecentlyPlayed === 'function') {
-                addToRecentlyPlayed(songId, song.title, song.thumbnail);
-            } else if (typeof addToRecentlyPlayedLocal === 'function') {
-                addToRecentlyPlayedLocal(songId);
-            }
-            
-            // Update Recently Played display
-            if (typeof displayRecentlyPlayed === 'function') {
-                setTimeout(displayRecentlyPlayed, 500);
-            }
-            
-            // Remove this listener to avoid duplicates
-            audioPlayer.removeEventListener('ended', onSongEnded);
-        });
     } catch (error) {
         console.error(`Playback error for ${song.title}:`, error);
         document.querySelector(".popup-notification")?.remove();
         if (retryCount < 3) {
             showPopup(`Retrying (${retryCount + 1}/3)...`);
-            setTimeout(() => {
-                isPlaying = false;
-                playSong(title, context, retryCount + 1);
-            }, 1000);
-        } else {
-            showPopup("Song failed after retries, skipping...");
+            await new Promise(resolve => setTimeout(resolve, 1000));
             isPlaying = false;
-            nextSong();
+            return playSong(title, context, retryCount + 1);
+        } else {
+            showPopup(`Song "${song.title}" failed after retries, skipping...`);
+            isPlaying = false;
+            return nextSong();
         }
-        return;
+    } finally {
+        isPlaying = false;
     }
-    isPlaying = false;
 }
 
 // Debounced version of playSong
@@ -644,86 +635,94 @@ function highlightCurrentSong() {
 }
 
 async function handleSongEnd() {
-    console.log("Song ended, Repeat Mode:", repeatMode);
-    audioPlayer.removeEventListener('ended', handleSongEnd);
-
+    console.log("Song ended, Repeat Mode:", repeatMode, "Context:", currentContext, "Index:", currentSongIndex);
+    
     if (repeatMode === 2) { // Repeat one
         audioPlayer.currentTime = 0;
         await audioPlayer.play();
-        audioPlayer.addEventListener('ended', handleSongEnd);
         updatePlayPauseButton();
         preloadNextSong();
         return;
     }
 
-    if (repeatMode === 1 || currentSongIndex < currentPlaylist.length - 1) { // Repeat all or next song
+    if (currentPlaylist.length === 0) {
+        console.error("Current playlist is empty!");
+        showPopup("Playlist empty, stopping.");
+        return;
+    }
+
+    if (isQueueActive && songQueue.length > 0) {
+        // Handle queue if active (from queue.js)
+        handleSongEndWithQueue();
+        return;
+    }
+
+    if (repeatMode === 1 || currentSongIndex < currentPlaylist.length - 1) {
         currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     } else {
+        // Playlist transition logic
+        let nextContext = null;
+        let nextPlaylist = null;
         if (currentContext === 'bhojpuri' && jsonBhojpuriSongs.length > 0) {
-            currentPlaylist = jsonBhojpuriSongs;
-            currentContext = 'json-bhojpuri';
-            currentSongIndex = 0;
+            nextPlaylist = jsonBhojpuriSongs;
+            nextContext = 'json-bhojpuri';
         } else if (currentContext === 'phonk' && jsonPhonkSongs.length > 0) {
-            currentPlaylist = jsonPhonkSongs;
-            currentContext = 'json-phonk';
-            currentSongIndex = 0;
+            nextPlaylist = jsonPhonkSongs;
+            nextContext = 'json-phonk';
         } else if (currentContext === 'haryanvi' && jsonHaryanviSongs.length > 0) {
-            currentPlaylist = jsonHaryanviSongs;
-            currentContext = 'json-haryanvi';
-            currentSongIndex = 0;
-        } else if (currentContext === 'json-remixes' && jsonBhojpuriSongs.length > 0) { // Transition to Bhojpuri after Remixes
-            currentPlaylist = jsonBhojpuriSongs;
-            currentContext = 'json-bhojpuri';
-            currentSongIndex = 0;
+            nextPlaylist = jsonHaryanviSongs;
+            nextContext = 'json-haryanvi';
+        } else if (currentContext === 'json-remixes' && fixedBhojpuri.length > 0) {
+            nextPlaylist = fixedBhojpuri; // Transition to Trending Bhojpuri
+            nextContext = 'bhojpuri';
         } else if (currentContext === 'search') {
             const lastSong = currentPlaylist[currentSongIndex];
             if (jsonBhojpuriSongs.some(s => s.title === lastSong.title)) {
-                currentPlaylist = jsonBhojpuriSongs;
-                currentContext = 'json-bhojpuri';
+                nextPlaylist = jsonBhojpuriSongs;
+                nextContext = 'json-bhojpuri';
                 currentSongIndex = jsonBhojpuriSongs.findIndex(s => s.title === lastSong.title) + 1;
             } else if (jsonPhonkSongs.some(s => s.title === lastSong.title)) {
-                currentPlaylist = jsonPhonkSongs;
-                currentContext = 'json-phonk';
+                nextPlaylist = jsonPhonkSongs;
+                nextContext = 'json-phonk';
                 currentSongIndex = jsonPhonkSongs.findIndex(s => s.title === lastSong.title) + 1;
             } else if (jsonHaryanviSongs.some(s => s.title === lastSong.title)) {
-                currentPlaylist = jsonHaryanviSongs;
-                currentContext = 'json-haryanvi';
+                nextPlaylist = jsonHaryanviSongs;
+                nextContext = 'json-haryanvi';
                 currentSongIndex = jsonHaryanviSongs.findIndex(s => s.title === lastSong.title) + 1;
             } else if (jsonRemixSongs.some(s => s.title === lastSong.title)) {
-                currentPlaylist = jsonRemixSongs;
-                currentContext = 'json-remixes';
+                nextPlaylist = fixedBhojpuri; // Transition to Trending Bhojpuri
+                nextContext = 'bhojpuri';
                 currentSongIndex = jsonRemixSongs.findIndex(s => s.title === lastSong.title) + 1;
             }
-            if (currentSongIndex >= currentPlaylist.length) currentSongIndex = 0;
-        } else if (['json-bhojpuri', 'json-phonk', 'json-haryanvi', 'json-remixes'].includes(currentContext)) {
+            if (currentSongIndex >= nextPlaylist.length) currentSongIndex = 0;
+        } else if (['json-bhojpuri', 'json-phonk', 'json-haryanvi'].includes(currentContext)) {
             if (currentContext === 'json-bhojpuri' && jsonPhonkSongs.length > 0) {
-                currentPlaylist = jsonPhonkSongs;
-                currentContext = 'json-phonk';
-                currentSongIndex = 0;
+                nextPlaylist = jsonPhonkSongs;
+                nextContext = 'json-phonk';
             } else if (currentContext === 'json-phonk' && jsonHaryanviSongs.length > 0) {
-                currentPlaylist = jsonHaryanviSongs;
-                currentContext = 'json-haryanvi';
-                currentSongIndex = 0;
+                nextPlaylist = jsonHaryanviSongs;
+                nextContext = 'json-haryanvi';
             } else if (currentContext === 'json-haryanvi' && jsonRemixSongs.length > 0) {
-                currentPlaylist = jsonRemixSongs;
-                currentContext = 'json-remixes';
-                currentSongIndex = 0;
-            } else if (currentContext === 'json-remixes' && jsonBhojpuriSongs.length > 0) {
-                currentPlaylist = jsonBhojpuriSongs;
-                currentContext = 'json-bhojpuri';
-                currentSongIndex = 0;
+                nextPlaylist = jsonRemixSongs;
+                nextContext = 'json-remixes';
             } else {
                 console.log("End of all playlists, stopping.");
+                showPopup("End of playlists, stopping.");
                 return;
             }
         } else {
             console.log("End of playlist, stopping.");
+            showPopup("End of playlist, stopping.");
             return;
         }
+        currentPlaylist = nextPlaylist;
+        currentContext = nextContext;
+        currentSongIndex = 0;
     }
 
     if (currentPlaylist.length === 0) {
-        console.error("Current playlist is empty!");
+        console.error("Current playlist is empty after transition!");
+        showPopup("Playlist empty, stopping.");
         return;
     }
 
@@ -944,33 +943,59 @@ document.addEventListener("DOMContentLoaded", async () => {
             .catch(err => console.error('Service Worker error:', err));
     }
 
+    // Ensure event listeners are attached only once
     if (playPauseBtn) {
+        playPauseBtn.removeEventListener('click', togglePlay); // Remove existing listener
         playPauseBtn.addEventListener('click', togglePlay);
     }
-    if (seekBar) seekBar.addEventListener('input', () => seekSong(seekBar.value));
-    if (nextBtn) nextBtn.addEventListener('click', nextSong);
-    if (prevBtn) prevBtn.addEventListener('click', previousSong);
-    if (repeatBtn) repeatBtn.addEventListener('click', toggleRepeat);
+    if (seekBar) {
+        seekBar.removeEventListener('input', seekSong); // Remove existing listener
+        seekBar.addEventListener('input', () => seekSong(seekBar.value));
+    }
+    if (nextBtn) {
+        nextBtn.removeEventListener('click', nextSong); // Remove existing listener
+        nextBtn.addEventListener('click', nextSong);
+    }
+    if (prevBtn) {
+        prevBtn.removeEventListener('click', previousSong); // Remove existing listener
+        prevBtn.addEventListener('click', previousSong);
+    }
+    if (repeatBtn) {
+        repeatBtn.removeEventListener('click', toggleRepeat); // Remove existing listener
+        repeatBtn.addEventListener('click', toggleRepeat);
+    }
 
     console.log("DOM fully loaded and event listeners attached.");
 });
 
 function nextSong() {
-    if (!audioPlayer.src || audioPlayer.paused) {
-        if (currentPlaylist.length > 0) {
-            const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
-            const nextSong = currentPlaylist[nextIndex];
-            addToQueue(nextSong, true);
-            showPopup(`Added "${nextSong.title}" to queue`);
-        }
+    if (currentPlaylist.length === 0) {
+        showPopup("No songs in playlist!");
         return;
     }
-    
+
+    // Bypass queue if not active
+    if (isQueueActive && songQueue.length > 0) {
+        handleSongEndWithQueue();
+        return;
+    }
+
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
 function previousSong() {
+    if (currentPlaylist.length === 0) {
+        showPopup("No songs in playlist!");
+        return;
+    }
+
+    // Bypass queue if not active
+    if (isQueueActive && songQueue.length > 0) {
+        showPopup("Queue is active, use queue controls.");
+        return;
+    }
+
     currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
@@ -1111,4 +1136,17 @@ function generateShareLink(songId) {
 
 function getSongData(songId) {
     return window.songData && window.songData[songId];
+}
+
+// Ensure queue.js variables are defined if not loaded
+let isQueueActive = false;
+let songQueue = [];
+function addToQueue(song) {
+    console.log("Queue not fully implemented, song added to fallback queue:", song);
+    songQueue.push(song);
+    isQueueActive = true;
+}
+function handleSongEndWithQueue() {
+    console.log("Queue not fully implemented, falling back to default navigation");
+    handleSongEnd();
 }
