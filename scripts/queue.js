@@ -1,9 +1,9 @@
-let queueIndex = 0; // Unique to queue.js
+let queueIndex = 0;
 
 const queueList = document.getElementById("queue-list");
 const clearQueueBtn = document.getElementById("clear-queue-btn");
-const toggleQueueBtn = document.getElementById("queue-toggle-btn"); // Updated to queue-toggle-btn
-const queuePanel = document.getElementById("queue-panel"); // Targets queue-panel
+const toggleQueueBtn = document.getElementById("queue-toggle-btn");
+const queuePanel = document.getElementById("queue-panel");
 const closeQueueBtn = document.getElementById("close-queue-btn");
 
 function addToQueue(song, playImmediately = false) {
@@ -65,7 +65,7 @@ function updateQueueUI() {
             <button class="remove-queue-btn" data-index="${index}">🗑️</button>
         `;
         queueItem.addEventListener("click", () => {
-            console.log("Queue item clicked:", index);
+            console.log("Queue item clicked:", index, song.title);
             queueIndex = index;
             playSong(song.title, getSongContext(song));
             updateQueueUI();
@@ -77,6 +77,7 @@ function updateQueueUI() {
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
             const index = parseInt(btn.dataset.index);
+            console.log("Removing queue item at index:", index);
             songQueue.splice(index, 1);
             if (index < queueIndex) queueIndex--;
             if (songQueue.length === 0) isQueueActive = false;
@@ -91,19 +92,24 @@ function updateQueueUI() {
 }
 
 function handleSongEndWithQueue() {
-    console.log(`Song ended - Queue:`, songQueue, `Repeat: ${repeatMode}`);
+    console.log(`Song ended - Queue:`, songQueue, `Repeat: ${repeatMode}, QueueIndex: ${queueIndex}`);
 
     if (repeatMode === 2) {
         audioPlayer.currentTime = 0;
         audioPlayer.play().then(() => {
             updatePlayPauseButton();
             preloadNextSong();
-        }).catch(err => console.error("Repeat one error:", err));
+        }).catch(err => {
+            console.error("Repeat one error:", err);
+            showPopup("Failed to repeat song, skipping...");
+            nextSong();
+        });
         return;
     }
 
     if (songQueue.length > 0 && queueIndex < songQueue.length) {
         const nextSong = songQueue[queueIndex];
+        console.log("Playing next song from queue:", nextSong.title);
         playSong(nextSong.title, getSongContext(nextSong));
         queueIndex++;
         if (queueIndex >= songQueue.length) {
@@ -117,6 +123,7 @@ function handleSongEndWithQueue() {
         queueIndex = 0;
         songQueue = [];
         updateQueueUI();
+        console.log("Queue empty, falling back to handleSongEnd");
         handleSongEnd();
     }
 }
@@ -153,15 +160,15 @@ async function playSong(title, context) {
         case 'search': song = currentPlaylist.find(s => s.title === title); currentContext = 'search'; break;
     }
 
-    if (!song) {
-        console.error(`Song not found: ${title} in context ${context}`);
+    if (!song || !isValidSong(song)) {
+        console.error(`Song not found or invalid: ${title} in context ${context}`);
         isPlaying = false;
         showPopup(`Song "${title}" not found, skipping...`);
         return handleSongEndWithQueue();
     }
 
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
-    console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}`);
+    console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}, Index: ${currentSongIndex}`);
 
     try {
         manualPause = false;
