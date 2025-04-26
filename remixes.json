@@ -1,236 +1,275 @@
 [
     {
         "title": "KAANTA LAGA REMIX",
-        "thumbnail": "https://i1.sndcdn.com/artworks-NKzanEYBwFTKVc7z-MtITUA-t1080x1080.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//KAANTA%20LAGA%20REMIX.mp3",
+        "thumbnail": "https://i1.sndcdn.com/artworks-NKzanEYBwFTKVc7z-MtITUA-t1080x1080.jpg",
         "keywords": ["kaanta", "laga", "remix", "edm", "dance", "dj", "siday"]
     },
     {
         "title": "AANKH MAREY REMIX",
-        "thumbnail": "https://a10.gaanacdn.com/gn_img/song/lJvKa56KDV/vKalOg7xbD/size_m_1544078542.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//LADKI%20AANKH%20NAREY.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/song/lJvKa56KDV/vKalOg7xbD/size_m_1544078542.jpg",
         "keywords": ["aankh", "marey", "remix", "edm", "dance", "dj", "siday"]
     },
     {
         "title": "KISSIK X OO ANTAVA",
-        "thumbnail": "https://c.saavncdn.com/563/Kissik-From-Pushpa-2-The-Rule-Hindi-Hindi-2024-20241124192116-500x500.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//KISSIK.mp3",
+        "thumbnail": "https://c.saavncdn.com/563/Kissik-From-Pushpa-2-The-Rule-Hindi-Hindi-2024-20241124192116-500x500.jpg",
         "keywords": ["kissik", "remix", "pushpa", "club", "dj", "dalal", "allu", "arjun"]
     },
     {
         "title": "Balma",
-        "thumbnail": "assets/remixes-hindi/Balma.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Balma.mp3",
+        "thumbnail": "assets/remixes-hindi/Balma.jpg",
         "keywords": ["balma", "remix", "himesh", "reshammiya", "club", "dj", "dalal"]
     },
     {
         "title": "Mere Naseeb Mein",
-        "thumbnail": "https://img.youtube.com/vi/iO0AjoGw_1U/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Mere%20Naseeb%20Mein.mp3",
+        "thumbnail": "https://img.youtube.com/vi/iO0AjoGw_1U/default.jpg",
         "keywords": ["mere", "naseeb", "mein", "remix", "prank", "dj", "franky"]
     },
     {
         "title": "Bolo Ta Ra Ra",
-        "thumbnail": "https://i1.sndcdn.com/artworks-8mgs9Av6GiBD-0-t500x500.png",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Bolo%20Ta%20Ra%20Ra.mp3",
+        "thumbnail": "https://i1.sndcdn.com/artworks-8mgs9Av6GiBD-0-t500x500.png",
         "keywords": ["bolo", "ta", "ra", "remix", "dj", "scoob"]
     },
     {
         "title": "Pardesiya Yeh Sach Hai Piya",
-        "thumbnail": "https://img.youtube.com/vi/gPvR50oRwo0/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Pardesiya%20Yeh%20Sach%20Hai%20Piya.mp3",
+        "thumbnail": "https://img.youtube.com/vi/gPvR50oRwo0/default.jpg",
         "keywords": ["pardesiya", "sach", "hai", "piya", "remix", "circuit", "dj", "ash"]
     },
     {
         "title": "Mare Mahabob Remix",
-        "thumbnail": "https://img.youtube.com/vi/-coiy9ydA8M/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Mere%20Mahabob.mp3",
+        "thumbnail": "https://img.youtube.com/vi/-coiy9ydA8M/default.jpg",
         "keywords": ["mare", "mahabob", "remix", "dj", "manik", "bollywood"]
     },
     {
         "title": "DJ Mera Gana Baja De",
-        "thumbnail": "https://img.youtube.com/vi/lXwhoDLqUVU/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//DJ%20Mera%20Gana%20Baja%20De.mp3",
+        "thumbnail": "https://img.youtube.com/vi/lXwhoDLqUVU/default.jpg",
         "keywords": ["dj", "mera", "gana", "baja", "de", "remix", "sunidhi", "ajijul"]
     },
     {
         "title": "Saat Samundar",
-        "thumbnail": "https://img.youtube.com/vi/XshdnO0biGo/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Saat%20Samundar.mp3",
+        "thumbnail": "https://img.youtube.com/vi/XshdnO0biGo/default.jpg",
         "keywords": ["saat", "samundar", "remix", "club", "dj", "ravish", "chico"]
     },
     {
         "title": "Daddy Mummy",
-        "thumbnail": "https://img.youtube.com/vi/tVrWZ7a6AP0/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Daddy%20Mummy.mp3",
+        "thumbnail": "https://img.youtube.com/vi/tVrWZ7a6AP0/default.jpg",
         "keywords": ["daddy", "mummy", "remix", "bass", "urvashi", "bhaag", "johnny"]
     },
     {
         "title": "Param Sundari Remix",
-        "thumbnail": "https://img.youtube.com/vi/rc7Db1OnzlU/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Param%20Sundari.mp3",
+        "thumbnail": "https://img.youtube.com/vi/rc7Db1OnzlU/default.jpg",
         "keywords": ["param", "sundari", "remix", "dj", "manik", "shreya", "ghoshal"]
     },
     {
         "title": "Kiya Kiya",
-        "thumbnail": "https://img.youtube.com/vi/iEdlXLMZKWI/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Kiya%20Kiya.mp3",
+        "thumbnail": "https://img.youtube.com/vi/iEdlXLMZKWI/default.jpg",
         "keywords": ["kiya", "remix", "bass", "welcome"]
     },
     {
         "title": "Uncha Lamba Kad",
-        "thumbnail": "https://img.youtube.com/vi/2dmF5qZ75qc/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Uncha%20Lamba%20Kad.mp3",
+        "thumbnail": "https://img.youtube.com/vi/2dmF5qZ75qc/default.jpg",
         "keywords": ["uncha", "lamba", "kad", "remix", "dj", "enzed", "akshay"]
     },
     {
         "title": "Bin Tere Sanam",
-        "thumbnail": "https://img.youtube.com/vi/J6lFJo3q1K4/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//BIN%20TERE%20SANAM.mp3",
+        "thumbnail": "https://img.youtube.com/vi/J6lFJo3q1K4/default.jpg",
         "keywords": ["bin", "tere", "sanam", "remix", "ay", "sunix"]
     },
     {
         "title": "Husnn Hai Suhaana Remix",
-        "thumbnail": "https://img.youtube.com/vi/1KGMSWMXQ10/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Husnn%20Hai%20Suhaana.mp3",
+        "thumbnail": "https://img.youtube.com/vi/1KGMSWMXQ10/default.jpg",
         "keywords": ["husnn", "hai", "suhaana", "remix", "dj", "manik", "coolie"]
     },
     {
         "title": "Garmi",
-        "thumbnail": "https://img.youtube.com/vi/QVzC5DaDrXQ/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Garmi.mp3",
+        "thumbnail": "https://img.youtube.com/vi/QVzC5DaDrXQ/default.jpg",
         "keywords": ["garmi", "remix", "dj", "dalal", "street", "dancer", "badshah"]
     },
     {
         "title": "Dilbar Dilbar",
-        "thumbnail": "https://img.youtube.com/vi/7DiVgiReI0I/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Dilbar%20Dilbar.mp3",
+        "thumbnail": "https://img.youtube.com/vi/7DiVgiReI0I/default.jpg",
         "keywords": ["dilbar", "remix", "dj", "aayush", "nora", "neha", "dhvani"]
     },
     {
         "title": "Hookah Bar",
-        "thumbnail": "https://img.youtube.com/vi/2zSCKUZb7AU/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Hookah%20Bar.mp3",
+        "thumbnail": "https://img.youtube.com/vi/2zSCKUZb7AU/default.jpg",
         "keywords": ["hookah", "bar", "remix", "club", "khiladi", "himesh"]
     },
     {
         "title": "Duniya Me Aaye Ho Toh Love Karlo",
-        "thumbnail": "https://img.youtube.com/vi/WDevFzffo5g/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Duniya%20Me%20Aaye%20Ho%20Toh%20Love%20Karlo.mp3",
+        "thumbnail": "https://img.youtube.com/vi/WDevFzffo5g/default.jpg",
         "keywords": ["duniya", "aaye", "ho", "love", "karlo", "remix", "dj", "anil"]
     },
     {
         "title": "Ek Chumma Tu Mujhko Udhar De De",
-        "thumbnail": "https://img.youtube.com/vi/5NI6E9Qc-mU/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Ek%20Chumma%20Tu%20Mujhko%20Udhar%20De%20De.mp3",
+        "thumbnail": "https://img.youtube.com/vi/5NI6E9Qc-mU/default.jpg",
         "keywords": ["ek", "chumma", "mujhko", "udhar", "de", "remix", "edm", "abishek"]
     },
     {
         "title": "Munda Gora Rang Dekh Ke",
-        "thumbnail": "https://img.youtube.com/vi/HtPwduZwlBc/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Munda%20Gora%20Rang%20Dekh%20Ke.mp3",
+        "thumbnail": "https://img.youtube.com/vi/HtPwduZwlBc/default.jpg",
         "keywords": ["munda", "gora", "rang", "dekh", "ke", "remix", "edm", "dj", "ap"]
     },
     {
         "title": "Tinku Jiya",
-        "thumbnail": "https://img.youtube.com/vi/NUbP4fxcas4/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Tinku%20Jiya.mp3",
+        "thumbnail": "https://img.youtube.com/vi/NUbP4fxcas4/default.jpg",
         "keywords": ["tinku", "jiya", "remix", "club", "dj", "dalal", "yamla"]
     },
     {
         "title": "Gali Gali",
-        "thumbnail": "https://img.youtube.com/vi/kIu0aofCbdI/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Gali%20Gali.mp3",
+        "thumbnail": "https://img.youtube.com/vi/kIu0aofCbdI/default.jpg",
         "keywords": ["gali", "remix", "kgf", "dj", "hemanth", "neha", "mouni"]
     },
     {
         "title": "Lat Lag Gayi",
-        "thumbnail": "https://img.youtube.com/vi/jPrQSPSKeBg/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Lat%20Lag%20Gayi.mp3",
+        "thumbnail": "https://img.youtube.com/vi/jPrQSPSKeBg/default.jpg",
         "keywords": ["lat", "lag", "gayi", "remix", "race", "bounce", "himanshu"]
     },
     {
         "title": "Jhoom Jhoom",
-        "thumbnail": "https://img.youtube.com/vi/WFyfUOzS-BE/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Jhoom%20Jhoom.mp3",
+        "thumbnail": "https://img.youtube.com/vi/WFyfUOzS-BE/default.jpg",
         "keywords": ["jhoom", "remix", "himesh", "reshammiya", "club", "dj", "dalal"]
     },
     {
         "title": "Pushpa Mashup",
-        "thumbnail": "https://img.youtube.com/vi/TJWTwJ3QFlU/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Pushpa%20Mashup.mp3",
+        "thumbnail": "https://img.youtube.com/vi/TJWTwJ3QFlU/default.jpg",
         "keywords": ["pushpa", "mashup", "remix", "dj", "dalal", "srivalli", "saami"]
     },
     {
         "title": "Desi Boyz",
-        "thumbnail": "https://img.youtube.com/vi/oWF16uI9wjY/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Desi%20Boyz.mp3",
+        "thumbnail": "https://img.youtube.com/vi/oWF16uI9wjY/default.jpg",
         "keywords": ["desi", "boyz", "remix", "vdj", "shaan", "mike"]
     },
     {
         "title": "Subha Hone Na De",
-        "thumbnail": "https://img.youtube.com/vi/sKoK8jNWjXc/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Subha%20Hone%20Na%20De.mp3",
+        "thumbnail": "https://img.youtube.com/vi/sKoK8jNWjXc/default.jpg",
         "keywords": ["subha", "hone", "na", "de", "remix", "dj", "franky", "desi"]
     },
     {
         "title": "Sau Tarah Ke",
-        "thumbnail": "https://c.saavncdn.com/231/Dishoom-Hindi-2016-500x500.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Sau%20Tarah%20ke.mp3",
+        "thumbnail": "https://c.saavncdn.com/231/Dishoom-Hindi-2016-500x500.jpg",
         "keywords": ["sau", "tarah", "ke", "remix", "dj", "aaditya", "prince"]
     },
     {
         "title": "Nadiyon Paar",
-        "thumbnail": "https://c.saavncdn.com/505/Nadiyon-Paar-Let-the-Music-Play-Again-From-Roohi--Hindi-2021-20210303125809-500x500.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Nadiyon%20Paar.mp3",
+        "thumbnail": "https://c.saavncdn.com/505/Nadiyon-Paar-Let-the-Music-Play-Again-From-Roohi--Hindi-2021-20210303125809-500x500.jpg",
         "keywords": ["nadiyon", "paar", "remix", "roohi", "shamur", "dj", "purvish"]
     },
     {
         "title": "Aankhon Aankhon",
-        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/Rz4W8vKxD5/z4W8lRDJWx/size_m.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Aankhon%20Aankhon.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/Rz4W8vKxD5/z4W8lRDJWx/size_m.jpg",
         "keywords": ["aankhon", "remix", "yo", "honey", "singh", "bhaag", "johnny"]
     },
     {
         "title": "Barbadiyan",
-        "thumbnail": "https://c.saavncdn.com/408/Shiddat-Hindi-2021-20210922172609-500x500.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Barbadiyan.mp3",
+        "thumbnail": "https://c.saavncdn.com/408/Shiddat-Hindi-2021-20210922172609-500x500.jpg",
         "keywords": ["barbadiyan", "remix", "dj", "lalit", "shiddat", "sunny"]
     },
     {
         "title": "Nachange Saari Raat",
-        "thumbnail": "https://lyricsraag.com/wp-content/uploads/2016/05/Pulkit-SamratYami-Gautam.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Nachange%20Saari%20Raat.mp3",
+        "thumbnail": "https://lyricsraag.com/wp-content/uploads/2016/05/Pulkit-SamratYami-Gautam.jpg",
         "keywords": ["nachange", "saari", "raat", "remix", "dj", "ravish", "chico"]
     },
     {
         "title": "NA NA NA RE REMIX",
-        "thumbnail": "assets/remixes-hindi/NA NA NA RE.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//NA%20NA%20NA%20RE.mp3",
+        "thumbnail": "assets/remixes-hindi/NA NA NA RE.jpg",
         "keywords": ["na", "re", "remix", "dj", "anup", "daler", "mehndi"]
     },
     {
         "title": "Tunak Tunak Tun",
-        "thumbnail": "https://i1.sndcdn.com/artworks-j4q4PJXtCwSc-0-t1080x1080.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Tunak%20Tunak%20Tun.mp3",
+        "thumbnail": "https://i1.sndcdn.com/artworks-j4q4PJXtCwSc-0-t1080x1080.jpg",
         "keywords": ["tunak", "remix", "bass", "daler", "mehndi"]
     },
     {
         "title": "Tere Liye",
-        "thumbnail": "https://pendujatt.com.se/uploads/album/tere-liye-remix-madan-mohan.webp",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Tere%20Liye.mp3",
+        "thumbnail": "https://pendujatt.com.se/uploads/album/tere-liye-remix-madan-mohan.webp",
         "keywords": ["tere", "liye", "remix", "dj", "umi", "prince", "atif"]
     },
     {
         "title": "AAYEGA MAZA AB BARSAT KA",
-        "thumbnail": "https://img.youtube.com/vi/Y051I06T3-E/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//AAYEGA%20MAZA%20AB%20BARSAT%20KA.mp3",
+        "thumbnail": "https://img.youtube.com/vi/Y051I06T3-E/default.jpg",
         "keywords": ["aayega", "maza", "barsat", "remix", "mc", "stan", "emiway"]
     },
     {
         "title": "Tip Tip Barsa Paani",
-        "thumbnail": "https://img.youtube.com/vi/2l_vfFUZs6I/default.jpg",
+        "artist": "",
         "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Tip%20Tip%20Barsa%20Pani.mp3",
+        "thumbnail": "https://img.youtube.com/vi/2l_vfFUZs6I/default.jpg",
         "keywords": ["tip", "tip", "barsa", "paani", "remix", "dj", "manik", "akshay"]
     }
 ]
