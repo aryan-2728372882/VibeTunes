@@ -87,9 +87,17 @@
         });
 
         const loadOrNotifyAvatar = (uid, userAvatar) => {
-            const storedAvatar = localStorage.getItem('customAvatar');
-            if (storedAvatar) {
-                userAvatar.src = storedAvatar;
+            const user = auth.currentUser;
+            if (user && user.email && user.email.endsWith('@gmail.com')) {
+                if (user.photoURL) {
+                    if (user.photoURL.includes('default') || (user.photoURL.includes('/s2/') && !user.photoURL.includes('photo.jpg'))) {
+                        userAvatar.src = '/assets/default-avatar.png';
+                    } else {
+                        userAvatar.src = user.photoURL;
+                    }
+                } else {
+                    userAvatar.src = '/assets/default-avatar.png';
+                }
             } else {
                 db.collection("users").doc(uid).get().then(doc => {
                     if (doc.exists && doc.data().hasCustomAvatar) {
@@ -266,5 +274,5 @@
     <script src="scripts/queue.js"></script>
     <script src="scripts/mail.js"></script>
     <script src="scripts/suppresslog.js"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9370477a487c458e',t:'MTc0NTc3NzQ1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

@@ -546,8 +546,6 @@
         </div>
         <div class="update-card">
             <h3>Update Profile</h3>
-            <input type="file" id="avatar-upload" accept="image/*">
-            <button id="update-avatar-btn">Set Avatar</button>
             <input type="text" id="new-username" placeholder="New Username">
             <button id="update-username-btn">Update Username</button>
             <h3 style="margin-top: 1.5rem;">Update Password</h3>
@@ -778,10 +776,21 @@
             };
 
             const loadOrNotifyAvatar = (uid, userAvatar) => {
-                const storedAvatar = localStorage.getItem('customAvatar');
-                if (storedAvatar) {
-                    userAvatar.src = storedAvatar;
+                const user = auth.currentUser;
+                if (user && user.email && user.email.endsWith('@gmail.com')) {
+                    // For Gmail users, try to use Google profile picture
+                    if (user.photoURL) {
+                        // Check if it's a default avatar (e.g., contains 'default' or letter pattern)
+                        if (user.photoURL.includes('default') || (user.photoURL.includes('/s2/') && !user.photoURL.includes('photo.jpg'))) {
+                            userAvatar.src = '/assets/default-avatar.png'; // Your custom default
+                        } else {
+                            userAvatar.src = user.photoURL; // Custom uploaded image
+                        }
+                    } else {
+                        userAvatar.src = '/assets/default-avatar.png'; // Fallback if no photoURL
+                    }
                 } else {
+                    // Non-Gmail users or no custom avatar set
                     db.collection("users").doc(uid).get().then(doc => {
                         if (doc.exists && doc.data().hasCustomAvatar) {
                             showNotification('Info', 'Your avatar is missing (e.g., cleared data or new device). Please set it again from the account section.', 'info');
@@ -877,63 +886,6 @@
                 }
             };
 
-            const handleAvatarUpdate = async () => {
-                const user = auth.currentUser;
-                if (!user) return;
-
-                const fileInput = document.getElementById("avatar-upload");
-                const file = fileInput.files[0];
-                const button = document.getElementById("update-avatar-btn");
-                toggleButtonLoading(button, true);
-
-                if (!file) {
-                    showNotification('Error', 'Please select an image to upload.', 'error');
-                    toggleButtonLoading(button, false);
-                    return;
-                }
-
-                const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                if (!validImageTypes.includes(file.type)) {
-                    showNotification('Error', 'Please upload a valid image (JPEG, PNG, GIF, or WebP).', 'error');
-                    toggleButtonLoading(button, false);
-                    return;
-                }
-
-                const maxSizeInBytes = 5 * 1024 * 1024;
-                if (file.size > maxSizeInBytes) {
-                    showNotification('Error', 'Image size must be less than 5MB.', 'error');
-                    toggleButtonLoading(button, false);
-                    return;
-                }
-
-                try {
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        const dataURL = e.target.result;
-                        localStorage.setItem('customAvatar', dataURL);
-                        const userAvatar = document.getElementById('userAvatar');
-                        userAvatar.src = dataURL;
-
-                        await db.collection("users").doc(user.uid).update({
-                            hasCustomAvatar: true,
-                            avatarUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                        showNotification('Success', 'Avatar set successfully!', 'success');
-                    };
-                    reader.onerror = () => {
-                        showNotification('Error', 'Failed to read the image.', 'error');
-                        toggleButtonLoading(button, false);
-                    };
-                    reader.readAsDataURL(file);
-                } catch (error) {
-                    console.error("Avatar update error:", error);
-                    showNotification('Error', `Failed to set avatar: ${error.message}`, 'error');
-                } finally {
-                    toggleButtonLoading(button, false);
-                }
-            };
-
             const handleUsernameUpdate = async () => {
                 const user = auth.currentUser;
                 if (!user) return;
@@ -992,17 +944,18 @@
             document.getElementById("login-btn").addEventListener("click", handleEmailLogin);
             document.getElementById("google-login-btn").addEventListener("click", handleGoogleLogin);
             document.getElementById("signup-btn").addEventListener("click", handleSignup);
-            document.getElementById("update-avatar-btn").addEventListener("click", handleAvatarUpdate);
             document.getElementById("update-username-btn").addEventListener("click", handleUsernameUpdate);
             document.getElementById("update-password-btn").addEventListener("click", handlePasswordUpdate);
             document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
             document.getElementById("forgot-password-link").addEventListener("click", () => {
                 const email = document.getElementById("login-email").value.trim();
-                if (email) {
-                    auth.sendPasswordResetEmail(email)
-                        .then(() => showNotification('Success', 'Password reset email sent!', 'success'))
-                        .catch(error => showNotification('Error', `Error: ${error.message}`, 'error'));
+                if (!email) {
+                    showNotification('Error', 'Please enter your email address first.', 'error');
+                    return;
                 }
+                auth.sendPasswordResetEmail(email)
+                    .then(() => showNotification('Success', 'Password reset email sent! Check your inbox.', 'success'))
+                    .catch(error => showNotification('Error', `Error: ${error.message}`, 'error'));
             });
 
             document.getElementById("show-signup-btn").addEventListener("click", () => showAuthForm('signup'));
@@ -1021,5 +974,5 @@
         </div>
         <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
     </footer>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9370477a69adbf9a',t:'MTc0NTc3NzQ1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
