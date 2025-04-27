@@ -791,8 +791,36 @@
                 }
             };
 
+            const handleUsernameUpdate = async () => {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const newUsername = document.getElementById("new-username").value.trim();
+                const button = document.getElementById("update-username-btn");
+                toggleButtonLoading(button, true);
+
+                if (!newUsername) {
+                    showNotification('Error', 'Please enter a new username.', 'error');
+                    toggleButtonLoading(button, false);
+                    return;
+                }
+
+                try {
+                    await db.collection("users").doc(user.uid).update({
+                        username: newUsername
+                    });
+                    document.getElementById("new-username").value = ''; // Clear input
+                    showNotification('Success', 'Username updated successfully!', 'success');
+                } catch (error) {
+                    console.error("Username update error:", error);
+                    showNotification('Error', `Failed to update username: ${error.message}`, 'error');
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            };
+
             const handlePasswordUpdate = async () => {
-                const user =	auth.currentUser;
+                const user = auth.currentUser;
                 if (!user) return;
 
                 const currentPassword = document.getElementById("current-password").value;
@@ -821,6 +849,7 @@
             document.getElementById("login-btn").addEventListener("click", handleEmailLogin);
             document.getElementById("google-login-btn").addEventListener("click", handleGoogleLogin);
             document.getElementById("signup-btn").addEventListener("click", handleSignup);
+            document.getElementById("update-username-btn").addEventListener("click", handleUsernameUpdate);
             document.getElementById("update-password-btn").addEventListener("click", handlePasswordUpdate);
             document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
             document.getElementById("forgot-password-link").addEventListener("click", () => {
@@ -848,5 +877,5 @@
         </div>
         <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
     </footer>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'936f8a327ac9bfd8',t:'MTc0NTc2OTcwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
