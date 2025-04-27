@@ -73,6 +73,7 @@
         .nav-links {
             display: flex;
             gap: 1.5rem;
+            align-items: center;
         }
     
         .nav-links a {
@@ -89,6 +90,38 @@
             color: var(--text-primary);
             background: rgba(147, 51, 234, 0.2);
             transform: translateY(-2px);
+        }
+
+        .avatar-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-img:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .avatar-img {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .avatar-img {
+                width: 30px;
+                height: 30px;
+            }
         }
     
         .container {
@@ -387,6 +420,10 @@
             border-color: var(--accent);
         }
 
+        .notification-content.info {
+            border-color: var(--secondary);
+        }
+
         .notification-content h3 {
             margin-bottom: 1rem;
             color: var(--primary);
@@ -398,6 +435,10 @@
 
         .notification-content.error h3 {
             color: var(--accent);
+        }
+
+        .notification-content.info h3 {
+            color: var(--secondary);
         }
 
         .notification-content p {
@@ -437,7 +478,7 @@
         #auth-container {
             position: relative;
             overflow: hidden;
-            min-height: 450px; /* Adjust based on form height */
+            min-height: 450px;
         }
     </style>
 </head>
@@ -449,6 +490,12 @@
             </a>
             <nav class="nav-links">
                 <a href="index.html">Home</a>
+                <div class="avatar-container" id="avatarContainer" style="display: none;">
+                    <a href="auth.html">
+                        <img id="userAvatar" class="avatar-img" src="/assets/default-avatar.png" alt="User Avatar">
+                    </a>
+                </div>
+                <a href="#" id="loginLink" style="display: block;">Login</a>
             </nav>
         </div>
     </header>
@@ -499,6 +546,8 @@
         </div>
         <div class="update-card">
             <h3>Update Profile</h3>
+            <input type="file" id="avatar-upload" accept="image/*">
+            <button id="update-avatar-btn">Set Avatar</button>
             <input type="text" id="new-username" placeholder="New Username">
             <button id="update-username-btn">Update Username</button>
             <h3 style="margin-top: 1.5rem;">Update Password</h3>
@@ -584,7 +633,7 @@
                 });
                 const targetForm = document.getElementById(`${formType}-form`);
                 targetForm.style.display = 'block';
-                setTimeout(() => targetForm.classList.add('active-form'), 10); // Small delay for transition
+                setTimeout(() => targetForm.classList.add('active-form'), 10);
             };
 
             // Notification System
@@ -675,17 +724,33 @@
                 .catch(error => console.error("Auth persistence error:", error));
 
             auth.onAuthStateChanged(user => {
+                const avatarContainer = document.getElementById("avatarContainer");
+                const loginLink = document.getElementById("loginLink");
+                const userAvatar = document.getElementById("userAvatar");
+
                 if (user) {
                     document.getElementById("auth-container").style.display = "none";
                     document.getElementById("accountDashboard").style.display = "block";
                     document.getElementById("user-email").textContent = user.email;
                     sessionStorage.setItem("userUID", user.uid);
                     loadUserData(user.uid);
+
+                    // Show avatar, hide login link
+                    loginLink.style.display = "none";
+                    avatarContainer.style.display = "flex";
+
+                    // Load or notify for avatar
+                    loadOrNotifyAvatar(user.uid, userAvatar);
                 } else {
                     document.getElementById("auth-container").style.display = "block";
                     document.getElementById("accountDashboard").style.display = "none";
                     sessionStorage.clear();
                     showAuthForm('login');
+
+                    // Show login link, hide avatar
+                    loginLink.style.display = "block";
+                    avatarContainer.style.display = "none";
+                    userAvatar.src = "/assets/default-avatar.png";
                 }
             });
 
@@ -710,6 +775,25 @@
                     console.error("Error loading user data:", error);
                     showNotification('Error', 'Please Login To Use VibeTunes 🥳', 'error');
                 });
+            };
+
+            const loadOrNotifyAvatar = (uid, userAvatar) => {
+                const storedAvatar = localStorage.getItem('customAvatar');
+                if (storedAvatar) {
+                    userAvatar.src = storedAvatar;
+                } else {
+                    db.collection("users").doc(uid).get().then(doc => {
+                        if (doc.exists && doc.data().hasCustomAvatar) {
+                            showNotification('Info', 'Your avatar is missing (e.g., cleared data or new device). Please set it again from the account section.', 'info');
+                            userAvatar.src = "/assets/default-avatar.png";
+                        } else {
+                            userAvatar.src = "/assets/default-avatar.png";
+                        }
+                    }).catch(error => {
+                        console.error("Error checking avatar status:", error);
+                        userAvatar.src = "/assets/default-avatar.png";
+                    });
+                }
             };
 
             // Authentication Functions
@@ -738,6 +822,7 @@
                             username: `${firstName}${Math.floor(1000 + Math.random() * 9000)}`,
                             minutesListened: 0,
                             songsPlayed: 0,
+                            hasCustomAvatar: false,
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     }
@@ -779,6 +864,7 @@
                         username,
                         minutesListened: 0,
                         songsPlayed: 0,
+                        hasCustomAvatar: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     showNotification('Success', 'Signup successful! Please login.', 'success');
@@ -786,6 +872,63 @@
                 } catch (error) {
                     console.error("Signup error:", error);
                     showNotification('Error', error.message, 'error');
+                } finally {
+                    toggleButtonLoading(button, false);
+                }
+            };
+
+            const handleAvatarUpdate = async () => {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const fileInput = document.getElementById("avatar-upload");
+                const file = fileInput.files[0];
+                const button = document.getElementById("update-avatar-btn");
+                toggleButtonLoading(button, true);
+
+                if (!file) {
+                    showNotification('Error', 'Please select an image to upload.', 'error');
+                    toggleButtonLoading(button, false);
+                    return;
+                }
+
+                const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validImageTypes.includes(file.type)) {
+                    showNotification('Error', 'Please upload a valid image (JPEG, PNG, GIF, or WebP).', 'error');
+                    toggleButtonLoading(button, false);
+                    return;
+                }
+
+                const maxSizeInBytes = 5 * 1024 * 1024;
+                if (file.size > maxSizeInBytes) {
+                    showNotification('Error', 'Image size must be less than 5MB.', 'error');
+                    toggleButtonLoading(button, false);
+                    return;
+                }
+
+                try {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const dataURL = e.target.result;
+                        localStorage.setItem('customAvatar', dataURL);
+                        const userAvatar = document.getElementById('userAvatar');
+                        userAvatar.src = dataURL;
+
+                        await db.collection("users").doc(user.uid).update({
+                            hasCustomAvatar: true,
+                            avatarUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        showNotification('Success', 'Avatar set successfully!', 'success');
+                    };
+                    reader.onerror = () => {
+                        showNotification('Error', 'Failed to read the image.', 'error');
+                        toggleButtonLoading(button, false);
+                    };
+                    reader.readAsDataURL(file);
+                } catch (error) {
+                    console.error("Avatar update error:", error);
+                    showNotification('Error', `Failed to set avatar: ${error.message}`, 'error');
                 } finally {
                     toggleButtonLoading(button, false);
                 }
@@ -809,7 +952,7 @@
                     await db.collection("users").doc(user.uid).update({
                         username: newUsername
                     });
-                    document.getElementById("new-username").value = ''; // Clear input
+                    document.getElementById("new-username").value = '';
                     showNotification('Success', 'Username updated successfully!', 'success');
                 } catch (error) {
                     console.error("Username update error:", error);
@@ -849,6 +992,7 @@
             document.getElementById("login-btn").addEventListener("click", handleEmailLogin);
             document.getElementById("google-login-btn").addEventListener("click", handleGoogleLogin);
             document.getElementById("signup-btn").addEventListener("click", handleSignup);
+            document.getElementById("update-avatar-btn").addEventListener("click", handleAvatarUpdate);
             document.getElementById("update-username-btn").addEventListener("click", handleUsernameUpdate);
             document.getElementById("update-password-btn").addEventListener("click", handlePasswordUpdate);
             document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
@@ -877,5 +1021,5 @@
         </div>
         <p style="margin-top: 1.5rem; opacity: 0.8;">© 2025 VibeTunes - Music with Respect</p>
     </footer>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'936f8a327ac9bfd8',t:'MTc0NTc2OTcwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>

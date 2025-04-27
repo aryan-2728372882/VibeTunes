@@ -13,6 +13,40 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
+    <style>
+        .avatar-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #9333ea;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-img:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .avatar-img {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .avatar-img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -32,15 +66,49 @@
 
         // Update Navbar Based on Auth State
         auth.onAuthStateChanged(user => {
-            const accountNavItem = document.getElementById("nav-account");
+            const navAccount = document.getElementById("nav-account");
+            const avatarContainer = document.getElementById("avatarContainer");
+            const loginLink = document.getElementById("loginLink");
+            const userAvatar = document.getElementById("userAvatar");
+
             if (user) {
                 console.log("User is logged in:", user.email);
-                accountNavItem.innerHTML = `<a href="auth.html">Account</a>`;
+                loginLink.style.display = "none";
+                avatarContainer.style.display = "flex";
+
+                // Load or notify for avatar
+                loadOrNotifyAvatar(user.uid, userAvatar);
             } else {
                 console.warn("No user logged in.");
-                accountNavItem.innerHTML = `<a href="auth.html">Login</a>`;
+                loginLink.style.display = "block";
+                avatarContainer.style.display = "none";
+                userAvatar.src = "/assets/default-avatar.png";
             }
         });
+
+        const loadOrNotifyAvatar = (uid, userAvatar) => {
+            const storedAvatar = localStorage.getItem('customAvatar');
+            if (storedAvatar) {
+                userAvatar.src = storedAvatar;
+            } else {
+                db.collection("users").doc(uid).get().then(doc => {
+                    if (doc.exists && doc.data().hasCustomAvatar) {
+                        showNotification('Info', 'Your avatar is missing (e.g., cleared data or new device). Please set it again from the account section.', 'info');
+                        userAvatar.src = "/assets/default-avatar.png";
+                    } else {
+                        userAvatar.src = "/assets/default-avatar.png";
+                    }
+                }).catch(error => {
+                    console.error("Error checking avatar status:", error);
+                    userAvatar.src = "/assets/default-avatar.png";
+                });
+            }
+        };
+
+        // Notification System (Basic Implementation)
+        const showNotification = (title, message, type = 'info') => {
+            alert(`${title}: ${message}`); // Simplified for demo; replace with your notification system if available
+        };
 
         // Redirect Unauthenticated Users to Login Page
         function checkUserSession() {
@@ -65,7 +133,14 @@
                 <img src="assets/VibeTunes logo-modified.png" alt="VibeTunes Logo" class="logo">
             </a>
             <nav class="nav-links">
-                <span id="nav-account"><a href="auth.html">Login</a></span>
+                <span id="nav-account">
+                    <a href="auth.html" id="loginLink" style="display: block;">Login</a>
+                    <div class="avatar-container" id="avatarContainer" style="display: none;">
+                        <a href="auth.html">
+                            <img id="userAvatar" class="avatar-img" src="/assets/default-avatar.png" alt="User Avatar">
+                        </a>
+                    </div>
+                </span>
                 <span id="notificationIcon" onclick="openNotificationDialog()">🔔
                     <span id="notificationDot"></span>
                 </span>
@@ -143,7 +218,7 @@
             <h3>Queue</h3>
             <div class="queue-controls">
                 <button id="clear-queue-btn" onclick="clearQueue()">Clear Queue</button>
-                <button id="close-queue-btn" onclick="toggleQueuePanel()">✖ Close</button> <!-- Added Close Button -->
+                <button id="close-queue-btn" onclick="toggleQueuePanel()">✖ Close</button>
             </div>
         </div>
         <div id="queue-list" class="queue-list"></div>
@@ -174,8 +249,7 @@
           navigator.serviceWorker.register('/scripts/service-worker.js')
             .then(() => console.log('Service Worker registered'));
         }
-      </script>
-      
+    </script>
 
     <footer class="footer">
         <div class="footer-links">
