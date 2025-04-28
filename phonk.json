@@ -11,7 +11,8 @@
             "funk",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "BAD PARENTING FUNK V2",
@@ -26,7 +27,8 @@
             "phonk",
             "funny",
             "comedy"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "X-SLIDE",
@@ -39,7 +41,8 @@
             "808iuli",
             "phonk",
             "slide"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "CUTE DEPRESSED",
@@ -52,7 +55,8 @@
             "phonk",
             "sad",
             "cute"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Slide da Treme Melódica v2",
@@ -66,7 +70,8 @@
             "phonk",
             "slide",
             "melodic"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Eu Sento Gabu!",
@@ -77,7 +82,8 @@
             "Eu Sento Gabu!",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Murder In My Mind",
@@ -89,7 +95,8 @@
             "phonk",
             "dark",
             "creepy"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "METAMORPHOSIS",
@@ -101,7 +108,8 @@
             "phonk",
             "intense",
             "transformative"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "FUNKED UP",
@@ -114,7 +122,8 @@
             "isq",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "BRODYAGA FUNK",
@@ -125,7 +134,8 @@
             "BRODYAGA FUNK",
             "phonk",
             "russian"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "AURA",
@@ -137,7 +147,8 @@
             "DJZRX",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "hypnotic",
@@ -149,7 +160,8 @@
             "isq",
             "phonk",
             "atmospheric"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Lya Funk",
@@ -162,7 +174,8 @@
             "TRVNSPORTER",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "MONTAGEM BRAVO",
@@ -173,7 +186,8 @@
             "MONTAGEM BRAVO",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "AUTOMOTIVO MANGOS",
@@ -184,7 +198,8 @@
             "AUTOMOTIVO MANGOS",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "LOVELY BASTARDS",
@@ -194,7 +209,8 @@
         "keywords": [
             "LOVELY BASTARDS",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Montagem Mysterious Game",
@@ -206,7 +222,8 @@
             "LXNGVX",
             "phonk",
             "game"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "EVOLUTION FUNK VOL. II",
@@ -221,7 +238,8 @@
             "EVO",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "AUTOMOTIVO DA TURBULENCIA",
@@ -233,7 +251,8 @@
             "phonk",
             "brazilian funk",
             "turbulent"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "FUNK UNIVERSO",
@@ -246,7 +265,8 @@
             "funk",
             "phonk",
             "space"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "BRAZILIAN DANÇA PHONK",
@@ -257,7 +277,8 @@
             "BRAZILIAN DANÇA PHONK",
             "phonk",
             "brazilian"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "BAIXO",
@@ -269,7 +290,8 @@
             "xxanteria",
             "phonk",
             "bass"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "NUNCA MUDA?",
@@ -281,7 +303,8 @@
             "Scythermane",
             "NXGHT!",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Orquestra Maldita",
@@ -292,7 +315,8 @@
             "Orquestra Maldita",
             "phonk",
             "orchestral"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "NEON BLADE",
@@ -303,7 +327,8 @@
             "NEON BLADE",
             "phonk",
             "cyberpunk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "MONTAGEM DIAMANTE ROSA",
@@ -314,7 +339,8 @@
             "MONTAGEM DIAMANTE ROSA",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "TUCA DONKA",
@@ -327,7 +353,8 @@
             "DJ FKU",
             "Skorde",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "TREINAMENTO DE FORÇA",
@@ -339,19 +366,21 @@
             "TRXVELER",
             "phonk",
             "motivational"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "RAVE",
         "artist": "Dxrk ダーク",
         "link": "https://www.dropbox.com/scl/fi/38gx0kumyp38aqdpv5lpq/Dxrk-RAVE-Official-Audio.mp3?rlkey=607b7ynm3wlyfw3awjeoe1s37&st=ahizpcuq&raw=1",
-        "thumbnail": "https://www.sound.xyz/_next/image?url=https://d2i9ybouka0ieh.cloudfront.net/artist-uploads/35499510-9208-43cc-8019-13a2cb0b408a/RELEASE_WEB_STATIC_IMAGE/83777-newImage.png&w=3840&q=75",
+        "thumbnail": "https://www.sound.xyz/_next/image?url=https://d2i9ybouka0ieh.cloudfront.net/artist-Uploads/35499510-9208-43cc-8019-13a2cb0b408a/RELEASE_WEB_STATIC_IMAGE/83777-newImage.png&w=3840&q=75",
         "keywords": [
             "RAVE",
             "Dxrk ダーク",
             "phonk",
             "rave"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "GHOST!",
@@ -364,7 +393,8 @@
             "KIIXSHI",
             "phonk",
             "ghost"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Cuando se te moja la tarea 2",
@@ -376,7 +406,8 @@
             "LDRR",
             "phonk",
             "funny"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "DNA",
@@ -388,7 +419,8 @@
             "LXNGVX",
             "VISXGE",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "AVANGARD",
@@ -400,7 +432,8 @@
             "LONOWN",
             "slowed",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Life in Rio",
@@ -411,7 +444,8 @@
             "Life in Rio",
             "phonk",
             "brazilian"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "GigaChad Theme",
@@ -424,7 +458,8 @@
             "phonk",
             "house",
             "meme"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Sequência da Dz7",
@@ -435,7 +470,8 @@
             "Sequência da Dz7",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Beeper Funk",
@@ -449,7 +485,8 @@
             "funk",
             "phonk",
             "slowed"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "BRUXO FANTASMA",
@@ -461,7 +498,8 @@
             "LXNGVX",
             "Dj Gabriel do Borel",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Scopin",
@@ -471,7 +509,8 @@
         "keywords": [
             "Scopin",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "RAPTURE",
@@ -481,7 +520,8 @@
         "keywords": [
             "RAPTURE",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "FRESH",
@@ -492,7 +532,8 @@
             "FRESH",
             "NXVAMANE",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Montagem Lunar Celestia 1.0",
@@ -504,7 +545,8 @@
             "TOKYOPHILE",
             "phonk",
             "slowed"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "PYTHON FUNK",
@@ -517,7 +559,8 @@
             "Sayfalse",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "O Melhor no Que Faz 3.0 [Slowed]",
@@ -528,7 +571,8 @@
             "O Melhor no Que Faz 3.0",
             "phonk",
             "slowed"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "MONTAGEM VOZES PROFUNDAS (Remixes)",
@@ -540,7 +584,8 @@
             "phonk",
             "brazilian funk",
             "remix"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "EL QUE LA DEBE FUNK",
@@ -551,7 +596,8 @@
             "EL QUE LA DEBE FUNK",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "AUTOMOTIVO EMPURRA",
@@ -563,7 +609,8 @@
             "sma$her",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Montagem Melodia Explosiva",
@@ -577,7 +624,8 @@
             "DYSMANE",
             "Mc Dido",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "RISADA CHUCK 01",
@@ -589,7 +637,8 @@
             "phonk",
             "horror",
             "chuck"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Se Paciente Funk",
@@ -601,7 +650,8 @@
             "RD12",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "FUNK INFERNAL",
@@ -614,7 +664,8 @@
             "Mxng0",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "EMPTY FUNK",
@@ -628,7 +679,8 @@
             "sixnite",
             "funk",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "THOMAS",
@@ -638,7 +690,8 @@
         "keywords": [
             "THOMAS",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "Mexican Phonk Eki",
@@ -651,7 +704,8 @@
             "TOLCHONOV",
             "phonk",
             "mexican"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "DRESS!",
@@ -661,7 +715,8 @@
         "keywords": [
             "DRESS!",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "AUTOMOTIVO PA PA PAPAI",
@@ -673,7 +728,8 @@
             "DJ RIO",
             "0to8",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "BLOODY BRAZIL (Slowed)",
@@ -686,7 +742,8 @@
             "phonk",
             "slowed",
             "brazilian"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "REI DO BRASIL",
@@ -698,7 +755,8 @@
             "Seek",
             "phonk",
             "brazilian"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "KRUSHKRUSH!",
@@ -709,7 +767,8 @@
             "KRUSHKRUSH!",
             "Hussain Ali",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "NITE",
@@ -720,7 +779,8 @@
             "NITE",
             "ELVEN DIOR",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "krushed!",
@@ -733,7 +793,8 @@
             "SXCREDMANE",
             "FXRCE",
             "phonk"
-        ]
+        ],
+        "genre": "Phonk"
     },
     {
         "title": "The Automotivo Infernal 1.0",
@@ -744,6 +805,7 @@
             "The Automotivo Infernal 1.0",
             "phonk",
             "brazilian funk"
-        ]
+        ],
+        "genre": "Phonk"
     }
 ]
