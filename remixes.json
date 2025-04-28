@@ -310,5 +310,21 @@
         "thumbnail": "https://img.youtube.com/vi/2l_vfFUZs6I/default.jpg",
         "keywords": ["tip", "tip", "barsa", "paani", "remix", "dj", "manik", "akshay"],
         "genre": "Remix"
+    },
+    {
+        "title": "Chunnari Chunnari",
+        "artist": "",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Chunnari%20Chunnari.mp3",
+        "thumbnail": "https://i1.sndcdn.com/artworks-000545295708-xm2psz-t1080x1080.jpg",
+        "keywords": ["chunnari", "remix", "dj"],
+        "genre": "Remix"
+    },
+    {
+        "title": "Ek Haseena Thi Ek Deewana Tha",
+        "artist": "",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Ek%20Haseena%20Thi%20Ek%20Deewana%20Tha.mp3",
+        "thumbnail": "https://i1.sndcdn.com/artworks-000233417117-4jhe4y-t1080x1080.jpg",
+        "keywords": ["ek", "haseena", "thi", "deewana", "tha", "remix", "dj"],
+        "genre": "Remix"
     }
 ]
