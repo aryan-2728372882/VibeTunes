@@ -326,5 +326,21 @@
         "thumbnail": "https://i1.sndcdn.com/artworks-000233417117-4jhe4y-t1080x1080.jpg",
         "keywords": ["ek", "haseena", "thi", "deewana", "tha", "remix", "dj"],
         "genre": "Remix"
+    },
+    {
+        "title": "Mujhse Shadi Krogi",
+        "artist": "",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Mujhse%20Shadi%20Karogi.mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/01A3mar3NQ/01A3mar3NQ/size_m.jpg",
+        "keywords": ["mujhse", "shadi", "krogi", "remix", "dj"],
+        "genre": "Remix"
+    },
+    {
+        "title": "Ishq Tera Tadpave ( Oh ho ho)",
+        "artist": "",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Ishq%20Tera%20Tadpave%20(Oh%20Ho%20Ho%20Ho).mp3",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/21GWwR3pkg/GWwrz07p3p/size_m.jpg",
+        "keywords": ["ishq", "tera", "tadpave", "oh", "ho", "ho", "remix", "dj"],
+        "genre": "Remix"
     }
 ]
