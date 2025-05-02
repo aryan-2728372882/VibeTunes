@@ -32,6 +32,7 @@ function setupSongTracking(uid) {
             hasSeeked = false;
             showPopup("Song started playing!");
         }
+        updatePlayPauseButton();
     });
 
     audioPlayer.addEventListener("pause", () => {
@@ -43,6 +44,7 @@ function setupSongTracking(uid) {
             songStarted = false;
             showPopup("Song paused.");
         }
+        updatePlayPauseButton();
     });
 
     audioPlayer.addEventListener("ended", () => {
@@ -62,6 +64,7 @@ function setupSongTracking(uid) {
         }
         totalPlayTime = 0;
         continuousPlayTime = 0;
+        updatePlayPauseButton();
     });
 
     seekBar.addEventListener("input", () => {
@@ -96,29 +99,23 @@ function updateUserStats(uid, minutesPlayed) {
 
 // Popup Utility Function
 function showPopup(message) {
-    // Check if a popup is already being shown
     if (showPopup.isPending) {
-        // Delay the new popup until the current one is gone
         setTimeout(() => showPopup(message), 200);
         return;
     }
 
-    // Set flag to indicate a popup is pending
     showPopup.isPending = true;
 
-    // Remove any existing popup
     const existingPopup = document.querySelector(".popup-notification");
     if (existingPopup) {
         existingPopup.remove();
     }
 
-    // Create new popup
     const popup = document.createElement("div");
     popup.className = "popup-notification";
     popup.textContent = message;
     document.body.appendChild(popup);
 
-    // Remove popup after 3 seconds and clear pending flag
     setTimeout(() => {
         if (popup.parentNode) {
             popup.remove();
@@ -127,10 +124,8 @@ function showPopup(message) {
     }, 3000);
 }
 
-// Initialize pending flag
 showPopup.isPending = false;
 
-// Song Lists
 // Song Lists
 const fixedBhojpuri = [
     {
@@ -158,7 +153,7 @@ const fixedBhojpuri = [
         "genre": "Bhojpuri"
     },
     {
-        "title": "Balma Kadar na Jane   Jane",
+        "title": "Balma Kadar na Jane",
         "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20-%20%E0%A4%AC%E0%A4%B2%20%E0%A4%B0%20%E0%A4%89%E0%A4%AE%E0%A4%B0%E0%A4%AF%20%E0%A4%95%20%20Dhananjay%20Dhadkan%20Viral%20Song%202024%20%20Balma%20Kadar%20Na%20Jnae.mp3",
         "thumbnail": "https://c.saavncdn.com/659/Balma-Kadar-Na-Jane-Bhojpuri-2024-20241022172505-500x500.jpg",
         "genre": "Bhojpuri"
@@ -347,7 +342,7 @@ const nextBtn = document.getElementById("next-btn");
 const prevBtn = document.getElementById("prev-btn");
 const repeatBtn = document.getElementById("repeat-btn");
 
-playerContainer.style.display = "none";
+if (playerContainer) playerContainer.style.display = "none";
 
 // Utility Functions
 function throttle(func, limit) {
@@ -407,16 +402,30 @@ function enableBackgroundPlayback() {
                 audioPlayer.play().catch(err => {
                     console.error("Background playback error:", err);
                     showPopup("Playback paused in background, retrying...");
-                    setTimeout(() => audioPlayer.play().catch(() => nextSong()), 1000);
+                    setTimeout(() => {
+                        if (wasPlayingBeforeHide) {
+                            audioPlayer.play().catch(() => {
+                                console.error("Retry failed, skipping to next song");
+                                nextSong();
+                            });
+                        }
+                    }, 1000);
                 });
             }
-        } else if (document.visibilityState === "visible" && wasPlayingBeforeHide) {
+        } else if (document.visibilityState === "visible" && wasPlayingBeforeHide && audioPlayer.paused) {
             requestWakeLock();
-            updateProgress();
             audioPlayer.play().catch(err => {
                 console.error("Resume playback error:", err);
-                setTimeout(() => audioPlayer.play().catch(() => nextSong()), 1000);
+                showPopup("Failed to resume playback, retrying...");
+                setTimeout(() => {
+                    audioPlayer.play().catch(() => {
+                        console.error("Retry failed, skipping to next song");
+                        nextSong();
+                    });
+                }, 1000);
             });
+            updatePlayPauseButton();
+            updateProgress();
         }
     };
 
@@ -431,7 +440,6 @@ function enableBackgroundPlayback() {
         }
     });
 
-    // Handle buffering
     audioPlayer.addEventListener('waiting', () => {
         console.log("Buffering detected...");
         showPopup("Buffering, please wait...");
@@ -439,12 +447,15 @@ function enableBackgroundPlayback() {
 
     audioPlayer.addEventListener('canplay', () => {
         console.log("Can play, resuming...");
-        if (wasPlayingBeforeHide && audioPlayer.paused) {
-            audioPlayer.play().catch(err => console.error("Resume after buffering error:", err));
+        if (wasPlayingBeforeHide && audioPlayer.paused && !manualPause) {
+            audioPlayer.play().catch(err => {
+                console.error("Resume after buffering error:", err);
+                showPopup("Failed to resume after buffering");
+            });
         }
+        updatePlayPauseButton();
     });
 
-    // Cache fallback on error
     audioPlayer.addEventListener('error', async () => {
         console.error("Audio error, checking cache...");
         const currentSrc = audioPlayer.src;
@@ -466,6 +477,7 @@ function enableBackgroundPlayback() {
             console.error("Cache access error:", err);
             nextSong();
         }
+        updatePlayPauseButton();
     });
 }
 
@@ -578,7 +590,7 @@ async function loadFullJSONSongs() {
 }
 
 function isValidSong(song) {
-    const isValid = song && 
+    const isValid = song &&
                    typeof song.title === 'string' && song.title.trim() &&
                    typeof song.link === 'string' && song.link.trim() &&
                    typeof song.thumbnail === 'string' && song.thumbnail.trim();
@@ -611,7 +623,7 @@ function populateSection(containerId, songs, context) {
 
         window.songData = window.songData || {};
         window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
-        
+
         const menuBtn = songElement.querySelector('.song-menu-btn');
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -641,14 +653,14 @@ function searchSongs(query) {
         songsHash[song.title] = song;
     });
     allSongs = Object.values(songsHash);
-    
-    const searchSongsList = allSongs.filter(song => 
+
+    const searchSongsList = allSongs.filter(song =>
         song.title.toLowerCase().includes(query)
     );
-    
+
     const searchContainer = document.querySelector('#search-results-container .scroll-container');
     searchContainer.innerHTML = '';
-    
+
     if (searchSongsList.length > 0) {
         document.getElementById('search-results-container').style.display = 'block';
         searchSongsList.forEach(song => {
@@ -666,18 +678,18 @@ function searchSongs(query) {
                 </div>
                 <div class="song-title">${song.title}</div>
             `;
-            
+
             window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
             searchContainer.appendChild(songElement);
-            
+
             const menuBtn = songElement.querySelector('.song-menu-btn');
             menuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 showSongMenu(e, songId);
             });
         });
-        
-        currentPlaylist = searchSongsList.filter(song => 
+
+        currentPlaylist = searchSongsList.filter(song =>
             song.title.toLowerCase().includes(query)
         );
     } else {
@@ -729,7 +741,6 @@ async function playSong(title, context, retryCount = 0) {
         audioPlayer.pause();
         audioPlayer.currentTime = 0;
 
-        // Check cache first
         const cache = await caches.open('vibetunes-audio-cache');
         const cachedResponse = await cache.match(song.link);
         if (cachedResponse) {
@@ -750,14 +761,14 @@ async function playSong(title, context, retryCount = 0) {
         clearAudioCache();
         requestWakeLock();
         updateProgress();
-        
+
         const songId = `${context}-${currentSongIndex}`;
         if (typeof addToRecentlyPlayed === 'function') {
             addToRecentlyPlayed(songId, song.title, song.thumbnail);
         } else if (typeof addToRecentlyPlayedLocal === 'function') {
             addToRecentlyPlayedLocal(songId);
         }
-        
+
         if (typeof displayRecentlyPlayed === 'function') {
             setTimeout(displayRecentlyPlayed, 500);
         }
@@ -790,7 +801,7 @@ function highlightCurrentSong() {
 
 async function handleSongEnd() {
     console.log("Song ended, Repeat Mode:", repeatMode, "Context:", currentContext, "Index:", currentSongIndex);
-    
+
     if (repeatMode === 2) {
         audioPlayer.currentTime = 0;
         await audioPlayer.play();
@@ -933,7 +944,7 @@ async function fetchLatestTelegramUpdates() {
                     }
 
                     activeMessageCount++;
-                    
+
                     const announcementSection = document.createElement("section");
                     announcementSection.classList.add("notification-box");
                     announcementSection.setAttribute('data-message-id', messageId);
@@ -981,17 +992,17 @@ async function fetchLatestTelegramUpdates() {
 function clearNotifications() {
     if (notificationContainer) {
         const messageElements = notificationContainer.querySelectorAll('.notification-box');
-        
+
         if (messageElements.length === 0) {
             showNotificationPopup("No notifications to clear");
             return;
         }
-        
+
         messageElements.forEach(element => {
             const messageId = element.getAttribute('data-message-id');
             if (messageId) clearedMessageIds.add(parseInt(messageId));
         });
-        
+
         notificationContainer.innerHTML = `
             <div class="no-notifications">
                 <svg viewBox="0 0 24 24" style="width:48px;height:48px;margin-bottom:10px;opacity:0.5">
@@ -1000,11 +1011,11 @@ function clearNotifications() {
                 <p>No announcements available at this time.</p>
             </div>
         `;
-        
+
         localStorage.setItem('userClearedMessages', JSON.stringify([...clearedMessageIds]));
         showNotificationPopup("Notifications cleared permanently for your account");
     }
-    
+
     markAsSeen();
 }
 
@@ -1013,7 +1024,7 @@ function initializeNotifications() {
     if (savedClearedIds) {
         clearedMessageIds = new Set(JSON.parse(savedClearedIds));
     }
-    
+
     fetchLatestTelegramUpdates();
 }
 
@@ -1059,14 +1070,12 @@ initializeNotifications();
 
 // Event Listeners
 audioPlayer.addEventListener("play", () => {
-    if (manualPause) {
-        if (document.activeElement === playPauseBtn || audioPlayer.currentTime === 0) {
-            manualPause = false;
-            console.log("Manual pause reset by user action or new song");
-        } else {
-            audioPlayer.pause();
-            console.log("Blocked unwanted play after manual pause");
-        }
+    if (manualPause && document.activeElement !== playPauseBtn && audioPlayer.currentTime !== 0) {
+        audioPlayer.pause();
+        console.log("Blocked unwanted play after manual pause");
+    } else {
+        manualPause = false;
+        updatePlayPauseButton();
     }
 });
 
@@ -1080,6 +1089,7 @@ audioPlayer.addEventListener('error', (e) => {
     showPopup("Song failed to play, skipping...");
     isPlaying = false;
     nextSong();
+    updatePlayPauseButton();
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -1100,26 +1110,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         showPopup("Service Worker not supported, playback may be affected.");
     }
 
-    if (playPauseBtn) {
-        playPauseBtn.removeEventListener('click', togglePlay);
-        playPauseBtn.addEventListener('click', togglePlay);
-    }
-    if (seekBar) {
-        seekBar.removeEventListener('input', seekSong);
-        seekBar.addEventListener('input', () => seekSong(seekBar.value));
-    }
-    if (nextBtn) {
-        nextBtn.removeEventListener('click', nextSong);
-        nextBtn.addEventListener('click', nextSong);
-    }
-    if (prevBtn) {
-        prevBtn.removeEventListener('click', previousSong);
-        prevBtn.addEventListener('click', previousSong);
-    }
-    if (repeatBtn) {
-        repeatBtn.removeEventListener('click', toggleRepeat);
-        repeatBtn.addEventListener('click', toggleRepeat);
-    }
+    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlay);
+    if (seekBar) seekBar.addEventListener('input', () => seekSong(seekBar.value));
+    if (nextBtn) nextBtn.addEventListener('click', nextSong);
+    if (prevBtn) prevBtn.addEventListener('click', previousSong);
+    if (repeatBtn) repeatBtn.addEventListener('click', toggleRepeat);
 
     console.log("DOM fully loaded and event listeners attached.");
 });
@@ -1185,6 +1180,7 @@ function togglePlay() {
                 .catch(error => {
                     console.error("Toggle play error:", error);
                     showPopup("Click again to play");
+                    updatePlayPauseButton();
                 });
         }
     } else {
@@ -1194,18 +1190,6 @@ function togglePlay() {
         updatePlayPauseButton();
     }
 }
-
-audioPlayer.addEventListener('play', () => {
-    if (manualPause) {
-        if (document.activeElement === playPauseBtn) {
-            manualPause = false;
-            console.log("Manual pause reset by user play action");
-        } else {
-            audioPlayer.pause();
-            console.log("Blocked unwanted play after manual pause.");
-        }
-    }
-});
 
 document.querySelectorAll('.scroll-container').forEach(container => {
     const items = container.querySelectorAll('.song-item').length;
@@ -1236,35 +1220,35 @@ console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
 
 function showSongMenu(event, songId) {
     document.querySelectorAll('.song-context-menu').forEach(menu => menu.remove());
-    
+
     const contextMenu = document.createElement('div');
     contextMenu.className = 'song-context-menu';
-    
+
     const rect = event.target.getBoundingClientRect();
     contextMenu.style.position = 'fixed';
     contextMenu.style.top = `${rect.bottom + 5}px`;
     contextMenu.style.left = `${rect.left}px`;
-    
+
     contextMenu.innerHTML = `
         <button class="menu-option add-to-queue-btn">Add to Queue</button>
         <button class="menu-option share-btn">Share</button>
     `;
-    
+
     const addToQueueBtn = contextMenu.querySelector('.add-to-queue-btn');
     addToQueueBtn.addEventListener('click', () => {
         const song = window.songData[songId];
         addToQueue(song);
         contextMenu.remove();
     });
-    
+
     const shareBtn = contextMenu.querySelector('.share-btn');
     shareBtn.addEventListener('click', () => {
         generateShareLink(songId);
         contextMenu.remove();
     });
-    
+
     document.body.appendChild(contextMenu);
-    
+
     document.addEventListener('click', function closeMenu(e) {
         if (!contextMenu.contains(e.target) && e.target !== event.target) {
             contextMenu.remove();
@@ -1279,12 +1263,12 @@ function generateShareLink(songId) {
         showPopup("Song not found for sharing.");
         return;
     }
-    
+
     const encodedSong = encodeURIComponent(JSON.stringify(song));
     const shareLink = `${window.location.origin}/shared.html?song=${encodedSong}`;
-    
+
     copyToClipboard(shareLink, "Share link copied to clipboard!", "Failed to copy link.");
-    
+
     console.log(`Generated share link: ${shareLink}`);
 }
 
@@ -1323,4 +1307,10 @@ function handleSongEndWithQueue() {
     currentPlaylist = [nextSong, ...currentPlaylist];
     currentSongIndex = 0;
     playSong(nextSong.title, context);
+}
+
+function copyToClipboard(text, successMessage, errorMessage) {
+    navigator.clipboard.writeText(text)
+        .then(() => showPopup(successMessage))
+        .catch(() => showPopup(errorMessage));
 }
