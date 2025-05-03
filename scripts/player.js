@@ -184,7 +184,7 @@ const fixedBhojpuri = [
     },
     {
         "title": "samastipur jila ha",
-        "link": "https://github.com/aryan-2728372882/TRENDINGBHOJPURI/raw/main/%23video%20Song%20%20%23%E0%A4%B8%E0%A4%AE%E0%A4%B8%E0%A4%A4%E0%A4%AA%E0%A4%B0%20%20%E0%A4%9C%E0%A4%B2%20%E0%A4%B9%20%20%23chandan%20yadav%20or%20%23kajal%20raj%20%E0%A4%95%20%E0%A4%AC%E0%A4%B0%E0%A4%A1%20%E0%A4%97%E0%A4%A8%20%20%20Samastipur%20jila%20ha.mp3",
+        "link": "https://github.com/aryan-2728372882/TRENDINGB Saatastipur%20jila%20ha.mp3",
         "thumbnail": "https://i.ytimg.com/vi/-EBdpD_aGls/maxresdefault.jpg",
         "genre": "Bhojpuri"
     }
@@ -230,7 +230,7 @@ const fixedPhonk = [
     {
         "title": "Acordeão Funk",
         "link": "https://github.com/aryan-2728372882/TRENDINGPHONK/raw/main/Acorde%C3%A3o%20Funk.mp3",
-        "thumbnail": "https://i.ytimg.com/vi/-ELVoLmlSpU/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGBYgcigxMA8=&rs=AOn4CLBoSiMTQsIhkgEGi-_-wKzsTngy0Q",
+        "thumbnail": "https://i.ytimg.com/vi/-ELVoLmlSpU/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGH8gEyh5MA8=&rs=AOn4CLBJoXKWv-g1K0zNg1Xxp93d1jviQg",
         "genre": "Phonk"
     },
     {
@@ -383,8 +383,26 @@ function setupMediaSession(song) {
             artist: song.artist || 'Unknown Artist',
             artwork: [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
         });
-        navigator.mediaSession.setActionHandler('play', () => togglePlay());
-        navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+        navigator.mediaSession.setActionHandler('play', () => {
+            if (audioPlayer.paused) {
+                manualPause = false;
+                audioPlayer.play().then(() => {
+                    updatePlayPauseButton();
+                    requestWakeLock();
+                }).catch(err => {
+                    console.error("MediaSession play error:", err);
+                    showPopup("Failed to play from lock screen");
+                });
+            }
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+            if (!audioPlayer.paused) {
+                manualPause = true;
+                audioPlayer.pause();
+                updatePlayPauseButton();
+                showPopup("Paused from lock screen");
+            }
+        });
         navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
         navigator.mediaSession.setActionHandler('previoustrack', () => previousSong());
     }
@@ -1159,9 +1177,22 @@ function toggleRepeat() {
     console.log("Repeat mode changed to:", repeatMode);
 }
 
+function truncateTitle(title) {
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if (isAndroid) {
+        const words = title.split(' ');
+        if (words.length > 3) {
+            return words.slice(0, 3).join(' ') + '...';
+        } else if (title.length > 20) {
+            return title.substring(0, 17) + '...';
+        }
+    }
+    return title;
+}
+
 function updatePlayerUI(song) {
     document.getElementById("player-thumbnail").src = song.thumbnail;
-    document.getElementById("player-title").textContent = song.title;
+    document.getElementById("player-title").textContent = truncateTitle(song.title);
     updatePlayPauseButton();
 }
 
@@ -1193,8 +1224,11 @@ function togglePlay() {
 
 document.querySelectorAll('.scroll-container').forEach(container => {
     const items = container.querySelectorAll('.song-item').length;
-    const bufferWidth = Math.max(20, items * 5);
-    container.style.setProperty('--buffer-width', `${bufferWidth}rem`);
+    const itemWidth = 10; // Approximate width of each song-item in rem
+    const containerWidth = container.offsetWidth / 16; // Convert px to rem
+    const totalContentWidth = items * itemWidth;
+    const extraPadding = Math.max(20, (totalContentWidth - containerWidth + itemWidth) * 1.2); // Add 20% extra padding
+    container.style.setProperty('--buffer-width', `${extraPadding}rem`);
 });
 
 function updatePlayPauseButton() {
