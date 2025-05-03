@@ -342,5 +342,45 @@
         "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/21GWwR3pkg/GWwrz07p3p/size_m.jpg",
         "keywords": ["ishq", "tera", "tadpave", "oh", "ho", "ho", "remix", "dj"],
         "genre": "Remix"
+    },
+    {
+        "title": "Bachna Ae Haseeno",
+        "artist": "",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Bachna%20Ae%20Haseeno.mp3",
+        "thumbnail": "https://c.saavncdn.com/112/Bachna-Ae-Haseeno-Hindi-2008-20190329150948-500x500.jpg",        
+        "keywords": ["bachna", "ae", "haseeno", "remix", "dj"],
+        "genre": "Remix"
+    },
+    {
+        "title": "Afgan Jalebi",
+        "artist": "",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//AFGHAN%20JALEBI.mp3",
+        "thumbnail": "https://c.saavncdn.com/951/Phantom-Hindi-2015-500x500.jpg",
+        "keywords": ["afgan", "jalebi", "remix", "dj"],
+        "genre": "Remix"
+    },
+    {
+        "title": "",
+        "artist": "",
+        "link": "",
+        "thumbnail": "",
+        "keywords": [],
+        "genre": "Remix"
+    },
+    {
+        "title": "",
+        "artist": "",
+        "link": "",
+        "thumbnail": "",
+        "keywords": [],
+        "genre": "Remix"
+    },
+    {
+        "title": "",
+        "artist": "",
+        "link": "",
+        "thumbnail": "",
+        "keywords": [],
+        "genre": "Remix"
     }
 ]
