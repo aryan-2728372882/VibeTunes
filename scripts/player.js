@@ -839,8 +839,10 @@ async function handleSongEnd() {
         return;
     }
 
-    if (repeatMode === 1 || currentSongIndex < currentPlaylist.length - 1) {
+    if (repeatMode === 1) {
         currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
+    } else if (currentSongIndex < currentPlaylist.length - 1) {
+        currentSongIndex += 1;
     } else {
         let nextContext = null;
         let nextPlaylist = null;
@@ -1014,7 +1016,7 @@ function clearNotifications() {
         if (messageElements.length === 0) {
             showNotificationPopup("No notifications to clear");
             return;
-        }
+    }
 
         messageElements.forEach(element => {
             const messageId = element.getAttribute('data-message-id');
