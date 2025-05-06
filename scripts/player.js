@@ -1,10 +1,8 @@
 // Firebase Auth and Firestore
 auth.onAuthStateChanged(user => {
     if (!user) {
-        console.warn("No user logged in, skipping song tracking.");
         showPopup("Please log in to track your listening stats!");
     } else {
-        console.log("User detected:", user.email);
         showPopup(`Welcome, ${user.email}! Tracking your stats...`);
         setupSongTracking(user.uid);
     }
@@ -14,8 +12,6 @@ function setupSongTracking(uid) {
     const audioPlayer = document.getElementById("audio-player");
     const seekBar = document.getElementById("seek-bar");
     if (!audioPlayer || !seekBar) {
-        console.error("Audio player or seek bar not found!");
-        showPopup("Error: Player setup failed. Refresh the page.");
         return;
     }
 
@@ -30,7 +26,6 @@ function setupSongTracking(uid) {
             lastPlayTime = Date.now();
             songStarted = true;
             hasSeeked = false;
-            showPopup("Song started playing!");
         }
         updatePlayPauseButton();
     });
@@ -42,7 +37,6 @@ function setupSongTracking(uid) {
             if (!hasSeeked) continuousPlayTime += elapsed;
             lastPlayTime = 0;
             songStarted = false;
-            showPopup("Song paused.");
         }
         updatePlayPauseButton();
     });
@@ -58,9 +52,6 @@ function setupSongTracking(uid) {
         if (continuousPlayTime >= 60) {
             const minutesPlayed = Math.round(totalPlayTime / 60);
             updateUserStats(uid, minutesPlayed);
-            showPopup(`Song finished! Stats updated: +${minutesPlayed} min`);
-        } else {
-            showPopup("Song ended");
         }
         totalPlayTime = 0;
         continuousPlayTime = 0;
@@ -77,8 +68,24 @@ function setupSongTracking(uid) {
             }
             hasSeeked = true;
             continuousPlayTime = 0;
-            showPopup("Seeked in song - continuous playtime reset.");
         }
+    });
+
+    audioPlayer.addEventListener('error', async () => {
+        const currentSrc = audioPlayer.src;
+        try {
+            const cache = await caches.open('vibetunes-audio-cache');
+            const cachedResponse = await cache.match(currentSrc);
+            if (cachedResponse) {
+                audioPlayer.src = URL.createObjectURL(await cachedResponse.blob());
+                audioPlayer.play().catch(() => nextSong());
+            } else {
+                nextSong();
+            }
+        } catch {
+            nextSong();
+        }
+        updatePlayPauseButton();
     });
 }
 
@@ -88,43 +95,10 @@ function updateUserStats(uid, minutesPlayed) {
     userRef.update({
         songsPlayed: firebase.firestore.FieldValue.increment(1),
         minutesListened: firebase.firestore.FieldValue.increment(minutesPlayed)
-    }).then(() => {
-        console.log(`Updated: +1 song, +${minutesPlayed} minutes`);
     }).catch(error => {
-        console.error("Error updating user stats:", error);
-        showPopup("Failed to update stats. Retrying in 2 seconds...");
         setTimeout(() => updateUserStats(uid, minutesPlayed), 2000);
     });
 }
-
-// Popup Utility Function
-function showPopup(message) {
-    if (showPopup.isPending) {
-        setTimeout(() => showPopup(message), 200);
-        return;
-    }
-
-    showPopup.isPending = true;
-
-    const existingPopup = document.querySelector(".popup-notification");
-    if (existingPopup) {
-        existingPopup.remove();
-    }
-
-    const popup = document.createElement("div");
-    popup.className = "popup-notification";
-    popup.textContent = message;
-    document.body.appendChild(popup);
-
-    setTimeout(() => {
-        if (popup.parentNode) {
-            popup.remove();
-        }
-        showPopup.isPending = false;
-    }, 3000);
-}
-
-showPopup.isPending = false;
 
 // Song Lists
 const fixedBhojpuri = [
@@ -389,9 +363,6 @@ function setupMediaSession(song) {
                 audioPlayer.play().then(() => {
                     updatePlayPauseButton();
                     requestWakeLock();
-                }).catch(err => {
-                    console.error("MediaSession play error:", err);
-                    showPopup("Failed to play from lock screen");
                 });
             }
         });
@@ -400,7 +371,6 @@ function setupMediaSession(song) {
                 manualPause = true;
                 audioPlayer.pause();
                 updatePlayPauseButton();
-                showPopup("Paused from lock screen");
             }
         });
         navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
@@ -417,29 +387,19 @@ function enableBackgroundPlayback() {
         if (document.visibilityState === "hidden") {
             wasPlayingBeforeHide = !audioPlayer.paused;
             if (wasPlayingBeforeHide) {
-                audioPlayer.play().catch(err => {
-                    console.error("Background playback error:", err);
-                    showPopup("Playback paused in background, retrying...");
+                audioPlayer.play().catch(() => {
                     setTimeout(() => {
                         if (wasPlayingBeforeHide) {
-                            audioPlayer.play().catch(() => {
-                                console.error("Retry failed, skipping to next song");
-                                nextSong();
-                            });
+                            audioPlayer.play().catch(() => nextSong());
                         }
                     }, 1000);
                 });
             }
         } else if (document.visibilityState === "visible" && wasPlayingBeforeHide && audioPlayer.paused) {
             requestWakeLock();
-            audioPlayer.play().catch(err => {
-                console.error("Resume playback error:", err);
-                showPopup("Failed to resume playback, retrying...");
+            audioPlayer.play().catch(() => {
                 setTimeout(() => {
-                    audioPlayer.play().catch(() => {
-                        console.error("Retry failed, skipping to next song");
-                        nextSong();
-                    });
+                    audioPlayer.play().catch(() => nextSong());
                 }, 1000);
             });
             updatePlayPauseButton();
@@ -451,49 +411,19 @@ function enableBackgroundPlayback() {
 
     window.addEventListener("blur", () => {
         if (!audioPlayer.paused) {
-            audioPlayer.play().catch(err => {
-                console.error("Blur playback error:", err);
+            audioPlayer.play().catch(() => {
                 setTimeout(() => audioPlayer.play().catch(() => nextSong()), 1000);
             });
         }
     });
 
     audioPlayer.addEventListener('waiting', () => {
-        console.log("Buffering detected...");
-        showPopup("Buffering, please wait...");
     });
 
     audioPlayer.addEventListener('canplay', () => {
-        console.log("Can play, resuming...");
         if (wasPlayingBeforeHide && audioPlayer.paused && !manualPause) {
-            audioPlayer.play().catch(err => {
-                console.error("Resume after buffering error:", err);
-                showPopup("Failed to resume after buffering");
+            audioPlayer.play().catch(() => {
             });
-        }
-        updatePlayPauseButton();
-    });
-
-    audioPlayer.addEventListener('error', async () => {
-        console.error("Audio error, checking cache...");
-        const currentSrc = audioPlayer.src;
-        try {
-            const cache = await caches.open('vibetunes-audio-cache');
-            const cachedResponse = await cache.match(currentSrc);
-            if (cachedResponse) {
-                console.log("Found cached audio, retrying...");
-                audioPlayer.src = URL.createObjectURL(await cachedResponse.blob());
-                audioPlayer.play().catch(err => {
-                    console.error("Cached playback error:", err);
-                    nextSong();
-                });
-            } else {
-                console.log("No cached audio, skipping...");
-                nextSong();
-            }
-        } catch (err) {
-            console.error("Cache access error:", err);
-            nextSong();
         }
         updatePlayPauseButton();
     });
@@ -508,24 +438,17 @@ async function requestWakeLock() {
         try {
             if ('wakeLock' in navigator) {
                 wakeLock = await navigator.wakeLock.request('screen');
-                console.log("Wake Lock acquired");
                 wakeLock.addEventListener('release', () => {
-                    console.log("Wake Lock released");
                     wakeLock = null;
                     if (!audioPlayer.paused && document.visibilityState === "visible") {
                         setTimeout(requestWakeLock, 1000);
                     }
                 });
-            } else {
-                console.warn("Wake Lock not supported in this browser.");
             }
-        } catch (err) {
-            console.warn(`Wake Lock request failed (attempt ${retryCount + 1}/${maxRetries}):`, err);
+        } catch {
             if (retryCount < maxRetries - 1) {
                 retryCount++;
                 setTimeout(attemptWakeLock, 5000);
-            } else {
-                console.error("Max wake lock retries reached.");
             }
         }
     };
@@ -537,7 +460,6 @@ function preloadNextSong() {
     if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length - 1) return;
     const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
     const url = currentPlaylist[nextIndex].link;
-    console.log(`Preloading: ${currentPlaylist[nextIndex].title}, URL: ${url}`);
     if (preloadedAudio && preloadedAudio.src !== url) {
         preloadedAudio.src = url;
     } else if (!preloadedAudio) {
@@ -596,14 +518,11 @@ async function loadFullJSONSongs() {
             link: song.link?.trim() || "",
             thumbnail: song.thumbnail?.trim() || "https://via.placeholder.com/150"
         }));
-        console.log("Loaded JSON songs:", { jsonBhojpuriSongs, jsonPhonkSongs, jsonHaryanviSongs, jsonRemixSongs });
         populateSection('bhojpuri-collection', jsonBhojpuriSongs, 'json-bhojpuri');
         populateSection('phonk-collection', jsonPhonkSongs, 'json-phonk');
         populateSection('haryanvi-collection', jsonHaryanviSongs, 'json-haryanvi');
         populateSection('remix-collection', jsonRemixSongs, 'json-remixes');
-    } catch (error) {
-        console.error("Error loading JSON songs:", error);
-        showPopup("Failed to load song collections, using fixed playlists.");
+    } catch {
     }
 }
 
@@ -612,9 +531,6 @@ function isValidSong(song) {
                    typeof song.title === 'string' && song.title.trim() &&
                    typeof song.link === 'string' && song.link.trim() &&
                    typeof song.thumbnail === 'string' && song.thumbnail.trim();
-    if (!isValid) {
-        console.warn("Invalid song data:", song);
-    }
     return isValid;
 }
 
@@ -653,8 +569,7 @@ function populateSection(containerId, songs, context) {
 async function loadSearchSongs() {
     try {
         searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...jsonRemixSongs, ...fixedBhojpuri, ...fixedPhonk, ...fixedHaryanvi];
-    } catch (error) {
-        console.error("Error loading search songs:", error);
+    } catch {
     }
 }
 
@@ -718,8 +633,6 @@ function searchSongs(query) {
 // Playback Logic
 async function playSong(title, context, retryCount = 0) {
     if (isPlaying) {
-        console.log(`Already playing, queuing: ${title}`);
-        showPopup(`"${title}" queued, waiting for current song to finish`);
         addToQueue({ title, link: currentPlaylist.find(s => s.title === title)?.link, thumbnail: currentPlaylist.find(s => s.title === title)?.thumbnail });
         return;
     }
@@ -738,31 +651,25 @@ async function playSong(title, context, retryCount = 0) {
     }
 
     if (!song || !isValidSong(song)) {
-        console.error(`Song not found or invalid: ${title} in context ${context}`, song);
         isPlaying = false;
-        showPopup(`Song "${title}" not found or invalid, skipping...`);
         return nextSong();
     }
 
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
     if (currentSongIndex === -1) {
-        console.error(`Song index not found for ${title} in ${context}`);
         isPlaying = false;
         return nextSong();
     }
-    console.log(`Playing: ${song.title}, Context: ${context}, URL: ${song.link}, Index: ${currentSongIndex}`);
 
     const maxRetries = 3;
     try {
         manualPause = false;
-        showPopup("Loading song...");
         audioPlayer.pause();
         audioPlayer.currentTime = 0;
 
         const cache = await caches.open('vibetunes-audio-cache');
         const cachedResponse = await cache.match(song.link);
         if (cachedResponse) {
-            console.log(`Using cached audio for ${song.title}`);
             audioPlayer.src = URL.createObjectURL(await cachedResponse.blob());
         } else {
             audioPlayer.src = song.link;
@@ -770,7 +677,6 @@ async function playSong(title, context, retryCount = 0) {
 
         audioPlayer.load();
         await audioPlayer.play();
-        document.querySelector(".popup-notification")?.remove();
         playerContainer.style.display = "flex";
         updatePlayerUI(song);
         setupMediaSession(song);
@@ -790,16 +696,12 @@ async function playSong(title, context, retryCount = 0) {
         if (typeof displayRecentlyPlayed === 'function') {
             setTimeout(displayRecentlyPlayed, 500);
         }
-    } catch (error) {
-        console.error(`Playback error for ${song.title}:`, error);
-        document.querySelector(".popup-notification")?.remove();
+    } catch {
         if (retryCount < maxRetries) {
-            showPopup(`Retrying (${retryCount + 1}/${maxRetries})...`);
             await new Promise(resolve => setTimeout(resolve, 2000));
             isPlaying = false;
             return playSong(title, context, retryCount + 1);
         } else {
-            showPopup(`Song "${song.title}" failed after retries, skipping...`);
             isPlaying = false;
             return nextSong();
         }
@@ -818,8 +720,6 @@ function highlightCurrentSong() {
 }
 
 async function handleSongEnd() {
-    console.log("Song ended, Repeat Mode:", repeatMode, "Context:", currentContext, "Index:", currentSongIndex);
-
     if (repeatMode === 2) {
         audioPlayer.currentTime = 0;
         await audioPlayer.play();
@@ -829,8 +729,6 @@ async function handleSongEnd() {
     }
 
     if (currentPlaylist.length === 0) {
-        console.error("Current playlist is empty!");
-        showPopup("Playlist empty, stopping.");
         return;
     }
 
@@ -889,13 +787,9 @@ async function handleSongEnd() {
                 nextPlaylist = jsonRemixSongs;
                 nextContext = 'json-remixes';
             } else {
-                console.log("End of all playlists, stopping.");
-                showPopup("End of playlists, stopping.");
                 return;
             }
         } else {
-            console.log("End of playlist, stopping.");
-            showPopup("End of playlist, stopping.");
             return;
         }
         currentPlaylist = nextPlaylist;
@@ -904,8 +798,6 @@ async function handleSongEnd() {
     }
 
     if (currentPlaylist.length === 0) {
-        console.error("Current playlist is empty after transition!");
-        showPopup("Playlist empty, stopping.");
         return;
     }
 
@@ -924,14 +816,6 @@ if (!localStorage.getItem('userFirstVisit')) {
     localStorage.setItem('userFirstVisit', Math.floor(Date.now() / 1000));
 }
 const userFirstVisit = parseInt(localStorage.getItem('userFirstVisit'));
-
-if (!notificationContainer) {
-    console.error("Error: #notificationContainer not found in the DOM.");
-}
-
-if (!notificationDot) {
-    console.error("Error: #notificationDot not found in the DOM.");
-}
 
 async function fetchLatestTelegramUpdates() {
     if (!notificationContainer) return;
@@ -999,8 +883,7 @@ async function fetchLatestTelegramUpdates() {
         } else {
             if (!notificationSeen && notificationDot) notificationDot.style.display = "block";
         }
-    } catch (error) {
-        console.error("Error fetching Telegram updates:", error);
+    } catch {
         notificationContainer.innerHTML = `
             <div class="error-notification">
                 <p>Unable to fetch announcements. Please try again later.</p>
@@ -1012,11 +895,6 @@ async function fetchLatestTelegramUpdates() {
 function clearNotifications() {
     if (notificationContainer) {
         const messageElements = notificationContainer.querySelectorAll('.notification-box');
-
-        if (messageElements.length === 0) {
-            showNotificationPopup("No notifications to clear");
-            return;
-    }
 
         messageElements.forEach(element => {
             const messageId = element.getAttribute('data-message-id');
@@ -1033,7 +911,6 @@ function clearNotifications() {
         `;
 
         localStorage.setItem('userClearedMessages', JSON.stringify([...clearedMessageIds]));
-        showNotificationPopup("Notifications cleared permanently for your account");
     }
 
     markAsSeen();
@@ -1066,10 +943,6 @@ function closeNotificationDialog() {
     if (notificationPage) notificationPage.style.display = "none";
 }
 
-function showNotificationPopup(message) {
-    showPopup(message);
-}
-
 async function deleteTelegramMessage(messageId) {
     try {
         const response = await fetch(`https://api.telegram.org/bot${bot_token}/deleteMessage`, {
@@ -1078,9 +951,7 @@ async function deleteTelegramMessage(messageId) {
             body: JSON.stringify({ chat_id: chat_id, message_id: messageId })
         });
         const result = await response.json();
-        if (!result.ok) console.error("Delete failed:", result);
-    } catch (error) {
-        console.error("Delete error:", error);
+    } catch {
     }
 }
 
@@ -1092,7 +963,6 @@ initializeNotifications();
 audioPlayer.addEventListener("play", () => {
     if (manualPause && document.activeElement !== playPauseBtn && audioPlayer.currentTime !== 0) {
         audioPlayer.pause();
-        console.log("Blocked unwanted play after manual pause");
     } else {
         manualPause = false;
         updatePlayPauseButton();
@@ -1100,13 +970,10 @@ audioPlayer.addEventListener("play", () => {
 });
 
 audioPlayer.addEventListener("pause", () => {
-    console.log("Playback paused at:", audioPlayer.currentTime);
     updatePlayPauseButton();
 });
 
-audioPlayer.addEventListener('error', (e) => {
-    console.error("Audio error:", e.target.error);
-    showPopup("Song failed to play, skipping...");
+audioPlayer.addEventListener('error', () => {
     isPlaying = false;
     nextSong();
     updatePlayPauseButton();
@@ -1119,15 +986,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     enableBackgroundPlayback();
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/scripts/service-worker.js')
-            .then(reg => console.log('Service Worker registered:', reg.scope))
-            .catch(err => {
-                console.error('Service Worker registration failed:', err);
-                showPopup("Service Worker failed to register, caching may not work.");
-            });
-    } else {
-        console.warn("Service Worker not supported in this browser.");
-        showPopup("Service Worker not supported, playback may be affected.");
+        navigator.serviceWorker.register('/scripts/service-worker.js').catch(() => {
+        });
     }
 
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlay);
@@ -1135,13 +995,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (nextBtn) nextBtn.addEventListener('click', nextSong);
     if (prevBtn) prevBtn.addEventListener('click', previousSong);
     if (repeatBtn) repeatBtn.addEventListener('click', toggleRepeat);
-
-    console.log("DOM fully loaded and event listeners attached.");
 });
 
 function nextSong() {
     if (currentPlaylist.length === 0) {
-        showPopup("No songs in playlist!");
         return;
     }
 
@@ -1156,12 +1013,10 @@ function nextSong() {
 
 function previousSong() {
     if (currentPlaylist.length === 0) {
-        showPopup("No songs in playlist!");
         return;
     }
 
     if (isQueueActive && songQueue.length > 0) {
-        showPopup("Queue is active, use queue controls.");
         return;
     }
 
@@ -1175,8 +1030,6 @@ function toggleRepeat() {
         repeatBtn.textContent = ['⏹️', '♾️', '➊'][repeatMode];
         repeatBtn.style.color = ['#fff', '#0f0', '#00f'][repeatMode];
     }
-    showPopup(['Repeat Off', 'Repeat All', 'Repeat One'][repeatMode]);
-    console.log("Repeat mode changed to:", repeatMode);
 }
 
 function truncateTitle(title) {
@@ -1206,30 +1059,26 @@ function togglePlay() {
             manualPause = false;
             audioPlayer.play()
                 .then(() => {
-                    console.log("Playing");
                     updatePlayPauseButton();
                     requestWakeLock();
                 })
-                .catch(error => {
-                    console.error("Toggle play error:", error);
-                    showPopup("Click again to play");
+                .catch(() => {
                     updatePlayPauseButton();
                 });
         }
     } else {
         manualPause = true;
         audioPlayer.pause();
-        console.log("Paused");
         updatePlayPauseButton();
     }
 }
 
 document.querySelectorAll('.scroll-container').forEach(container => {
     const items = container.querySelectorAll('.song-item').length;
-    const itemWidth = 10; // Approximate width of each song-item in rem
-    const containerWidth = container.offsetWidth / 16; // Convert px to rem
+    const itemWidth = 10;
+    const containerWidth = container.offsetWidth / 16;
     const totalContentWidth = items * itemWidth;
-    const extraPadding = Math.max(20, (totalContentWidth - containerWidth + itemWidth) * 1.2); // Add 20% extra padding
+    const extraPadding = Math.max(20, (totalContentWidth - containerWidth + itemWidth) * 1.2);
     container.style.setProperty('--buffer-width', `${extraPadding}rem`);
 });
 
@@ -1251,8 +1100,6 @@ function changeVolume(value) {
     audioPlayer.volume = value / 100;
     document.getElementById("volume-percentage").textContent = `${value}%`;
 }
-
-console.log('Audio Player State:', audioPlayer.paused ? 'Paused' : 'Playing');
 
 function showSongMenu(event, songId) {
     document.querySelectorAll('.song-context-menu').forEach(menu => menu.remove());
@@ -1296,16 +1143,12 @@ function showSongMenu(event, songId) {
 function generateShareLink(songId) {
     const song = getSongData(songId);
     if (!song) {
-        showPopup("Song not found for sharing.");
         return;
     }
 
     const encodedSong = encodeURIComponent(JSON.stringify(song));
     const shareLink = `${window.location.origin}/shared.html?song=${encodedSong}`;
-
-    copyToClipboard(shareLink, "Share link copied to clipboard!", "Failed to copy link.");
-
-    console.log(`Generated share link: ${shareLink}`);
+    navigator.clipboard.writeText(shareLink);
 }
 
 function getSongData(songId) {
@@ -1314,14 +1157,10 @@ function getSongData(songId) {
 
 function addToQueue(song) {
     if (!song || !isValidSong(song)) {
-        console.error("Invalid song for queue:", song);
-        showPopup("Cannot add invalid song to queue.");
         return;
     }
-    console.log("Adding to queue:", song);
     songQueue.push(song);
     isQueueActive = true;
-    showPopup(`Added "${song.title}" to queue`);
 }
 
 function handleSongEndWithQueue() {
@@ -1333,12 +1172,9 @@ function handleSongEndWithQueue() {
 
     const nextSong = songQueue.shift();
     if (!nextSong || !isValidSong(nextSong)) {
-        console.error("Invalid song in queue:", nextSong);
-        showPopup("Invalid song in queue, skipping...");
         handleSongEndWithQueue();
         return;
     }
-
     const context = currentContext;
     currentPlaylist = [nextSong, ...currentPlaylist];
     currentSongIndex = 0;
