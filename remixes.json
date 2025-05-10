@@ -129,8 +129,8 @@
     },
     {
         "title": "Garmi",
-        "artist": "",
-        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Garmi.mp3",
+        "artist": "Badshah",
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Garmi%20Song.mp3",
         "thumbnail": "https://a10.gaanacdn.com/gn_img/song/jBr3gybR1m/r3gNMnyQKR/size_m_1577334328.jpg",
         "keywords": ["garmi", "remix", "dj", "dalal", "street", "dancer", "badshah"],
         "genre": "Remix"
