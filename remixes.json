@@ -360,11 +360,11 @@
         "genre": "Remix"
     },
     {
-        "title": "",
+        "title": "Chura Liya Hai Tumne Jo Dil Ko",
         "artist": "",
-        "link": "",
-        "thumbnail": "",
-        "keywords": [],
+        "link": "https://qmsmncjhbrjtpeljhsph.supabase.co/storage/v1/object/public/remixes//Chura%20Liya%20Hai%20Tumne%20Jo%20Dil%20Ko.mp3",
+        "thumbnail": "https://s.saregama.tech/image/c/fh_150/e/4b/b2/mere-jeevan-saathi_1399714748.jpg",
+        "keywords": ["chura", "liya", "hai", "tumne", "jo", "dil", "ko"],
         "genre": "Remix"
     },
     {
