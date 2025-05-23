@@ -55,7 +55,7 @@ async function loadSharedSong() {
         playSong(currentSong.title, "shared");
     } catch (error) {
         console.error("Error loading shared song:", error);
-        showErrorMessage(`Failed to load song: ${error.message}. Use a direct download link (e.g., dl.dropboxusercontent.com for Dropbox).`);
+        showErrorMessage(`Failed to load song: ${error.message}. Use a direct download link (e.g., dl.dropboxusercontent.com for Dropbox or <project-id>.supabase.co/storage/v1/s3/buckets/<bucket-name>/public for Supabase).`);
         if (loadingMessageElement) {
             loadingMessageElement.style.display = "none";
         }
@@ -64,7 +64,6 @@ async function loadSharedSong() {
 
 function validateAudioUrl(url) {
     console.log("Validating audio URL:", url);
-    // Check for valid audio file extensions
     const isValid = /\.(mp3|wav|ogg|m4a)$/i.test(url);
     if (!isValid) {
         console.error("Invalid audio file extension for URL:", url);
@@ -94,6 +93,13 @@ function validateAndFixUrl(url) {
     if (!url) return "";
 
     console.log("Validating URL:", url);
+
+    // Handle Supabase URLs
+    if (url.includes(".supabase.co/storage")) {
+        // Ensure the URL uses the public bucket path
+        url = url.replace(/\/buckets\/([^/]+)\/files\//, "/buckets/$1/public/");
+        console.log("Converted to Supabase public URL:", url);
+    }
 
     // Handle Dropbox URLs
     if (url.includes("dropbox.com")) {
@@ -163,7 +169,7 @@ async function playSong(title, context) {
     } catch (error) {
         console.error("Playback failed:", error.message);
         showErrorMessage(
-            "Unable to play song. Ensure the link is a direct download URL (e.g., dl.dropboxusercontent.com for Dropbox) and points to a valid audio file."
+            "Unable to play song. Ensure the link is a direct download URL (e.g., dl.dropboxusercontent.com for Dropbox or <project-id>.supabase.co/storage/v1/s3/buckets/<bucket-name>/public for Supabase)."
         );
     }
 }
