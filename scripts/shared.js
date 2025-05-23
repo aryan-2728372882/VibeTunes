@@ -44,11 +44,10 @@ async function loadSharedSong() {
         currentSong.link = validateAndFixUrl(currentSong.link);
         displaySharedSong(currentSong);
 
-        try {
-            await validateAudioUrl(currentSong.link);
-        } catch (validationError) {
-            console.warn("Validation failed, proceeding anyway:", validationError);
+        if (!validateAudioUrl(currentSong.link)) {
+            throw new Error("Invalid audio file format. Please use a direct link to an MP3, WAV, OGG, or M4A file.");
         }
+
         if (loadingMessageElement) {
             loadingMessageElement.style.display = "none";
         }
@@ -56,36 +55,23 @@ async function loadSharedSong() {
         playSong(currentSong.title, "shared");
     } catch (error) {
         console.error("Error loading shared song:", error);
-        showErrorMessage(`Failed to load song: ${error.message}.`);
+        showErrorMessage(`Failed to load song: ${error.message}. Use a direct download link (e.g., dl.dropboxusercontent.com for Dropbox).`);
         if (loadingMessageElement) {
             loadingMessageElement.style.display = "none";
         }
     }
 }
 
-async function validateAudioUrl(url) {
+function validateAudioUrl(url) {
     console.log("Validating audio URL:", url);
-    if (url.includes("dropbox.com") || url.includes("dl.dropboxusercontent.com")) {
-        if (!/\.(mp3|wav|ogg|m4a)$/i.test(url)) {
-            throw new Error("Invalid Dropbox audio file extension");
-        }
-        console.log("Skipping validation for Dropbox link");
-        return;
+    // Check for valid audio file extensions
+    const isValid = /\.(mp3|wav|ogg|m4a)$/i.test(url);
+    if (!isValid) {
+        console.error("Invalid audio file extension for URL:", url);
+        return false;
     }
-    try {
-        const response = await fetch(url, { method: "HEAD" });
-        if (!response.ok) {
-            throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
-        }
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.startsWith("audio/")) {
-            throw new Error("URL does not point to a valid audio file");
-        }
-        console.log("Audio URL validated successfully:", url);
-    } catch (error) {
-        console.error("Audio URL validation failed:", error);
-        throw new Error(`Cannot access audio file: ${error.message}`);
-    }
+    console.log("Audio URL passed extension validation:", url);
+    return true;
 }
 
 function displaySharedSong(song) {
@@ -145,7 +131,7 @@ function validateAndFixUrl(url) {
     }
 }
 
-async function playSong(title, context, retryCount = 0) {
+async function playSong(title, context) {
     console.log("Playing song:", title, "Context:", context, "Current song:", currentSong);
 
     if (context !== "shared" && (!currentSong || currentSong.title !== title)) {
@@ -176,18 +162,9 @@ async function playSong(title, context, retryCount = 0) {
         enableBackgroundPlayback();
     } catch (error) {
         console.error("Playback failed:", error.message);
-        if (retryCount < 1 && !currentSong.link.includes("dl.dropboxusercontent.com")) {
-            console.log("Retrying with CORS proxy, attempt", retryCount + 1);
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(currentSong.link)}`;
-            console.log("Trying with CORS proxy:", proxyUrl);
-            currentSong.link = proxyUrl;
-            setTimeout(() => playSong(title, context, retryCount + 1), 1000);
-        } else {
-            console.error("Failed to play after retry");
-            showErrorMessage(
-                "Unable to play song. The file may be inaccessible due to CORS restrictions or invalid. Try using a direct download link."
-            );
-        }
+        showErrorMessage(
+            "Unable to play song. Ensure the link is a direct download URL (e.g., dl.dropboxusercontent.com for Dropbox) and points to a valid audio file."
+        );
     }
 }
 
@@ -267,7 +244,7 @@ function togglePlay() {
         audioPlayer.play()
             .catch(error => {
                 console.error("Play failed:", error);
-                showPopup("Failed to play audio. Check the link or try again.");
+                showPopup("Failed to play audio. Ensure the link is a direct download URL.");
                 updatePlayPauseButton();
             });
     } else {
