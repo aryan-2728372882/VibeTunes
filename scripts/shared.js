@@ -10,6 +10,7 @@ let isRepeat = false;
 let manualPause = false;
 let wakeLock = null;
 let popupTimeout = null;
+let corsProxyUrl = "https://api.allorigins.win/raw?url="; // CORS proxy for fallback
 
 async function loadSharedSong() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -52,6 +53,8 @@ async function loadSharedSong() {
             loadingMessageElement.style.display = "none";
         }
 
+        // Test the URL for CORS issues before playing
+        await testAudioUrl(currentSong.link);
         playSong(currentSong.title, "shared");
     } catch (error) {
         console.error("Error loading shared song:", error);
@@ -62,9 +65,41 @@ async function loadSharedSong() {
     }
 }
 
+async function testAudioUrl(url) {
+    return new Promise((resolve, reject) => {
+        const testAudio = new Audio();
+        
+        // Set CORS mode to handle cross-origin requests
+        testAudio.crossOrigin = "anonymous";
+        
+        testAudio.addEventListener('loadstart', () => {
+            console.log("Audio loading started for:", url);
+        });
+        
+        testAudio.addEventListener('canplay', () => {
+            console.log("Audio can play:", url);
+            resolve(true);
+        });
+        
+        testAudio.addEventListener('error', (e) => {
+            console.error("Audio test failed:", e, "for URL:", url);
+            // If direct URL fails, we'll try with CORS proxy
+            reject(new Error(`CORS or network error: ${e.message || 'Unknown error'}`));
+        });
+        
+        // Timeout after 10 seconds
+        setTimeout(() => {
+            reject(new Error("Audio loading timeout"));
+        }, 10000);
+        
+        testAudio.src = url;
+        testAudio.load();
+    });
+}
+
 function validateAudioUrl(url) {
     console.log("Validating audio URL:", url);
-    const isValid = /\.(mp3|wav|ogg|m4a)$/i.test(url);
+    const isValid = /\.(mp3|wav|ogg|m4a)(\?.*)?$/i.test(url);
     if (!isValid) {
         console.error("Invalid audio file extension for URL:", url);
         return false;
@@ -81,9 +116,10 @@ function displaySharedSong(song) {
     const songElement = document.createElement("div");
     songElement.className = "song-item";
     songElement.innerHTML = `
-        <img src="${song.thumbnail || 'default-thumbnail.png'}" alt="${song.title}" class="thumbnail" onclick="togglePlay()" onerror="this.src='default-thumbnail.png';">
+        <img src="${song.thumbnail || 'default-thumbnail.png'}" alt="${song.title}" class="thumbnail" onclick="togglePlay()" onerror="this.src='default-thumbnail.png';" crossorigin="anonymous">
         <div class="song-details">
             <h3>${song.title}</h3>
+            <p class="song-url" style="font-size: 0.8em; color: #666; word-break: break-all; margin-top: 5px;">${song.link}</p>
         </div>
     `;
     container.appendChild(songElement);
@@ -109,12 +145,31 @@ function validateAndFixUrl(url) {
         console.log("Converted to Dropbox direct URL:", url);
     }
 
+    // Handle Google Drive URLs
+    if (url.includes("drive.google.com")) {
+        const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if (fileIdMatch) {
+            url = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+            console.log("Converted to Google Drive direct URL:", url);
+        }
+    }
+
     // Handle GitHub URLs
     if (url.includes("github.com") && !url.includes("raw.githubusercontent.com")) {
         url = url.replace("github.com", "raw.githubusercontent.com")
                  .replace("/raw/", "/")
                  .replace("/blob/", "/");
         console.log("Converted to GitHub raw URL:", url);
+    }
+
+    // Handle OneDrive URLs
+    if (url.includes("1drv.ms") || url.includes("onedrive.live.com")) {
+        // OneDrive sharing links need to be converted to direct download
+        if (url.includes("1drv.ms")) {
+            console.log("OneDrive short URL detected - may need manual conversion");
+        } else {
+            url = url.replace("redir?", "download?");
+        }
     }
 
     try {
@@ -157,11 +212,11 @@ async function playSong(title, context) {
     currentSong.link = validateAndFixUrl(currentSong.link);
     console.log("Setting audio source to:", currentSong.link);
 
-    audioPlayer.src = currentSong.link;
-    audioPlayer.load();
-
+    // Set crossOrigin to handle CORS
+    audioPlayer.crossOrigin = "anonymous";
+    
     try {
-        await audioPlayer.play();
+        await loadAudioWithFallback(currentSong.link);
         updatePlayerUI(currentSong);
         setupMediaSession(currentSong);
         updatePlayPauseButton();
@@ -169,8 +224,83 @@ async function playSong(title, context) {
     } catch (error) {
         console.error("Playback failed:", error.message);
         showErrorMessage(
-            "Unable to play song. Ensure the link is a direct download URL (e.g., dl.dropboxusercontent.com for Dropbox or <project-id>.supabase.co/storage/v1/s3/buckets/<bucket-name>/public for Supabase)."
+            `Unable to play song: ${error.message}. This may be due to CORS restrictions. Try using a direct download URL from services like Dropbox (dl.dropboxusercontent.com) or ensure your hosting service allows cross-origin requests.`
         );
+    }
+}
+
+async function loadAudioWithFallback(url) {
+    console.log("Attempting to load audio:", url);
+    
+    return new Promise(async (resolve, reject) => {
+        let attempts = 0;
+        const maxAttempts = 3;
+        const urlsToTry = [
+            url, // Original URL
+            // Add CORS proxy as fallback for external URLs
+            ...(isExternalUrl(url) ? [corsProxyUrl + encodeURIComponent(url)] : [])
+        ];
+
+        for (const testUrl of urlsToTry) {
+            attempts++;
+            console.log(`Attempt ${attempts}: Testing URL:`, testUrl);
+            
+            try {
+                audioPlayer.src = testUrl;
+                audioPlayer.load();
+                
+                await new Promise((resolveLoad, rejectLoad) => {
+                    const onCanPlay = () => {
+                        audioPlayer.removeEventListener('canplay', onCanPlay);
+                        audioPlayer.removeEventListener('error', onError);
+                        audioPlayer.removeEventListener('abort', onError);
+                        resolveLoad();
+                    };
+                    
+                    const onError = (e) => {
+                        audioPlayer.removeEventListener('canplay', onCanPlay);
+                        audioPlayer.removeEventListener('error', onError);
+                        audioPlayer.removeEventListener('abort', onError);
+                        rejectLoad(new Error(`Failed to load: ${e.type} - ${e.message || 'Unknown error'}`));
+                    };
+                    
+                    audioPlayer.addEventListener('canplay', onCanPlay, { once: true });
+                    audioPlayer.addEventListener('error', onError, { once: true });
+                    audioPlayer.addEventListener('abort', onError, { once: true });
+                    
+                    // Timeout after 15 seconds
+                    setTimeout(() => {
+                        onError(new Error('Loading timeout'));
+                    }, 15000);
+                });
+                
+                // If we get here, the audio loaded successfully
+                console.log("Audio loaded successfully:", testUrl);
+                await audioPlayer.play();
+                resolve();
+                return;
+                
+            } catch (error) {
+                console.error(`Attempt ${attempts} failed:`, error.message);
+                
+                if (attempts === urlsToTry.length) {
+                    reject(new Error(`All ${attempts} attempts failed. Last error: ${error.message}`));
+                    return;
+                }
+                
+                // Wait a bit before next attempt
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+    });
+}
+
+function isExternalUrl(url) {
+    try {
+        const urlObj = new URL(url);
+        return urlObj.hostname !== window.location.hostname;
+    } catch {
+        return false;
     }
 }
 
@@ -186,6 +316,7 @@ function updatePlayerUI(song) {
     if (playerThumbnail) {
         playerThumbnail.src = song.thumbnail || "default-thumbnail.png";
         playerThumbnail.style.display = song.thumbnail ? "block" : "none";
+        playerThumbnail.crossOrigin = "anonymous"; // Handle CORS for images too
         playerThumbnail.onerror = function() {
             this.src = "default-thumbnail.png";
         };
@@ -250,7 +381,7 @@ function togglePlay() {
         audioPlayer.play()
             .catch(error => {
                 console.error("Play failed:", error);
-                showPopup("Failed to play audio. Ensure the link is a direct download URL.");
+                showPopup(`Failed to play audio: ${error.message}. This may be due to CORS restrictions.`);
                 updatePlayPauseButton();
             });
     } else {
@@ -301,7 +432,10 @@ function toggleRepeat() {
 function handleSongEnd() {
     if (isRepeat) {
         audioPlayer.currentTime = 0;
-        audioPlayer.play();
+        audioPlayer.play().catch(error => {
+            console.error("Repeat play failed:", error);
+            showPopup("Failed to repeat song.");
+        });
         showPopup("Repeating song.");
     } else {
         showPopup("Song ended. Click to replay.");
@@ -313,6 +447,18 @@ function showPopup(message) {
     if (!popup) {
         popup = document.createElement("div");
         popup.className = "popup-notification";
+        popup.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
         document.body.appendChild(popup);
     }
     popup.textContent = message;
@@ -321,7 +467,7 @@ function showPopup(message) {
     popupTimeout = setTimeout(() => {
         popup.style.display = "none";
         popupTimeout = null;
-    }, 3000);
+    }, 5000); // Increased timeout for longer messages
 }
 
 function showErrorMessage(message) {
@@ -329,9 +475,18 @@ function showErrorMessage(message) {
     if (container) {
         container.innerHTML = `
             <div class="error-message" style="text-align: center; padding: 20px; background-color: rgba(255, 0, 0, 0.1); border-radius: 8px; margin: 20px 0;">
-                <h3 style="color: #ff5555;">Error</h3>
-                <p>${message}</p>
-                <p style="margin-top: 15px;"><a href="index.html" style="color: #9333ea; text-decoration: underline;">Return to Home</a></p>
+                <h3 style="color: #ff5555;">⚠️ Playback Error</h3>
+                <p style="margin: 15px 0;">${message}</p>
+                <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px; margin: 15px 0; text-align: left;">
+                    <strong>💡 Tips for sharing songs:</strong>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Dropbox:</strong> Use dl.dropboxusercontent.com links</li>
+                        <li><strong>Google Drive:</strong> Make sure file is publicly accessible</li>
+                        <li><strong>GitHub:</strong> Use raw.githubusercontent.com links</li>
+                        <li><strong>Direct links:</strong> URLs ending in .mp3, .wav, .ogg, .m4a work best</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 15px;"><a href="index.html" style="color: #9333ea; text-decoration: underline;">🏠 Return to Home</a></p>
             </div>
         `;
     }
@@ -344,7 +499,7 @@ function initializeSharedPage() {
 
     if (!musicPlayer || !sharedSongContainer || !audioPlayer || !playPauseBtn || !seekBar) {
         console.error("Required DOM elements missing");
-        showErrorMessage("Player initialization failed. Please refresh.");
+        showErrorMessage("Player initialization failed. Please refresh the page.");
         return;
     }
 
@@ -353,6 +508,32 @@ function initializeSharedPage() {
     audioPlayer.addEventListener("pause", updatePlayPauseButton);
     audioPlayer.addEventListener("ended", handleSongEnd);
     audioPlayer.addEventListener("timeupdate", updateSeekBar);
+
+    // Add additional error handling for audio element
+    audioPlayer.addEventListener("error", (e) => {
+        console.error("Audio player error:", e);
+        const error = audioPlayer.error;
+        let errorMessage = "Unknown audio error";
+        
+        if (error) {
+            switch (error.code) {
+                case error.MEDIA_ERR_ABORTED:
+                    errorMessage = "Audio loading was aborted";
+                    break;
+                case error.MEDIA_ERR_NETWORK:
+                    errorMessage = "Network error while loading audio";
+                    break;
+                case error.MEDIA_ERR_DECODE:
+                    errorMessage = "Audio file is corrupted or unsupported format";
+                    break;
+                case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                    errorMessage = "Audio format not supported or CORS blocked";
+                    break;
+            }
+        }
+        
+        showPopup(`Audio Error: ${errorMessage}`);
+    });
 
     if (seekBar) {
         seekBar.addEventListener("input", handleSeek);

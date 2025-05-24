@@ -1,3 +1,14 @@
+/* global auth, db, firebase */
+const audioPlayer = document.getElementById("audio-player");
+const playerContainer = document.getElementById("music-player");
+const playPauseBtn = document.getElementById("play-pause-btn");
+const seekBar = document.getElementById("seek-bar");
+const nextBtn = document.getElementById("next-btn");
+const prevBtn = document.getElementById("prev-btn");
+const repeatBtn = document.getElementById("repeat-btn");
+
+if (playerContainer) playerContainer.style.display = "none";
+
 // Firebase Auth and Firestore
 auth.onAuthStateChanged(user => {
     if (!user) {
@@ -308,16 +319,6 @@ let isPlaying = false;
 let isQueueActive = false;
 let songQueue = [];
 
-const audioPlayer = document.getElementById("audio-player");
-const playerContainer = document.getElementById("music-player");
-const playPauseBtn = document.getElementById("play-pause-btn");
-const seekBar = document.getElementById("seek-bar");
-const nextBtn = document.getElementById("next-btn");
-const prevBtn = document.getElementById("prev-btn");
-const repeatBtn = document.getElementById("repeat-btn");
-
-if (playerContainer) playerContainer.style.display = "none";
-
 // Utility Functions
 function throttle(func, limit) {
     let inThrottle;
@@ -375,6 +376,8 @@ function setupMediaSession(song) {
         });
         navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
         navigator.mediaSession.setActionHandler('previoustrack', () => previousSong());
+        // Update playback state
+        navigator.mediaSession.playbackState = audioPlayer.paused ? 'paused' : 'playing';
     }
 }
 
@@ -387,21 +390,39 @@ function enableBackgroundPlayback() {
         if (document.visibilityState === "hidden") {
             wasPlayingBeforeHide = !audioPlayer.paused;
             if (wasPlayingBeforeHide) {
+                // Ensure media session is updated
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                }
+                // Force play with buffer check
                 audioPlayer.play().catch(() => {
                     setTimeout(() => {
-                        if (wasPlayingBeforeHide) {
+                        if (wasPlayingBeforeHide && !manualPause) {
                             audioPlayer.play().catch(() => nextSong());
                         }
-                    }, 1000);
+                    }, 500);
                 });
             }
-        } else if (document.visibilityState === "visible" && wasPlayingBeforeHide && audioPlayer.paused) {
-            requestWakeLock();
-            audioPlayer.play().catch(() => {
-                setTimeout(() => {
-                    audioPlayer.play().catch(() => nextSong());
-                }, 1000);
-            });
+        } else if (document.visibilityState === "visible") {
+            if (wasPlayingBeforeHide && audioPlayer.paused && !manualPause) {
+                requestWakeLock();
+                audioPlayer.play().catch(() => {
+                    setTimeout(() => {
+                        audioPlayer.play().catch(() => nextSong());
+                    }, 500);
+                });
+            }
+            // Update media session on visibility change
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = audioPlayer.paused ? 'paused' : 'playing';
+                if (currentPlaylist[currentSongIndex]) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: currentPlaylist[currentSongIndex].title,
+                        artist: currentPlaylist[currentSongIndex].artist || 'Unknown Artist',
+                        artwork: [{ src: currentPlaylist[currentSongIndex].thumbnail, sizes: '512x512', type: 'image/jpeg' }]
+                    });
+                }
+            }
             updatePlayPauseButton();
             updateProgress();
         }
@@ -409,23 +430,41 @@ function enableBackgroundPlayback() {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
+    // Optimize for device lock
     window.addEventListener("blur", () => {
-        if (!audioPlayer.paused) {
+        if (!audioPlayer.paused && !manualPause) {
             audioPlayer.play().catch(() => {
-                setTimeout(() => audioPlayer.play().catch(() => nextSong()), 1000);
+                setTimeout(() => audioPlayer.play().catch(() => nextSong()), 500);
             });
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'playing';
+            }
         }
     });
 
     audioPlayer.addEventListener('waiting', () => {
+        // Preload more aggressively when waiting
+        preloadNextSong();
     });
 
     audioPlayer.addEventListener('canplay', () => {
         if (wasPlayingBeforeHide && audioPlayer.paused && !manualPause) {
-            audioPlayer.play().catch(() => {
-            });
+            audioPlayer.play().catch(() => {});
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'playing';
+            }
         }
         updatePlayPauseButton();
+    });
+
+    // Add buffer monitoring
+    audioPlayer.addEventListener('progress', () => {
+        if (audioPlayer.buffered.length > 0) {
+            const bufferedEnd = audioPlayer.buffered.end(audioPlayer.buffered.length - 1);
+            if (bufferedEnd - audioPlayer.currentTime < 10 && !audioPlayer.paused) {
+                preloadNextSong();
+            }
+        }
     });
 }
 
@@ -725,6 +764,9 @@ async function handleSongEnd() {
         await audioPlayer.play();
         updatePlayPauseButton();
         preloadNextSong();
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'playing';
+        }
         return;
     }
 
@@ -966,11 +1008,17 @@ audioPlayer.addEventListener("play", () => {
     } else {
         manualPause = false;
         updatePlayPauseButton();
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'playing';
+        }
     }
 });
 
 audioPlayer.addEventListener("pause", () => {
     updatePlayPauseButton();
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'paused';
+    }
 });
 
 audioPlayer.addEventListener('error', () => {
@@ -986,8 +1034,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     enableBackgroundPlayback();
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/scripts/service-worker.js').catch(() => {
-        });
+        navigator.serviceWorker.register('/scripts/service-worker.js').catch(() => {});
     }
 
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlay);
@@ -1061,6 +1108,9 @@ function togglePlay() {
                 .then(() => {
                     updatePlayPauseButton();
                     requestWakeLock();
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.playbackState = 'playing';
+                    }
                 })
                 .catch(() => {
                     updatePlayPauseButton();
@@ -1070,6 +1120,9 @@ function togglePlay() {
         manualPause = true;
         audioPlayer.pause();
         updatePlayPauseButton();
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'paused';
+        }
     }
 }
 
