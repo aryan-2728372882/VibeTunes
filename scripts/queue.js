@@ -1,4 +1,5 @@
 let queueIndex = 0;
+let preQueueSongIndex = -1; // Track playlist index before queue starts
 
 const queueList = document.getElementById("queue-list");
 const clearQueueBtn = document.getElementById("clear-queue-btn");
@@ -17,8 +18,14 @@ function addToQueue(song, playImmediately = false) {
         songQueue = [song, ...songQueue];
         queueIndex = 0;
         isQueueActive = true;
+        // Save current playlist index before queue starts
+        preQueueSongIndex = currentSongIndex;
         playSong(song.title, getSongContext(song));
     } else {
+        if (!isQueueActive) {
+            // Save current playlist index when queue becomes active
+            preQueueSongIndex = currentSongIndex;
+        }
         songQueue.push(song);
         isQueueActive = true;
         updateQueueUI();
@@ -30,6 +37,7 @@ function clearQueue() {
     songQueue = [];
     queueIndex = 0;
     isQueueActive = false;
+    preQueueSongIndex = -1; // Reset pre-queue index
     updateQueueUI();
     showPopup("Queue cleared!");
 }
@@ -80,7 +88,10 @@ function updateQueueUI() {
             console.log("Removing queue item at index:", index);
             songQueue.splice(index, 1);
             if (index < queueIndex) queueIndex--;
-            if (songQueue.length === 0) isQueueActive = false;
+            if (songQueue.length === 0) {
+                isQueueActive = false;
+                preQueueSongIndex = currentSongIndex; // Preserve current index
+            }
             updateQueueUI();
             showPopup("Song removed from queue.");
         });
@@ -92,7 +103,7 @@ function updateQueueUI() {
 }
 
 function handleSongEndWithQueue() {
-    console.log(`Song ended - Queue:`, songQueue, `Repeat: ${repeatMode}, QueueIndex: ${queueIndex}`);
+    console.log(`Song ended - Queue:`, songQueue, `Repeat: ${repeatMode}, QueueIndex: ${queueIndex}, CurrentSongIndex: ${currentSongIndex}, PreQueueSongIndex: ${preQueueSongIndex}`);
 
     if (repeatMode === 2) {
         audioPlayer.currentTime = 0;
@@ -107,7 +118,7 @@ function handleSongEndWithQueue() {
         return;
     }
 
-    if (songQueue.length > 0 && queueIndex < songQueue.length) {
+    if (isQueueActive && songQueue.length > 0 && queueIndex < songQueue.length) {
         const nextSong = songQueue[queueIndex];
         console.log("Playing next song from queue:", nextSong.title);
         playSong(nextSong.title, getSongContext(nextSong));
@@ -116,14 +127,25 @@ function handleSongEndWithQueue() {
             songQueue = [];
             queueIndex = 0;
             isQueueActive = false;
+            // Restore playlist index for next song
+            if (preQueueSongIndex >= 0 && preQueueSongIndex < currentPlaylist.length - 1) {
+                currentSongIndex = preQueueSongIndex; // Start from pre-queue song
+            }
         }
         updateQueueUI();
     } else {
         isQueueActive = false;
         queueIndex = 0;
         songQueue = [];
+        // Restore playlist index or increment from pre-queue position
+        if (preQueueSongIndex >= 0 && preQueueSongIndex < currentPlaylist.length - 1) {
+            currentSongIndex = preQueueSongIndex + 1; // Next song after pre-queue song
+        } else if (currentSongIndex >= currentPlaylist.length - 1) {
+            currentSongIndex = 0; // Loop back to start if at end
+        }
+        preQueueSongIndex = -1; // Reset pre-queue index
         updateQueueUI();
-        console.log("Queue empty, falling back to handleSongEnd");
+        console.log("Queue empty, transitioning to playlist with CurrentSongIndex:", currentSongIndex);
         handleSongEnd();
     }
 }
@@ -141,9 +163,8 @@ function getSongContext(song) {
 
 async function playSong(title, context) {
     if (isPlaying) {
-        console.log(`Already playing, queuing: ${title}`);
-        const song = currentPlaylist.find(s => s.title === title) || songQueue.find(s => s.title === title);
-        if (song) addToQueue(song);
+        console.log(`Already playing, ignoring new request for: ${title}`);
+        showPopup("Please wait, another song is playing.");
         return;
     }
     isPlaying = true;
