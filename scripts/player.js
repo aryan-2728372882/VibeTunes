@@ -67,13 +67,11 @@ function setupSongTracking(uid) {
         totalPlayTime = 0;
         continuousPlayTime = 0;
         updatePlayPauseButton();
-        // Call handleSongEnd to automatically play the next song (Original code might need this)
-        handleSongEnd(); 
+        handleSongEnd();
     });
 
     seekBar.addEventListener("input", () => {
-        // Original seek handling logic
-        seekSong(seekBar.value); // Call the function to update audio time
+        seekSong(seekBar.value);
         if (songStarted) {
             if (lastPlayTime) {
                 const elapsed = (Date.now() - lastPlayTime) / 1000;
@@ -86,15 +84,13 @@ function setupSongTracking(uid) {
         }
     });
 
-    // Add listener to update seekbar when metadata loads (needed for correct duration)
     audioPlayer.addEventListener("loadedmetadata", () => {
         updateSeekBar();
     });
 
-    // Add listener to update seekbar during playback
     audioPlayer.addEventListener("timeupdate", throttle(() => {
         updateSeekBar();
-    }, 250)); // Throttle update frequency slightly
+    }, 250));
 
     audioPlayer.addEventListener("error", async () => {
         const currentSrc = audioPlayer.src;
@@ -125,7 +121,7 @@ function updateUserStats(uid, minutesPlayed) {
     });
 }
 
-// Song Lists (Keep original lists)
+// Song Lists
 const fixedBhojpuri = [
     {
         "title": "koiri ke raj chali",
@@ -292,13 +288,13 @@ const fixedHaryanvi = [
     {
         "title": "Teri Lat Lag Javegi",
         "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Teri%20Lat%20Lag%20Javegi.mp3",
-        "thumbnail": "https://c.saavncdn.com/443/Sonotek-DJ-Remix-Vol-6-Hindi-1991-20230329182027-500x500.jpg",
+        "thumbnail": "https://c.saavncdn.com/443/Sonotek-DJ-Remix-Vol-6-songs-2017-20230329182027-500x500.jpg",
         "genre": "Haryanvi"
     },
     {
         "title": "Teri Aakhya Ka Yo Kajal",
         "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Teri%20Aakhya%20Ka%20Yo%20Kajal.mp3",
-        "thumbnail": "https://a10.gaanacdn.com/gn_img/albums/lJvKa63DV9/JvKaOEv6WD/size_m.jpg",
+        "thumbnail": "https://a10.gaanacdn.com/gn_img/Albums/lJvKa63DV9/4vKa0Ev6WD.jpg",
         "genre": "Haryanvi"
     },
     {
@@ -310,12 +306,12 @@ const fixedHaryanvi = [
     {
         "title": "Ghunghat Bain",
         "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Ghunghat%20Bain.mp3",
-        "thumbnail": "https://c.saavncdn.com/041/Ghunghat-Bain-Remix-Haryanvi-2020-20201026142405-500x500.jpg",
+        "thumbnail": "https://c.saavncdn.com/041/Ghunghat-Bain-Remix-Haryanvi-2020-20201026122405-500x500.jpg",
         "genre": "Haryanvi"
     }
 ];
 
-// Player State Management (Keep original state variables)
+// Player State Management
 const MIN_PLAYTIME_THRESHOLD = 60;
 let currentPlaylist = [];
 let jsonBhojpuriSongs = [];
@@ -330,10 +326,8 @@ let wakeLock = null;
 let manualPause = false;
 let searchSongsList = [];
 let isPlaying = false;
-let isQueueActive = false;
-let songQueue = [];
 
-// Utility Functions (Keep original utilities)
+// Utility Functions
 function throttle(func, limit) {
     let inThrottle;
     return function (...args) {
@@ -353,15 +347,13 @@ function debounce(func, wait) {
     };
 }
 
-// Keep original updateProgress or rely on timeupdate listener as in original
 function updateProgress() {
-    if (!audioPlayer.paused && !isNaN(audioPlayer.duration)) {
+    if (!audioPlayer.paused && isFinite(audioPlayer.duration)) {
         seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
     }
-    requestAnimationFrame(updateProgress); // Keep original animation frame loop if present
+    requestAnimationFrame(updateProgress);
 }
 
-// Media Session API Integration (Keep original implementation)
 function setupMediaSession(song) {
     if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -374,7 +366,7 @@ function setupMediaSession(song) {
                 manualPause = false;
                 audioPlayer.play().then(() => {
                     updatePlayPauseButton();
-                    requestWakeLock(); // Ensure wake lock is requested
+                    requestWakeLock();
                 });
             }
         });
@@ -383,7 +375,6 @@ function setupMediaSession(song) {
                 manualPause = true;
                 audioPlayer.pause();
                 updatePlayPauseButton();
-                // Original code might release wake lock here, keep that behavior
             }
         });
         navigator.mediaSession.setActionHandler("nexttrack", () => nextSong());
@@ -392,10 +383,6 @@ function setupMediaSession(song) {
     }
 }
 
-// Enhanced Background Playback (Keep original implementation)
-// Minimal fix: Ensure requestWakeLock is called appropriately.
-// The original code already calls requestWakeLock in playSong, togglePlay, and setupMediaSession.
-// No direct changes needed here for minimal fix, assuming requestWakeLock itself works.
 function enableBackgroundPlayback() {
     audioPlayer.setAttribute("preload", "auto");
     let wasPlayingBeforeHide = false;
@@ -407,7 +394,6 @@ function enableBackgroundPlayback() {
                 if ("mediaSession" in navigator) {
                     navigator.mediaSession.playbackState = "playing";
                 }
-                // Original logic to force play
                 audioPlayer.play().catch(() => {
                     setTimeout(() => {
                         if (wasPlayingBeforeHide && !manualPause) {
@@ -418,7 +404,7 @@ function enableBackgroundPlayback() {
             }
         } else if (document.visibilityState === "visible") {
             if (wasPlayingBeforeHide && audioPlayer.paused && !manualPause) {
-                requestWakeLock(); // Ensure wake lock is requested on visibility return
+                requestWakeLock();
                 audioPlayer.play().catch(() => {
                     setTimeout(() => {
                         audioPlayer.play().catch(() => nextSong());
@@ -436,7 +422,7 @@ function enableBackgroundPlayback() {
                 }
             }
             updatePlayPauseButton();
-            updateProgress(); // Keep original call
+            updateProgress();
         }
     };
 
@@ -477,7 +463,6 @@ function enableBackgroundPlayback() {
     });
 }
 
-// Keep original Wake Lock functions
 async function requestWakeLock() {
     if (wakeLock !== null || document.visibilityState !== "visible") return;
     const maxRetries = 3;
@@ -505,7 +490,6 @@ async function requestWakeLock() {
     attemptWakeLock();
 }
 
-// Keep original preloadNextSong
 function preloadNextSong() {
     if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length - 1) return;
     const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
@@ -519,7 +503,6 @@ function preloadNextSong() {
     preloadedAudio.load();
 }
 
-// Keep original clearAudioCache
 function clearAudioCache() {
     if ("caches" in window) {
         caches.keys().then(cacheNames => cacheNames.forEach(name => caches.delete(name)));
@@ -529,7 +512,6 @@ function clearAudioCache() {
     }
 }
 
-// Song Display and Loading (Keep original functions)
 async function displayFixedSections() {
     populateSection("bhojpuri-list", fixedBhojpuri, "bhojpuri");
     populateSection("phonk-list", fixedPhonk, "phonk");
@@ -573,15 +555,14 @@ async function loadFullJSONSongs() {
         populateSection("phonk-collection", jsonPhonkSongs, "json-phonk");
         populateSection("haryanvi-collection", jsonHaryanviSongs, "json-haryanvi");
         populateSection("remix-collection", jsonRemixSongs, "json-remixes");
-    } catch {
-    }
+    } catch {}
 }
 
 function isValidSong(song) {
     const isValid = song &&
                    typeof song.title === "string" && song.title.trim() &&
                    typeof song.link === "string" && song.link.trim() &&
-                   typeof song.thumbnail === "string" && song.thumbnail.trim();
+                   typeof song.thumbnail === "string";
     return isValid;
 }
 
@@ -595,7 +576,7 @@ function populateSection(containerId, songs, context) {
         const songId = `${context}-${index}`;
         songElement.id = songId;
         songElement.innerHTML = `
-            <div class="thumbnail-container" onclick="debouncedPlaySong(\'${song.title}\', \'${context}\')">
+            <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', '${context}')">
                 <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                 <div class="hover-play">▶</div>
                 <div class="song-actions-toggle">
@@ -620,8 +601,7 @@ function populateSection(containerId, songs, context) {
 async function loadSearchSongs() {
     try {
         searchSongsList = [...jsonBhojpuriSongs, ...jsonPhonkSongs, ...jsonHaryanviSongs, ...jsonRemixSongs, ...fixedBhojpuri, ...fixedPhonk, ...fixedHaryanvi];
-    } catch {
-    }
+    } catch {}
 }
 
 function searchSongs(query) {
@@ -653,7 +633,7 @@ function searchSongs(query) {
             const songId = `search-${song.title}`;
             songElement.id = songId;
             songElement.innerHTML = `
-                <div class="thumbnail-container" onclick="debouncedPlaySong(\'${song.title}\', \'search\')">
+                <div class="thumbnail-container" onclick="debouncedPlaySong('${song.title}', 'search')">
                     <img src="${song.thumbnail}" alt="${song.title}" class="thumbnail">
                     <div class="hover-play">▶</div>
                     <div class="song-actions-toggle">
@@ -662,9 +642,9 @@ function searchSongs(query) {
                 </div>
                 <div class="song-title">${song.title}</div>
             `;
+            searchContainer.appendChild(songElement);
 
             window.songData[songId] = { title: song.title, link: song.link, thumbnail: song.thumbnail };
-            searchContainer.appendChild(songElement);
 
             const menuBtn = songElement.querySelector(".song-menu-btn");
             menuBtn.addEventListener("click", (e) => {
@@ -672,7 +652,6 @@ function searchSongs(query) {
                 showSongMenu(e, songId);
             });
         });
-
         currentPlaylist = searchSongsList.filter(song =>
             song.title.toLowerCase().includes(query)
         );
@@ -681,12 +660,8 @@ function searchSongs(query) {
     }
 }
 
-// Playback Logic
 async function playSong(title, context, retryCount = 0) {
-    if (isPlaying) {
-        addToQueue({ title, link: currentPlaylist.find(s => s.title === title)?.link, thumbnail: currentPlaylist.find(s => s.title === title)?.thumbnail });
-        return;
-    }
+    if (isPlaying) return;
     isPlaying = true;
 
     let song;
@@ -716,11 +691,8 @@ async function playSong(title, context, retryCount = 0) {
     try {
         manualPause = false;
         audioPlayer.pause();
-        
-        // *** MINIMAL FIX: Reset audio time and seek bar value ***
         audioPlayer.currentTime = 0;
-        if (seekBar) seekBar.value = 0; 
-        // *** END MINIMAL FIX ***
+        if (seekBar) seekBar.value = 0;
 
         const cache = await caches.open("vibetunes-audio-cache");
         const cachedResponse = await cache.match(song.link);
@@ -738,8 +710,8 @@ async function playSong(title, context, retryCount = 0) {
         highlightCurrentSong();
         preloadNextSong();
         clearAudioCache();
-        requestWakeLock(); // Ensure wake lock is requested
-        updateProgress(); // Keep original call
+        requestWakeLock();
+        updateProgress();
 
         const songId = `${context}-${currentSongIndex}`;
         if (typeof addToRecentlyPlayed === "function") {
@@ -752,7 +724,7 @@ async function playSong(title, context, retryCount = 0) {
             setTimeout(displayRecentlyPlayed, 500);
         }
     } catch (error) {
-        console.error("Error playing song:", error); // Log error
+        console.error("Error playing song:", error);
         if (retryCount < maxRetries) {
             await new Promise(resolve => setTimeout(resolve, 2000));
             isPlaying = false;
@@ -778,14 +750,17 @@ function highlightCurrentSong() {
 async function handleSongEnd() {
     if (repeatMode === 2) {
         audioPlayer.currentTime = 0;
-        // *** MINIMAL FIX: Reset seek bar value on repeat ***
         if (seekBar) seekBar.value = 0;
-        // *** END MINIMAL FIX ***
         await audioPlayer.play();
         updatePlayPauseButton();
         preloadNextSong();
         if ("mediaSession" in navigator) {
             navigator.mediaSession.playbackState = "playing";
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: currentPlaylist[currentSongIndex].title,
+                artist: currentPlaylist[currentSongIndex].artist || "Unknown Artist",
+                artwork: [{ src: currentPlaylist[currentSongIndex].thumbnail, sizes: "512x512", type: "image/jpeg" }]
+            });
         }
         return;
     }
@@ -794,24 +769,18 @@ async function handleSongEnd() {
         return;
     }
 
-    if (isQueueActive && songQueue.length > 0) {
-        // handleSongEndWithQueue(); // Keep original queue logic if present
-        return; // Assuming original code had queue logic here
-    }
-
     if (repeatMode === 1) {
         currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     } else if (currentSongIndex < currentPlaylist.length - 1) {
         currentSongIndex += 1;
     } else {
-        // Keep original context switching logic
         let nextContext = null;
         let nextPlaylist = null;
         if (currentContext === "bhojpuri" && jsonBhojpuriSongs.length > 0) {
             nextPlaylist = jsonBhojpuriSongs;
-            nextContext = "json-bhojpuri";
+            nextContext = "json";
         } else if (currentContext === "phonk" && jsonPhonkSongs.length > 0) {
-            nextPlaylist = jsonPhonkSongs;
+            nextSongs = jsonPhonkSongs;
             nextContext = "json-phonk";
         } else if (currentContext === "haryanvi" && jsonHaryanviSongs.length > 0) {
             nextPlaylist = jsonHaryanviSongs;
@@ -821,7 +790,7 @@ async function handleSongEnd() {
             nextContext = "bhojpuri";
         } else if (currentContext === "search") {
             const lastSong = currentPlaylist[currentSongIndex];
-            if (jsonBhojpuriSongs.some(s => s.title === lastSong.title)) {
+            if (jsonBhojpuriSongs.some(s => s.length === lastSong.title)) {
                 nextPlaylist = jsonBhojpuriSongs;
                 nextContext = "json-bhojpuri";
                 currentSongIndex = jsonBhojpuriSongs.findIndex(s => s.title === lastSong.title) + 1;
@@ -855,7 +824,7 @@ async function handleSongEnd() {
         } else {
             return;
         }
-        if (!nextPlaylist) return; // Added check
+        if (!nextPlaylist) return;
         currentPlaylist = nextPlaylist;
         currentContext = nextContext;
         currentSongIndex = 0;
@@ -868,7 +837,6 @@ async function handleSongEnd() {
     playSong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
-// Keep original Telegram notification logic
 let chat_id = "6181779900";
 let bot_token = "7508369131:AAE8jcB-F2secj2bJjeLN-g0Jrb-F54RyKc";
 let notificationContainer = document.getElementById("notificationContainer");
@@ -1015,15 +983,13 @@ async function deleteTelegramMessage(messageId) {
             body: JSON.stringify({ chat_id: chat_id, message_id: messageId })
         });
         const result = await response.json();
-    } catch {
-    }
+    } catch {}
 }
 
 setInterval(fetchLatestTelegramUpdates, 30000);
 
 initializeNotifications();
 
-// Event Listeners (Keep original listeners)
 audioPlayer.addEventListener("play", () => {
     if (manualPause && document.activeElement !== playPauseBtn && audioPlayer.currentTime !== 0) {
         audioPlayer.pause();
@@ -1060,23 +1026,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (playPauseBtn) playPauseBtn.addEventListener("click", togglePlay);
-    if (seekBar) seekBar.addEventListener("input", () => seekSong(seekBar.value)); // Ensure this listener exists
+    if (seekBar) seekBar.addEventListener("input", () => seekSong(seekBar.value));
     if (nextBtn) nextBtn.addEventListener("click", nextSong);
     if (prevBtn) prevBtn.addEventListener("click", previousSong);
     if (repeatBtn) repeatBtn.addEventListener("click", toggleRepeat);
 
-    // Initial UI updates
     updatePlayPauseButton();
-    updateSeekBar(); // Update seek bar on load
+    updateSeekBar();
 });
 
 function nextSong() {
     if (currentPlaylist.length === 0) {
-        return;
-    }
-
-    if (isQueueActive && songQueue.length > 0) {
-        // handleSongEndWithQueue(); // Keep original queue logic if present
         return;
     }
 
@@ -1086,10 +1046,6 @@ function nextSong() {
 
 function previousSong() {
     if (currentPlaylist.length === 0) {
-        return;
-    }
-
-    if (isQueueActive && songQueue.length > 0) {
         return;
     }
 
@@ -1133,7 +1089,7 @@ function togglePlay() {
             audioPlayer.play()
                 .then(() => {
                     updatePlayPauseButton();
-                    requestWakeLock(); // Ensure wake lock is requested on resume
+                    requestWakeLock();
                     if ("mediaSession" in navigator) {
                         navigator.mediaSession.playbackState = "playing";
                     }
@@ -1149,7 +1105,6 @@ function togglePlay() {
         if ("mediaSession" in navigator) {
             navigator.mediaSession.playbackState = "paused";
         }
-        // Original code might release wake lock here, keep that behavior
     }
 }
 
@@ -1168,51 +1123,55 @@ function updatePlayPauseButton() {
     }
 }
 
-// Keep original updateSeekBar
 function updateSeekBar() {
     if (seekBar && isFinite(audioPlayer.duration)) {
         seekBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
     } else if (seekBar) {
-        seekBar.value = 0; // Reset if duration is not available
+        seekBar.value = 0;
     }
 }
 
-// Keep original seekSong
 function seekSong(value) {
     if (isFinite(audioPlayer.duration)) {
         audioPlayer.currentTime = (value / 100) * audioPlayer.duration;
     }
 }
 
-// Keep original changeVolume
 function changeVolume(value) {
     audioPlayer.volume = value / 100;
     document.getElementById("volume-percentage").textContent = `${value}%`;
 }
 
-// Keep original showSongMenu and related functions
 function showSongMenu(event, songId) {
+    // Validate the event and target
+    if (!event || !event.target || typeof event.target.getBoundingClientRect !== 'function') {
+        console.error('Invalid event or target in showSongMenu:', event);
+        return;
+    }
+
+    // Remove existing context menus
     document.querySelectorAll(".song-context-menu").forEach(menu => menu.remove());
 
     const contextMenu = document.createElement("div");
     contextMenu.className = "song-context-menu";
 
-    const rect = event.target.getBoundingClientRect();
+    // Get the bounding rectangle of the clicked button
+    let rect;
+    try {
+        rect = event.target.getBoundingClientRect();
+    } catch (error) {
+        console.error('Error getting bounding client rect:', error);
+        // Fallback position
+        rect = { top: 0, left: 0, bottom: 0 };
+    }
+
     contextMenu.style.position = "fixed";
     contextMenu.style.top = `${rect.bottom + 5}px`;
     contextMenu.style.left = `${rect.left}px`;
 
     contextMenu.innerHTML = `
-        <button class="menu-option add-to-queue-btn">Add to Queue</button>
         <button class="menu-option share-btn">Share</button>
     `;
-
-    const addToQueueBtn = contextMenu.querySelector(".add-to-queue-btn");
-    addToQueueBtn.addEventListener("click", () => {
-        const song = window.songData[songId];
-        addToQueue(song);
-        contextMenu.remove();
-    });
 
     const shareBtn = contextMenu.querySelector(".share-btn");
     shareBtn.addEventListener("click", () => {
@@ -1222,35 +1181,38 @@ function showSongMenu(event, songId) {
 
     document.body.appendChild(contextMenu);
 
+    // Close menu when clicking outside
     document.addEventListener("click", function closeMenu(e) {
         if (!contextMenu.contains(e.target) && e.target !== event.target) {
             contextMenu.remove();
             document.removeEventListener("click", closeMenu);
         }
-    });
+    }, { once: true });
 }
 
 function generateShareLink(songId) {
     const song = getSongData(songId);
     if (!song) {
+        showPopup("Error: Song data not found.");
         return;
     }
-    // Keep original share logic
+
+    // Use the song's direct audio file URL
+    const shareUrl = song.link;
+
+    // Copy the URL to the clipboard
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        showPopup("Song link copied to clipboard!");
+    }).catch((error) => {
+        console.error("Failed to copy song link:", error);
+        showPopup("Failed to copy song link.");
+    });
 }
 
 function getSongData(songId) {
     return window.songData ? window.songData[songId] : null;
 }
 
-function addToQueue(song) {
-    // Keep original queue logic
-    if (!song || !song.title) return;
-    songQueue.push(song);
-    isQueueActive = true;
-    showPopup(`${song.title} added to queue.`);
-}
-
-// Keep original showPopup
 function showPopup(message) {
     const popup = document.getElementById("popup-notification");
     if (popup) {
@@ -1261,4 +1223,3 @@ function showPopup(message) {
         console.log("Popup:", message);
     }
 }
-
