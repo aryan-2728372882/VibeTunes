@@ -1,8 +1,8 @@
-const CACHE_NAME = 'vibetunes-cache-v1';
+const CACHE_NAME = 'vibetunes-cache-v2';
 const AUDIO_CACHE = 'vibetunes-audio-cache';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-const MAX_CACHE_SIZE = 100 * 1024 * 1024; // 100MB
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_CACHE_SIZE = 150 * 1024 * 1024; // Increased to 150MB
+const MAX_FILE_SIZE = 15 * 1024 * 1024; // Increased to 15MB
 
 self.addEventListener('install', event => {
     console.log('Service Worker installing...');
@@ -12,7 +12,7 @@ self.addEventListener('install', event => {
                 '/',
                 '/index.html',
                 '/player.js',
-                '/queue.js',
+                '/auth.html',
                 '/style.css'
             ]);
         })
@@ -32,6 +32,23 @@ self.addEventListener('activate', event => {
                     }
                 })
             );
+        }).then(() => {
+            // Clean up expired audio files
+            return caches.open(AUDIO_CACHE).then(cache => {
+                return cache.keys().then(requests => {
+                    const now = Date.now();
+                    return Promise.all(
+                        requests.map(async request => {
+                            const response = await cache.match(request);
+                            const cacheDate = new Date(response?.headers.get('date') || now).getTime();
+                            if (now - cacheDate > CACHE_DURATION) {
+                                console.log(`Deleting expired audio file: ${request.url}`);
+                                return cache.delete(request);
+                            }
+                        })
+                    );
+                });
+            });
         })
     );
     self.clients.claim();
@@ -53,12 +70,13 @@ self.addEventListener('fetch', event => {
             caches.open(AUDIO_CACHE).then(async cache => {
                 const cachedResponse = await cache.match(normalizedUrl);
                 if (cachedResponse) {
-                    const cachedDate = new Date(cachedResponse.headers.get('date')).getTime();
+                    const cachedDate = new Date(cachedResponse.headers.get('date') || Date.now()).getTime();
                     if (Date.now() - cachedDate < CACHE_DURATION) {
                         console.log(`Cache hit for ${normalizedUrl}`);
                         return cachedResponse;
                     }
                     console.log(`Cache expired for ${normalizedUrl}`);
+                    await cache.delete(normalizedUrl);
                 } else {
                     console.log(`Cache miss for ${normalizedUrl}`);
                 }
@@ -157,8 +175,4 @@ async function trimCache(cacheName, maxSize) {
             if (totalSize <= maxSize) break;
         }
     }
-
-    self.addEventListener('install', () => console.log('Service Worker installed'));
-    self.addEventListener('activate', () => console.log('Service Worker activated'));
-    self.addEventListener('fetch', event => event.respondWith(fetch(event.request)));
 }

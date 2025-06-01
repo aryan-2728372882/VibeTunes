@@ -757,7 +757,9 @@
                     if (doc.exists) {
                         const userData = doc.data();
                         document.getElementById("username").textContent = userData.username || "N/A";
-                        document.getElementById("minutes-listened").textContent = userData.minutesListened || 0;
+                        // Round minutesListened to ensure no decimals are displayed
+                        const minutesListened = userData.minutesListened || 0;
+                        document.getElementById("minutes-listened").textContent = Math.floor(minutesListened);
                         document.getElementById("songs-played").textContent = userData.songsPlayed || 0;
                         document.getElementById("stored-password").textContent = userData.password ? "********" : "Not Set";
                         
