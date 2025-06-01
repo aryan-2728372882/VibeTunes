@@ -61,7 +61,7 @@ function setupSongTracking(uid) {
             songStarted = false;
         }
         if (continuousPlayTime >= 60) {
-            const minutesPlayed = Math.floor(totalPlayTime / 60);
+            const minutesPlayed = Math.round(totalPlayTime / 60);
             updateUserStats(uid, minutesPlayed);
         }
         totalPlayTime = 0;
@@ -386,52 +386,30 @@ function setupMediaSession(song) {
 function enableBackgroundPlayback() {
     audioPlayer.setAttribute("preload", "auto");
     let wasPlayingBeforeHide = false;
-    let retryAttempts = 0;
-    const maxRetries = 5;
 
-    const handleVisibilityChange = async () => {
+    const handleVisibilityChange = () => {
         if (document.visibilityState === "hidden") {
             wasPlayingBeforeHide = !audioPlayer.paused;
             if (wasPlayingBeforeHide) {
                 if ("mediaSession" in navigator) {
                     navigator.mediaSession.playbackState = "playing";
                 }
-                try {
-                    await audioPlayer.play();
-                } catch (error) {
-                    console.warn("Playback failed on visibility hidden, retrying...", error);
-                    if (retryAttempts < maxRetries) {
-                        retryAttempts++;
-                        setTimeout(async () => {
-                            if (wasPlayingBeforeHide && !manualPause) {
-                                try {
-                                    await audioPlayer.play();
-                                } catch {
-                                    nextSong();
-                                }
-                            }
-                        }, 1000 * retryAttempts);
-                    } else {
-                        nextSong();
-                    }
-                }
+                audioPlayer.play().catch(() => {
+                    setTimeout(() => {
+                        if (wasPlayingBeforeHide && !manualPause) {
+                            audioPlayer.play().catch(() => nextSong());
+                        }
+                    }, 500);
+                });
             }
         } else if (document.visibilityState === "visible") {
-            retryAttempts = 0;
             if (wasPlayingBeforeHide && audioPlayer.paused && !manualPause) {
-                await requestWakeLock();
-                try {
-                    await audioPlayer.play();
-                } catch (error) {
-                    console.warn("Playback failed on visibility visible, retrying...", error);
-                    setTimeout(async () => {
-                        try {
-                            await audioPlayer.play();
-                        } catch {
-                            nextSong();
-                        }
-                    }, 1000);
-                }
+                requestWakeLock();
+                audioPlayer.play().catch(() => {
+                    setTimeout(() => {
+                        audioPlayer.play().catch(() => nextSong());
+                    }, 500);
+                });
             }
             if ("mediaSession" in navigator) {
                 navigator.mediaSession.playbackState = audioPlayer.paused ? "paused" : "playing";
@@ -450,20 +428,11 @@ function enableBackgroundPlayback() {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    window.addEventListener("blur", async () => {
+    window.addEventListener("blur", () => {
         if (!audioPlayer.paused && !manualPause) {
-            try {
-                await audioPlayer.play();
-            } catch (error) {
-                console.warn("Playback failed on blur, retrying...", error);
-                setTimeout(async () => {
-                    try {
-                        await audioPlayer.play();
-                    } catch {
-                        nextSong();
-                    }
-                }, 1000);
-            }
+            audioPlayer.play().catch(() => {
+                setTimeout(() => audioPlayer.play().catch(() => nextSong()), 500);
+            });
             if ("mediaSession" in navigator) {
                 navigator.mediaSession.playbackState = "playing";
             }
@@ -474,14 +443,12 @@ function enableBackgroundPlayback() {
         preloadNextSong();
     });
 
-    audioPlayer.addEventListener("canplay", async () => {
+    audioPlayer.addEventListener("canplay", () => {
         if (wasPlayingBeforeHide && audioPlayer.paused && !manualPause) {
-            try {
-                await audioPlayer.play();
-                if ("mediaSession" in navigator) {
-                    navigator.mediaSession.playbackState = "playing";
-                }
-            } catch {}
+            audioPlayer.play().catch(() => {});
+            if ("mediaSession" in navigator) {
+                navigator.mediaSession.playbackState = "playing";
+            }
         }
         updatePlayPauseButton();
     });
@@ -489,21 +456,10 @@ function enableBackgroundPlayback() {
     audioPlayer.addEventListener("progress", () => {
         if (audioPlayer.buffered.length > 0) {
             const bufferedEnd = audioPlayer.buffered.end(audioPlayer.buffered.length - 1);
-            const bufferThreshold = 15;
-            if (bufferedEnd - audioPlayer.currentTime < bufferThreshold && !audioPlayer.paused) {
+            if (bufferedEnd - audioPlayer.currentTime < 10 && !audioPlayer.paused) {
                 preloadNextSong();
             }
         }
-    });
-
-    const keepAliveInterval = setInterval(() => {
-        if (!audioPlayer.paused && document.visibilityState === "hidden") {
-            audioPlayer.currentTime = audioPlayer.currentTime;
-        }
-    }, 30000);
-
-    window.addEventListener("beforeunload", () => {
-        clearInterval(keepAliveInterval);
     });
 }
 
@@ -522,17 +478,8 @@ async function requestWakeLock() {
                         setTimeout(requestWakeLock, 1000);
                     }
                 });
-                if (!audioPlayer.paused) {
-                    setTimeout(() => {
-                        if (wakeLock && !audioPlayer.paused) {
-                            wakeLock.release();
-                            requestWakeLock();
-                        }
-                    }, 60000);
-                }
             }
-        } catch (error) {
-            console.warn("WakeLock request failed, retrying...", error);
+        } catch {
             if (retryCount < maxRetries - 1) {
                 retryCount++;
                 setTimeout(attemptWakeLock, 5000);
@@ -540,51 +487,20 @@ async function requestWakeLock() {
         }
     };
 
-    await attemptWakeLock();
+    attemptWakeLock();
 }
 
 function preloadNextSong() {
     if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length - 1) return;
-
     const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
     const url = currentPlaylist[nextIndex].link;
-
     if (preloadedAudio && preloadedAudio.src !== url) {
-        preloadedAudio.pause();
-        preloadedAudio.src = "";
-        preloadedAudio = null;
-    }
-
-    if (!preloadedAudio) {
-        preloadedAudio = new Audio();
-        preloadedAudio.preload = "auto";
         preloadedAudio.src = url;
-        preloadedAudio.load();
-
-        preloadedAudio.addEventListener("error", () => {
-            console.warn("Preload failed for next song, skipping preload...");
-            preloadedAudio = null;
-        });
-
-        preloadedAudio.addEventListener("canplay", () => {
-            console.log("Next song preloaded successfully:", url);
-        });
+    } else if (!preloadedAudio) {
+        preloadedAudio = new Audio(url);
     }
-
-    const cacheNextSong = async () => {
-        try {
-            const cache = await caches.open("vibetunes-audio-cache");
-            const cachedResponse = await cache.match(url);
-            if (!cachedResponse) {
-                await cache.add(url);
-                console.log("Next song cached successfully:", url);
-            }
-        } catch (error) {
-            console.warn("Failed to cache next song:", error);
-        }
-    };
-
-    cacheNextSong();
+    preloadedAudio.preload = "auto";
+    preloadedAudio.load();
 }
 
 function clearAudioCache() {
@@ -592,8 +508,6 @@ function clearAudioCache() {
         caches.keys().then(cacheNames => cacheNames.forEach(name => caches.delete(name)));
     }
     if (preloadedAudio && preloadedAudio.src !== audioPlayer.src) {
-        preloadedAudio.pause();
-        preloadedAudio.src = "";
         preloadedAudio = null;
     }
 }
