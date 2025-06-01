@@ -238,7 +238,7 @@
             <img id="player-thumbnail" src="" alt="Thumbnail">
             <div>
                 <h4 id="player-title">Song Title</h4>
-                <audio id="audio-player" ontimeupdate="updateSeekBar()" onended="handleSongEndWithQueue()"></audio>
+                <audio id="audio-player" ontimeupdate="updateSeekBar()" onended="handleSongEnd()"></audio>
                 <input type="range" id="seek-bar" value="0" max="100" step="1" oninput="seekSong(this.value)">
             </div>
         </div>
