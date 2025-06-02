@@ -297,13 +297,13 @@ const fixedHaryanvi = [
     {
         "title": "Teri Lat Lag Javegi",
         "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Teri%20Lat%20Lag%20Javegi.mp3",
-        "thumbnail": "https://c.saavncdn.com/443/Sonotek-DJ-Remix-Vol-6-songs-2017-20230329182027-500x500.jpg",
+        "thumbnail": "https://c.saavncdn.com/443/Sonotek-DJ-Remix-Vol-6-Hindi-1991-20230329182027-500x500.jpg",
         "genre": "Haryanvi"
     },
     {
         "title": "Teri Aakhya Ka Yo Kajal",
         "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Teri%20Aakhya%20Ka%20Yo%20Kajal.mp3",
-        "thumbnail": "https://a10.gaanacdn.com/gn_img/Albums/lJvKa63DV9/4vKa0Ev6WD.jpg",
+        "thumbnail": "https://img.wynk.in/unsafe/220x220/filters:no_upscale():strip_exif():format(webp)/http://s3.ap-south-1.amazonaws.com/wynk-music-cms/srch_pplchandigarh/2023-01/20/11-42/Teri%20Aakhya%20Ka%20Yo%20Kajal.jpg",
         "genre": "Haryanvi"
     },
     {
@@ -315,7 +315,7 @@ const fixedHaryanvi = [
     {
         "title": "Ghunghat Bain",
         "link": "https://github.com/aryan-2728372882/TRENDINGHARYANVI/raw/main/Ghunghat%20Bain.mp3",
-        "thumbnail": "https://c.saavncdn.com/041/Ghunghat-Bain-Remix-Haryanvi-2020-20201026122405-500x500.jpg",
+        "thumbnail": "https://c.saavncdn.com/041/Ghunghat-Bain-Remix-Haryanvi-2020-20201026142405-500x500.jpg",
         "genre": "Haryanvi"
     }
 ];
