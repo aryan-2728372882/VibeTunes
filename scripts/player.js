@@ -1209,7 +1209,7 @@ function showSongMenu(event, songId) {
     contextMenu.style.left = `${rect.left}px`;
 
     contextMenu.innerHTML = `
-        <button class="menu-option share-btn">Share</button>
+        <button class="menu-option share-btn">Testing</button>
     `;
 
     const shareBtn = contextMenu.querySelector(".share-btn");
