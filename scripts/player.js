@@ -99,12 +99,21 @@ function setupSongTracking(uid) {
             const cachedResponse = await cache.match(currentSrc);
             if (cachedResponse) {
                 audioPlayer.src = URL.createObjectURL(await cachedResponse.blob());
-                audioPlayer.play().catch(() => nextSong());
+                audioPlayer.load();
+                await audioPlayer.play();
             } else {
-                nextSong();
+                audioPlayer.src = currentSrc;
+                audioPlayer.load();
+                await audioPlayer.play();
             }
         } catch {
-            nextSong();
+            try {
+                audioPlayer.src = currentSrc;
+                audioPlayer.load();
+                await audioPlayer.play();
+            } catch {
+                nextSong();
+            }
         }
         updatePlayPauseButton();
     });
@@ -494,13 +503,27 @@ function preloadNextSong() {
     if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length - 1) return;
     const nextIndex = (currentSongIndex + 1) % currentPlaylist.length;
     const url = currentPlaylist[nextIndex].link;
+    
     if (preloadedAudio && preloadedAudio.src !== url) {
-        preloadedAudio.src = url;
-    } else if (!preloadedAudio) {
-        preloadedAudio = new Audio(url);
+        preloadedAudio.src = "";
+        preloadedAudio = null;
     }
-    preloadedAudio.preload = "auto";
-    preloadedAudio.load();
+    
+    if (!preloadedAudio) {
+        preloadedAudio = new Audio();
+    }
+    
+    if (preloadedAudio.src !== url) {
+        preloadedAudio.src = url;
+        preloadedAudio.preload = "auto";
+        preloadedAudio.load();
+        preloadedAudio.onerror = () => {
+            if (preloadedAudio) {
+                preloadedAudio.src = "";
+                preloadedAudio = null;
+            }
+        };
+    }
 }
 
 function clearAudioCache() {
@@ -508,6 +531,7 @@ function clearAudioCache() {
         caches.keys().then(cacheNames => cacheNames.forEach(name => caches.delete(name)));
     }
     if (preloadedAudio && preloadedAudio.src !== audioPlayer.src) {
+        preloadedAudio.src = "";
         preloadedAudio = null;
     }
 }
@@ -696,13 +720,14 @@ async function playSong(title, context, retryCount = 0) {
 
         const cache = await caches.open("vibetunes-audio-cache");
         const cachedResponse = await cache.match(song.link);
-        if (cachedResponse) {
-            audioPlayer.src = URL.createObjectURL(await cachedResponse.blob());
-        } else {
-            audioPlayer.src = song.link;
-        }
+        audioPlayer.src = cachedResponse ? URL.createObjectURL(await cachedResponse.blob()) : song.link;
 
         audioPlayer.load();
+        await new Promise((resolve, reject) => {
+            audioPlayer.oncanplay = resolve;
+            audioPlayer.onerror = () => reject(new Error("Failed to load audio"));
+            setTimeout(() => reject(new Error("Timeout loading audio")), 5000);
+        });
         await audioPlayer.play();
         playerContainer.style.display = "flex";
         updatePlayerUI(song);
@@ -726,12 +751,21 @@ async function playSong(title, context, retryCount = 0) {
     } catch (error) {
         console.error("Error playing song:", error);
         if (retryCount < maxRetries) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            isPlaying = false;
-            return playSong(title, context, retryCount + 1);
+            audioPlayer.src = song.link;
+            audioPlayer.load();
+            try {
+                await new Promise((resolve, reject) => {
+                    audioPlayer.oncanplay = resolve;
+                    audioPlayer.onerror = () => reject(new Error("Failed to load audio"));
+                    setTimeout(() => reject(new Error("Timeout loading audio")), 5000);
+                });
+                await audioPlayer.play();
+            } catch {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return playSong(title, context, retryCount + 1);
+            }
         } else {
-            isPlaying = false;
-            return nextSong();
+            nextSong();
         }
     } finally {
         isPlaying = false;
@@ -766,21 +800,23 @@ async function handleSongEnd() {
     }
 
     if (currentPlaylist.length === 0) {
+        isPlaying = false;
         return;
     }
+
+    let nextPlaylist = null;
+    let nextContext = null;
 
     if (repeatMode === 1) {
         currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
     } else if (currentSongIndex < currentPlaylist.length - 1) {
         currentSongIndex += 1;
     } else {
-        let nextContext = null;
-        let nextPlaylist = null;
         if (currentContext === "bhojpuri" && jsonBhojpuriSongs.length > 0) {
             nextPlaylist = jsonBhojpuriSongs;
-            nextContext = "json";
+            nextContext = "json-bhojpuri";
         } else if (currentContext === "phonk" && jsonPhonkSongs.length > 0) {
-            nextSongs = jsonPhonkSongs;
+            nextPlaylist = jsonPhonkSongs;
             nextContext = "json-phonk";
         } else if (currentContext === "haryanvi" && jsonHaryanviSongs.length > 0) {
             nextPlaylist = jsonHaryanviSongs;
@@ -790,7 +826,7 @@ async function handleSongEnd() {
             nextContext = "bhojpuri";
         } else if (currentContext === "search") {
             const lastSong = currentPlaylist[currentSongIndex];
-            if (jsonBhojpuriSongs.some(s => s.length === lastSong.title)) {
+            if (jsonBhojpuriSongs.some(s => s.title === lastSong.title)) {
                 nextPlaylist = jsonBhojpuriSongs;
                 nextContext = "json-bhojpuri";
                 currentSongIndex = jsonBhojpuriSongs.findIndex(s => s.title === lastSong.title) + 1;
@@ -803,8 +839,8 @@ async function handleSongEnd() {
                 nextContext = "json-haryanvi";
                 currentSongIndex = jsonHaryanviSongs.findIndex(s => s.title === lastSong.title) + 1;
             } else if (jsonRemixSongs.some(s => s.title === lastSong.title)) {
-                nextPlaylist = fixedBhojpuri;
-                nextContext = "bhojpuri";
+                nextPlaylist = jsonRemixSongs;
+                nextContext = "json-remixes";
                 currentSongIndex = jsonRemixSongs.findIndex(s => s.title === lastSong.title) + 1;
             }
             if (nextPlaylist && currentSongIndex >= nextPlaylist.length) currentSongIndex = 0;
@@ -819,22 +855,28 @@ async function handleSongEnd() {
                 nextPlaylist = jsonRemixSongs;
                 nextContext = "json-remixes";
             } else {
+                isPlaying = false;
                 return;
             }
         } else {
+            isPlaying = false;
             return;
         }
-        if (!nextPlaylist) return;
+        if (!nextPlaylist) {
+            isPlaying = false;
+            return;
+        }
         currentPlaylist = nextPlaylist;
         currentContext = nextContext;
         currentSongIndex = 0;
     }
 
     if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length) {
+        isPlaying = false;
         return;
     }
 
-    playSong(currentPlaylist[currentSongIndex].title, currentContext);
+    debouncedPlaySong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
 let chat_id = "6181779900";
@@ -1011,7 +1053,6 @@ audioPlayer.addEventListener("pause", () => {
 
 audioPlayer.addEventListener("error", () => {
     isPlaying = false;
-    nextSong();
     updatePlayPauseButton();
 });
 
@@ -1036,21 +1077,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function nextSong() {
-    if (currentPlaylist.length === 0) {
+    if (currentPlaylist.length === 0 || currentSongIndex >= currentPlaylist.length) {
+        isPlaying = false;
         return;
     }
 
     currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-    playSong(currentPlaylist[currentSongIndex].title, currentContext);
+    debouncedPlaySong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
 function previousSong() {
-    if (currentPlaylist.length === 0) {
+    if (currentPlaylist.length === 0 || currentSongIndex < 0) {
+        isPlaying = false;
         return;
     }
 
     currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
-    playSong(currentPlaylist[currentSongIndex].title, currentContext);
+    debouncedPlaySong(currentPlaylist[currentSongIndex].title, currentContext);
 }
 
 function toggleRepeat() {
@@ -1083,7 +1126,7 @@ function updatePlayerUI(song) {
 function togglePlay() {
     if (audioPlayer.paused) {
         if (!audioPlayer.src && currentPlaylist.length > 0) {
-            playSong(currentPlaylist[0].title, currentContext);
+            debouncedPlaySong(currentPlaylist[0].title, currentContext);
         } else {
             manualPause = false;
             audioPlayer.play()
@@ -1143,25 +1186,21 @@ function changeVolume(value) {
 }
 
 function showSongMenu(event, songId) {
-    // Validate the event and target
     if (!event || !event.target || typeof event.target.getBoundingClientRect !== 'function') {
         console.error('Invalid event or target in showSongMenu:', event);
         return;
     }
 
-    // Remove existing context menus
     document.querySelectorAll(".song-context-menu").forEach(menu => menu.remove());
 
     const contextMenu = document.createElement("div");
     contextMenu.className = "song-context-menu";
 
-    // Get the bounding rectangle of the clicked button
     let rect;
     try {
         rect = event.target.getBoundingClientRect();
     } catch (error) {
         console.error('Error getting bounding client rect:', error);
-        // Fallback position
         rect = { top: 0, left: 0, bottom: 0 };
     }
 
@@ -1181,7 +1220,6 @@ function showSongMenu(event, songId) {
 
     document.body.appendChild(contextMenu);
 
-    // Close menu when clicking outside
     document.addEventListener("click", function closeMenu(e) {
         if (!contextMenu.contains(e.target) && e.target !== event.target) {
             contextMenu.remove();
@@ -1197,10 +1235,8 @@ function generateShareLink(songId) {
         return;
     }
 
-    // Use the song's direct audio file URL
     const shareUrl = song.link;
 
-    // Copy the URL to the clipboard
     navigator.clipboard.writeText(shareUrl).then(() => {
         showPopup("Song link copied to clipboard!");
     }).catch((error) => {
