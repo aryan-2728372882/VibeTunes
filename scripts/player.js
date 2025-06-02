@@ -1062,6 +1062,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     changeVolume(100);
     enableBackgroundPlayback();
 
+    // Handle shared song from URL
+    if (typeof window.handleSharedSong === "function") {
+        window.handleSharedSong();
+    }
+
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("/scripts/service-worker.js").catch(() => {});
     }
@@ -1209,12 +1214,16 @@ function showSongMenu(event, songId) {
     contextMenu.style.left = `${rect.left}px`;
 
     contextMenu.innerHTML = `
-        <button class="menu-option share-btn">Testing</button>
+        <button class="menu-option share-btn">Share</button>
     `;
 
     const shareBtn = contextMenu.querySelector(".share-btn");
     shareBtn.addEventListener("click", () => {
-        generateShareLink(songId);
+        if (typeof window.generateShareLink === "function") {
+            window.generateShareLink(songId);
+        } else {
+            showPopup("Share functionality not available.");
+        }
         contextMenu.remove();
     });
 
@@ -1226,23 +1235,6 @@ function showSongMenu(event, songId) {
             document.removeEventListener("click", closeMenu);
         }
     }, { once: true });
-}
-
-function generateShareLink(songId) {
-    const song = getSongData(songId);
-    if (!song) {
-        showPopup("Error: Song data not found.");
-        return;
-    }
-
-    const shareUrl = song.link;
-
-    navigator.clipboard.writeText(shareUrl).then(() => {
-        showPopup("Song link copied to clipboard!");
-    }).catch((error) => {
-        console.error("Failed to copy song link:", error);
-        showPopup("Failed to copy song link.");
-    });
 }
 
 function getSongData(songId) {
