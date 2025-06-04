@@ -527,9 +527,16 @@ function preloadNextSong() {
     }
 }
 
-function clearAudioCache() {
+async function clearAudioCache() {
     if ("caches" in window) {
-        caches.keys().then(cacheNames => cacheNames.forEach(name => caches.delete(name)));
+        const cache = await caches.open("vibetunes-audio-cache");
+        const keys = await cache.keys();
+        const currentSrc = audioPlayer.src;
+        for (const request of keys) {
+            if (request.url !== currentSrc) {
+                await cache.delete(request);
+            }
+        }
     }
     if (preloadedAudio && preloadedAudio.src !== audioPlayer.src) {
         preloadedAudio.src = "";
@@ -686,25 +693,21 @@ function searchSongs(query) {
 }
 
 // Enhanced Music Player Code with Queue Management
+let isHandlingSongEnd = false;
+let playQueue = [];
+let currentPlayPromise = null;
 
-let isHandlingSongEnd = false; // Add this flag
-let playQueue = []; // Queue to handle multiple play requests
-let currentPlayPromise = null; // Track current play operation
-
-// Keep debouncedPlaySong for manual clicks to prevent rapid clicking
 const debouncedPlaySong = debounce(playSong, 300);
 
 async function playSong(title, context, retryCount = 0) {
     console.log(`Attempting to play: ${title} from ${context} (retry: ${retryCount})`);
     
-    // If already transitioning, add to queue instead of blocking
     if (isTransitioning) {
         console.log("Already transitioning, adding to queue");
         playQueue.push({ title, context, retryCount });
         return;
     }
     
-    // Wait for any existing play promise to complete
     if (currentPlayPromise) {
         try {
             await currentPlayPromise;
@@ -724,7 +727,6 @@ async function playSong(title, context, retryCount = 0) {
         isTransitioning = false;
         currentPlayPromise = null;
         
-        // Process queue if there are pending requests
         if (playQueue.length > 0) {
             const next = playQueue.shift();
             console.log("Processing queued song:", next.title);
@@ -747,14 +749,16 @@ async function playSongInternal(title, context, retryCount = 0) {
     }
 
     if (!song || !isValidSong(song)) {
-        console.log("Invalid song, skipping to next");
-        throw new Error("Invalid song");
+        console.log(`Invalid song: ${title}, skipping to next`);
+        nextSong();
+        return;
     }
 
     currentSongIndex = currentPlaylist.findIndex(s => s.title === title);
     if (currentSongIndex === -1) {
-        console.log("Song not found in playlist, skipping to next");
-        throw new Error("Song not found in playlist");
+        console.log(`Song ${title} not found in playlist, skipping to next`);
+        nextSong();
+        return;
     }
 
     const maxRetries = 3;
@@ -762,31 +766,24 @@ async function playSongInternal(title, context, retryCount = 0) {
     try {
         console.log(`Loading song: ${song.title}`);
         
-        // Stop current audio and reset
         if (audioPlayer) {
             audioPlayer.pause();
             audioPlayer.currentTime = 0;
-            // Remove all existing event listeners to prevent conflicts
             audioPlayer.removeEventListener('ended', handleSongEnd);
         }
         
         if (seekBar) seekBar.value = 0;
         manualPause = false;
 
-        // Load audio source
         const cache = await caches.open("vibetunes-audio-cache");
         const cachedResponse = await cache.match(song.link);
         audioPlayer.src = cachedResponse ? URL.createObjectURL(await cachedResponse.blob()) : song.link;
 
-        // Wait for audio to be ready
         await loadAudioWithTimeout(audioPlayer, 8000);
-        
-        // Play the audio
         await audioPlayer.play();
         
         console.log(`Successfully started playing: ${song.title}`);
         
-        // Update UI and state
         isPlaying = true;
         playerContainer.style.display = "flex";
         updatePlayerUI(song);
@@ -797,12 +794,9 @@ async function playSongInternal(title, context, retryCount = 0) {
         requestWakeLock();
         updateProgress();
 
-        // Add the ended event listener for this specific song
-        // Remove any existing ended listeners first
         audioPlayer.removeEventListener('ended', handleSongEnd);
         audioPlayer.addEventListener('ended', handleSongEnd, { once: true });
 
-        // Track recently played
         const songId = `${context}-${currentSongIndex}`;
         if (typeof addToRecentlyPlayed === "function") {
             addToRecentlyPlayed(songId, song.title, song.thumbnail);
@@ -815,22 +809,20 @@ async function playSongInternal(title, context, retryCount = 0) {
         }
         
     } catch (error) {
-        console.error(`Error playing song (attempt ${retryCount + 1}):`, error);
+        console.error(`Error playing song ${song.title} (attempt ${retryCount + 1}):`, error);
         
         if (retryCount < maxRetries) {
             console.log(`Retrying in 1 second... (${retryCount + 1}/${maxRetries})`);
             await new Promise(resolve => setTimeout(resolve, 1000));
             return playSongInternal(title, context, retryCount + 1);
         } else {
-            console.log("Max retries reached, will skip to next song");
+            console.log(`Max retries reached for ${song.title}, skipping to next song`);
             isPlaying = false;
-            // Don't call nextSong here, let handleSongEnd handle it
-            throw error;
+            nextSong();
         }
     }
 }
 
-// Helper function to load audio with proper timeout and cleanup
 function loadAudioWithTimeout(audio, timeout = 8000) {
     return new Promise((resolve, reject) => {
         let timeoutId;
@@ -853,19 +845,16 @@ function loadAudioWithTimeout(audio, timeout = 8000) {
             reject(new Error(`Audio load failed: ${e.type}`));
         };
         
-        // Set up event listeners
         audio.addEventListener('canplay', onCanPlay);
         audio.addEventListener('canplaythrough', onCanPlay);
         audio.addEventListener('error', onError);
         audio.addEventListener('abort', onError);
         
-        // Set timeout
         timeoutId = setTimeout(() => {
             cleanup();
             reject(new Error("Audio load timeout"));
         }, timeout);
         
-        // Start loading
         audio.load();
     });
 }
@@ -880,17 +869,13 @@ function highlightCurrentSong() {
 async function handleSongEnd() {
     console.log("Song ended naturally, transitioning to next...");
     
-    // Prevent multiple calls to handleSongEnd
     if (isTransitioning || isHandlingSongEnd) {
         console.log("Already handling song end, ignoring duplicate call");
         return;
     }
     
     isHandlingSongEnd = true;
-    
-    // Remove the ended event listener to prevent multiple calls
     audioPlayer.removeEventListener('ended', handleSongEnd);
-    
     isPlaying = false;
     
     if (repeatMode === 2) {
@@ -901,8 +886,6 @@ async function handleSongEnd() {
         isPlaying = true;
         updatePlayPauseButton();
         preloadNextSong();
-        
-        // Re-add event listener for next end
         audioPlayer.addEventListener('ended', handleSongEnd, { once: true });
         
         if ("mediaSession" in navigator) {
@@ -913,15 +896,16 @@ async function handleSongEnd() {
                 artwork: [{ src: currentPlaylist[currentSongIndex].thumbnail, sizes: "512x512", type: "image/jpeg" }]
             });
         }
+        isHandlingSongEnd = false;
         return;
     }
 
     if (currentPlaylist.length === 0) {
-        console.log("No playlist available");
+        console.log("No playlist available, stopping playback");
+        isHandlingSongEnd = false;
         return;
     }
 
-    // Calculate next song
     let nextPlaylist = currentPlaylist;
     let nextContext = currentContext;
     let nextIndex = currentSongIndex;
@@ -935,7 +919,6 @@ async function handleSongEnd() {
     } else {
         console.log("End of playlist reached, checking for next playlist...");
         
-        // Playlist transition logic
         if (currentContext === "bhojpuri" && jsonBhojpuriSongs.length > 0) {
             nextPlaylist = jsonBhojpuriSongs;
             nextContext = "json-bhojpuri";
@@ -979,16 +962,19 @@ async function handleSongEnd() {
                 nextPlaylist = jsonRemixSongs;
                 nextContext = "json-remixes";
             } else {
-                console.log("No more playlists available");
+                console.log("No more playlists available, stopping playback");
+                isHandlingSongEnd = false;
                 return;
             }
         } else {
-            console.log("No transition available");
+            console.log("No transition available, stopping playback");
+            isHandlingSongEnd = false;
             return;
         }
         
         if (!nextPlaylist || nextPlaylist.length === 0) {
-            console.log("Next playlist is empty");
+            console.log("Next playlist is empty, stopping playback");
+            isHandlingSongEnd = false;
             return;
         }
         
@@ -999,48 +985,53 @@ async function handleSongEnd() {
     }
 
     if (nextIndex >= nextPlaylist.length) {
-        console.log("Next index out of bounds");
+        console.log("Next index out of bounds, stopping playback");
+        isHandlingSongEnd = false;
         return;
     }
 
-    // Update global state
     currentPlaylist = nextPlaylist;
     currentContext = nextContext;
     currentSongIndex = nextIndex;
 
     const nextSong = currentPlaylist[currentSongIndex];
-    if (!nextSong) {
-        console.log("Next song not found");
+    if (!nextSong || !isValidSong(nextSong)) {
+        console.log("Next song is invalid, stopping playback");
+        isHandlingSongEnd = false;
         return;
     }
 
     console.log(`Playing next song: ${nextSong.title} from ${currentContext}`);
-    
-    // Small delay to ensure clean transition
     setTimeout(() => {
-        isHandlingSongEnd = false; // Reset the flag
+        isHandlingSongEnd = false;
         playSong(nextSong.title, currentContext);
     }, 100);
 }
 
-// Enhanced error handling for audio player
 if (audioPlayer) {
     audioPlayer.addEventListener('error', (e) => {
-        console.error("Audio player error:", e);
+        console.error("Audio player error:", {
+            error: e,
+            code: e.target.error?.code,
+            message: e.target.error?.message,
+            currentSong: currentPlaylist[currentSongIndex]?.title,
+            src: audioPlayer.src
+        });
         isPlaying = false;
         isTransitioning = false;
-        
-        // Clear any pending queue items that might be for the same song
         playQueue = playQueue.filter(item => item.title !== (currentPlaylist[currentSongIndex]?.title));
-        
-        // Try next song after a brief delay
         setTimeout(() => {
             if (currentPlaylist && currentSongIndex < currentPlaylist.length - 1) {
                 const nextSong = currentPlaylist[currentSongIndex + 1];
                 if (nextSong) {
+                    console.log(`Skipping to next song due to error: ${nextSong.title}`);
                     currentSongIndex++;
                     playSong(nextSong.title, currentContext);
+                } else {
+                    console.log("No valid next song found, stopping playback");
                 }
+            } else {
+                console.log("End of playlist reached, stopping playback");
             }
         }, 1000);
     });
@@ -1237,7 +1228,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     changeVolume(100);
     enableBackgroundPlayback();
 
-    // Handle shared song from URL
     if (typeof window.handleSharedSong === "function") {
         window.handleSharedSong();
     }
